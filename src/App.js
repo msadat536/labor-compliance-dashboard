@@ -1,78 +1,5 @@
-import { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 
-<<<<<<< Updated upstream
-const RC = r => r==="critical"||r==="high" ? "#dc2626" : r==="medium" ? "#d97706" : "#16a34a";
-const RB = r => r==="critical" ? "rgba(220,38,38,.1)" : r==="high" ? "rgba(220,38,38,.07)" : r==="medium" ? "rgba(217,119,6,.1)" : "rgba(22,163,74,.08)";
-const Pill = ({r,t}) => <span style={{background:RB(r),color:RC(r),border:`1px solid ${RC(r)}44`,borderRadius:4,padding:"2px 8px",fontSize:11,fontWeight:700,whiteSpace:"nowrap"}}>{t}</span>;
-const Bdg = ({t,c="#6366f1",bg="rgba(99,102,241,.1)"}) => <span style={{background:bg,color:c,border:`1px solid ${c}33`,borderRadius:4,padding:"2px 7px",fontSize:11,fontWeight:600,whiteSpace:"nowrap"}}>{t}</span>;
-const KPI = ({label,value,sub,color="#6366f1",onClick}) => (
-  <div onClick={onClick} style={{background:"#fff",border:"1px solid #e2e8f0",borderRadius:10,padding:"14px 18px",flex:1,minWidth:130,boxShadow:"0 1px 3px rgba(0,0,0,.06)",cursor:onClick?"pointer":"default"}}
-    onMouseEnter={e=>{if(onClick)e.currentTarget.style.boxShadow="0 4px 14px rgba(0,0,0,.12)"}}
-    onMouseLeave={e=>{e.currentTarget.style.boxShadow="0 1px 3px rgba(0,0,0,.06)"}}>
-    <div style={{color:"#94a3b8",fontSize:10,fontWeight:600,letterSpacing:1,textTransform:"uppercase",marginBottom:5}}>{label}</div>
-    <div style={{color,fontSize:26,fontWeight:800,lineHeight:1}}>{value}</div>
-    {sub && <div style={{color:"#94a3b8",fontSize:10,marginTop:4}}>{sub}</div>}
-    {onClick && <div style={{color,fontSize:10,marginTop:5,fontWeight:600}}>Click to explore →</div>}
-  </div>
-);
-const Card = ({children,style={}}) => <div style={{background:"#fff",border:"1px solid #e2e8f0",borderRadius:12,padding:18,marginBottom:16,boxShadow:"0 1px 3px rgba(0,0,0,.05)",...style}}>{children}</div>;
-const TH = ({children,style={}}) => <th style={{background:"#f8fafc",color:"#64748b",fontWeight:600,padding:"9px 11px",textAlign:"left",borderBottom:"1px solid #e2e8f0",fontSize:10,textTransform:"uppercase",whiteSpace:"nowrap",...style}}>{children}</th>;
-const TD = ({children,style={}}) => <td style={{padding:"9px 11px",borderBottom:"1px solid #f1f5f9",verticalAlign:"top",lineHeight:1.4,fontSize:12,...style}}>{children}</td>;
-const Tip = ({children}) => <div style={{color:"#6366f1",fontSize:11,marginBottom:14,background:"rgba(99,102,241,.06)",padding:"8px 14px",borderRadius:8,border:"1px solid rgba(99,102,241,.2)"}}>{children}</div>;
-const SrcLink = ({url,label="Gov't Source"}) => url ? <a href={url} target="_blank" rel="noopener noreferrer" onClick={e=>e.stopPropagation()} style={{fontSize:11,color:"#6366f1",textDecoration:"none",display:"inline-flex",alignItems:"center",gap:4,fontWeight:600}}>🔗 {label}</a> : null;
-
-const STATES = [
-  {s:"Alabama",a:"AL",mw:7.25,chg:false,note:"No state law — federal $7.25",tip:2.13,tc:5.12,sl:false,slN:"None",sch:false,schN:"None",r:"low",ot:"Weekly 40",otD:false,otNote:"Follows FLSA",local:"None",laws:["Federal minimum wage applies ($7.25)","No state sick leave","Tipped: $2.13 federal rate"],minor:"Follows FLSA.",brk:{rest:"None required (FLSA only)",meal:"None required (FLSA only)",premium:"None",mealNote:"Short breaks <20 min must be paid per FLSA"},src:"https://labor.alabama.gov/"},
-  {s:"Alaska",a:"AK",mw:13.00,chg:true,cd:"Jul 1, 2026",nr:14.00,note:"→$14.00 Jul 1, 2026. No tip credit.",tip:"Full MW",tc:"None",sl:true,slN:"All employers Jul 2025. 1hr/30hrs. 56hrs/yr (15+).",sch:false,schN:"None",r:"medium",ot:"Daily 8 + Weekly 40",otD:true,otNote:"OT after 8hrs/day OR 40hrs/week",local:"None",laws:["Min wage → $14.00 Jul 1, 2026","No tip credit — full MW","Daily OT after 8hrs","Paid sick leave all employers Jul 2025"],minor:"Work permit required.",brk:{rest:"None required for adults",meal:"None required for adults",premium:"None",mealNote:"Minors must receive breaks per DOL standards"},src:"https://labor.alaska.gov/lss/whhome.htm"},
-  {s:"Arizona",a:"AZ",mw:15.15,chg:false,note:"CPI-indexed. Flagstaff $17.85.",tip:12.15,tc:3.00,sl:true,slN:"1hr/30hrs up to 40hrs/yr.",sch:false,schN:"None",r:"medium",ot:"Weekly 40",otD:false,otNote:"Follows FLSA",local:"Flagstaff: $17.85",laws:["PSL: 1hr/30hrs","Tipped: $12.15 (credit $3.00)","Flagstaff local: $17.85"],minor:"Work permit required under 16.",brk:{rest:"None required (FLSA only)",meal:"None required (FLSA only)",premium:"None",mealNote:"Short breaks <20 min must be paid per FLSA"},src:"https://www.azica.gov/divisions/labor-department/minimum-wage"},
-  {s:"Arkansas",a:"AR",mw:11.00,chg:false,note:"State minimum $11.00.",tip:2.63,tc:8.37,sl:false,slN:"None",sch:false,schN:"None",r:"low",ot:"Weekly 40",otD:false,otNote:"Follows FLSA",local:"None",laws:["Tipped: $2.63 (credit $8.37)","No state sick leave"],minor:"Follows FLSA.",brk:{rest:"None required (FLSA only)",meal:"None required (FLSA only)",premium:"None",mealNote:"Short breaks <20 min must be paid per FLSA"},src:"https://www.labor.arkansas.gov/"},
-  {s:"California",a:"CA",mw:16.90,chg:false,note:"Fast food 60+ locs: $20. Many locals higher.",tip:"Full MW",tc:"None",sl:true,slN:"AB 406 Jan 2026: 40–80hrs/yr.",sch:true,schN:"SF, LA, Berkeley, Emeryville, San Jose Fair Workweek.",r:"high",ot:"Daily 8(1.5x)/12(2x) + Weekly 40 + 7th day",otD:true,otNote:"1.5x after 8hrs/day; 2x after 12hrs/day; 7th consecutive day 1.5x/2x",local:"LA $17.28 | SF $18.67 | W.Hollywood $19.08",laws:["No tip credit — full $16.90 required","Fast food: $20 (chains 60+ locations)","Daily OT: 1.5x >8hrs, 2x >12hrs","7th consecutive day rules","Fair Workweek laws in SF, LA, Berkeley, Emeryville","SDI/PFL contribution 1.3%"],minor:"DLSE permit required. 14–15: 3hr/day school days.",brk:{rest:"10-min PAID rest per 4hrs worked",meal:"30-min UNPAID meal per 5hrs; 2nd meal >10hrs",premium:"1 hour at regular pay per missed rest OR meal",mealNote:"Non-compliant meal periods must be paid as regular time worked"},src:"https://www.dir.ca.gov/dlse/faq_minimumwage.htm"},
-  {s:"Colorado",a:"CO",mw:14.81,chg:true,cd:"Jan 1, 2027",nr:15.00,note:"Denver $18.29. COMPS Order applies.",tip:11.79,tc:3.02,sl:true,slN:"HFWA: 1hr/30hrs up to 48hrs/yr.",sch:false,schN:"None",r:"medium",ot:"Daily 12 + Weekly 40",otD:true,otNote:"OT after 12hrs/day OR 40hrs/week per COMPS Order",local:"Denver: $18.29",laws:["COMPS Order covers restaurant workers","Denver local: $18.29","Daily OT after 12hrs","HFWA sick leave 1hr/30hrs"],minor:"Work permit required under 16.",brk:{rest:"10-min PAID rest per 4hrs worked",meal:"30-min UNPAID meal per 5hrs",premium:"None specific; COMPS Order penalties apply",mealNote:"COMPS Order §5 governs. Employee must be completely relieved."},src:"https://cdle.colorado.gov/wages"},
-  {s:"Connecticut",a:"CT",mw:16.35,chg:true,cd:"Jan 1, 2027",nr:17.00,note:"→$17.00 Jan 1, 2027.",tip:8.23,tc:8.12,sl:true,slN:"1hr/40hrs up to 40hrs/yr.",sch:false,schN:"None",r:"medium",ot:"Weekly 40",otD:false,otNote:"Follows FLSA",local:"None",laws:["Min wage → $17.00 Jan 2027","Tipped: $8.23 (credit $8.12)","PSL: 1hr/40hrs"],minor:"Work permit required.",brk:{rest:"None required by state law",meal:"30-min unpaid meal for shifts >7.5hrs",premium:"None specific",mealNote:"CT Gen. Stat. §31-51ii applies"},src:"https://www.ctdol.state.ct.us/wgwkstnd/wage-hour.htm"},
-  {s:"Delaware",a:"DE",mw:15.00,chg:false,note:"$15.00 effective Jan 2025.",tip:2.23,tc:12.77,sl:true,slN:"1hr/30hrs up to 40hrs/yr.",sch:false,schN:"None",r:"medium",ot:"Weekly 40",otD:false,otNote:"Follows FLSA",local:"None",laws:["$15.00 since Jan 2025","Tipped: $2.23 (credit $12.77)","PSL: 1hr/30hrs"],minor:"Work permit required under 18.",brk:{rest:"None required by state law",meal:"30-min unpaid meal for shifts >7.5hrs",premium:"None",mealNote:"Applies to employers with 10+ employees"},src:"https://labor.delaware.gov/divisions/industrial-affairs/wage-hour/"},
-  {s:"Florida",a:"FL",mw:14.00,chg:true,cd:"Sep 30, 2026",nr:15.00,note:"→$15.00 Sep 30, 2026. Tipped → $11.98.",tip:10.98,tc:3.02,sl:false,slN:"None",sch:false,schN:"None",r:"medium",ot:"Weekly 40",otD:false,otNote:"Follows FLSA",local:"None",laws:["Min wage → $15.00 Sep 30, 2026","Tipped → $11.98 Sep 30, 2026","No state sick leave"],minor:"Work permit required under 18.",brk:{rest:"None required (FLSA only)",meal:"None required (FLSA only)",premium:"None",mealNote:"Short breaks <20 min must be paid per FLSA"},src:"https://floridajobs.org/workforce-board-resources/policy-and-technical-assistance/labor-laws"},
-  {s:"Georgia",a:"GA",mw:7.25,chg:false,note:"Federal $7.25 applies.",tip:2.13,tc:5.12,sl:false,slN:"None",sch:false,schN:"None",r:"low",ot:"Weekly 40",otD:false,otNote:"Follows FLSA",local:"None",laws:["Federal minimum applies","No state sick leave","Tipped: $2.13"],minor:"Follows FLSA.",brk:{rest:"None required (FLSA only)",meal:"None required (FLSA only)",premium:"None",mealNote:"Short breaks <20 min must be paid per FLSA"},src:"https://dol.georgia.gov/labor-law-faqs"},
-  {s:"Hawaii",a:"HI",mw:14.00,chg:true,cd:"Jan 1, 2026",nr:16.00,note:"→$16.00 Jan 1, 2026.",tip:12.75,tc:1.25,sl:true,slN:"Employers 100+: up to 40hrs/yr.",sch:false,schN:"None",r:"medium",ot:"Weekly 40",otD:false,otNote:"Follows FLSA",local:"None",laws:["Min wage → $16.00 Jan 2026","Tipped: $12.75 (credit $1.25)","PSL large employers 100+"],minor:"Work permit required under 16.",brk:{rest:"None required (FLSA only)",meal:"None required (FLSA only)",premium:"None",mealNote:"Short breaks <20 min must be paid per FLSA"},src:"https://labor.hawaii.gov/wage-standards-division/"},
-  {s:"Idaho",a:"ID",mw:7.25,chg:false,note:"Federal rate.",tip:3.35,tc:3.90,sl:false,slN:"None",sch:false,schN:"None",r:"low",ot:"Weekly 40",otD:false,otNote:"Follows FLSA",local:"None",laws:["Federal minimum applies","No state sick leave"],minor:"Follows FLSA.",brk:{rest:"None required (FLSA only)",meal:"None required (FLSA only)",premium:"None",mealNote:"Short breaks <20 min must be paid per FLSA"},src:"https://labor.idaho.gov/"},
-  {s:"Illinois",a:"IL",mw:15.00,chg:false,note:"Chicago $16.20. Cook County $15.00.",tip:9.00,tc:6.00,sl:true,slN:"1hr/40hrs up to 40hrs/yr.",sch:true,schN:"Chicago Fair Workweek: 14-day notice.",r:"high",ot:"Weekly 40",otD:false,otNote:"Follows FLSA. Chicago adds predictability pay.",local:"Chicago $16.20 | Cook County $15.00",laws:["Chicago local: $16.20","Chicago Fair Workweek: 14-day notice","Tipped: $9.00 (credit $6.00)","PSL: 1hr/40hrs"],minor:"Work permit required.",brk:{rest:"None required by state law",meal:"20-min unpaid meal break for shifts >7.5hrs",premium:"None",mealNote:"820 ILCS 140/3. Employee must be completely free from duties."},src:"https://labor.illinois.gov/"},
-  {s:"Indiana",a:"IN",mw:7.25,chg:false,note:"Federal rate.",tip:2.13,tc:5.12,sl:false,slN:"None",sch:false,schN:"None",r:"low",ot:"Weekly 40",otD:false,otNote:"Follows FLSA",local:"None",laws:["Federal minimum applies","No state sick leave","Youth subminimum $4.25 first 90 days"],minor:"Follows FLSA.",brk:{rest:"None required (FLSA only)",meal:"None required (FLSA only)",premium:"None",mealNote:"Short breaks <20 min must be paid per FLSA"},src:"https://www.in.gov/dol/"},
-  {s:"Iowa",a:"IA",mw:7.25,chg:false,note:"Federal rate.",tip:4.35,tc:2.90,sl:false,slN:"None",sch:false,schN:"None",r:"low",ot:"Weekly 40",otD:false,otNote:"Follows FLSA",local:"None",laws:["Federal minimum applies","No state sick leave"],minor:"Follows FLSA.",brk:{rest:"None required (FLSA only)",meal:"None required for adults. Minors: 30-min after 5hrs.",premium:"None",mealNote:"Minor break rules: Iowa Code §92.7"},src:"https://www.iwd.iowa.gov/"},
-  {s:"Kansas",a:"KS",mw:7.25,chg:false,note:"Federal rate.",tip:2.13,tc:5.12,sl:false,slN:"None",sch:false,schN:"None",r:"low",ot:"Weekly 40",otD:false,otNote:"Follows FLSA",local:"None",laws:["Federal minimum applies","No state sick leave"],minor:"Follows FLSA.",brk:{rest:"None required (FLSA only)",meal:"None required (FLSA only)",premium:"None",mealNote:"Short breaks <20 min must be paid per FLSA"},src:"https://www.dol.ks.gov/"},
-  {s:"Kentucky",a:"KY",mw:7.25,chg:false,note:"Federal rate.",tip:2.13,tc:5.12,sl:false,slN:"None",sch:false,schN:"None",r:"low",ot:"Weekly 40",otD:false,otNote:"Follows FLSA",local:"None",laws:["Federal minimum applies","No state sick leave"],minor:"Follows FLSA.",brk:{rest:"10-min PAID rest per 4hrs worked",meal:"Reasonable unpaid meal break",premium:"None specific",mealNote:"KRS §337.355. One of few low-minimum states with rest break requirements."},src:"https://labor.ky.gov/"},
-  {s:"Louisiana",a:"LA",mw:7.25,chg:false,note:"No state law. Federal $7.25.",tip:2.13,tc:5.12,sl:false,slN:"None",sch:false,schN:"None",r:"low",ot:"Weekly 40",otD:false,otNote:"Follows FLSA",local:"None",laws:["Federal minimum applies","No state sick leave"],minor:"Follows FLSA.",brk:{rest:"None required (FLSA only)",meal:"None required (FLSA only)",premium:"None",mealNote:"Short breaks <20 min must be paid per FLSA"},src:"https://www.laworks.net/"},
-  {s:"Maine",a:"ME",mw:14.65,chg:true,cd:"Jan 1, 2027",nr:15.00,note:"Portland $15.00. CPI-indexed.",tip:7.33,tc:7.32,sl:true,slN:"1hr/40hrs up to 40hrs/yr.",sch:false,schN:"None",r:"medium",ot:"Weekly 40",otD:false,otNote:"Follows FLSA",local:"Portland: $15.00",laws:["CPI indexing","Portland local $15.00","Tipped: $7.33","PSL: 1hr/40hrs"],minor:"Work permit required.",brk:{rest:"None required by state law",meal:"30-min unpaid break per 6 consecutive hours",premium:"None",mealNote:"26 MRS §603. Employee must be relieved of all duties."},src:"https://www.maine.gov/labor/labor_laws/"},
-  {s:"Maryland",a:"MD",mw:15.00,chg:false,note:"Montgomery County $17.15. Prince George's $16.50.",tip:3.63,tc:11.37,sl:true,slN:"1hr/30hrs up to 40–64hrs/yr.",sch:false,schN:"None",r:"medium",ot:"Weekly 40",otD:false,otNote:"Follows FLSA",local:"Montgomery Co $17.15 | PG Co $16.50",laws:["Tipped: $3.63 (credit $11.37)","PSL: 1hr/30hrs","Local rates: Montgomery & PG County"],minor:"Work permit required under 18.",brk:{rest:"None required (FLSA only)",meal:"None required for adults (FLSA only)",premium:"None",mealNote:"Minors under 16: 30-min unpaid break after 5hrs"},src:"https://www.dllr.state.md.us/labor/wages/"},
-  {s:"Massachusetts",a:"MA",mw:15.00,chg:false,note:"$15.00. No further increase scheduled.",tip:6.75,tc:8.25,sl:true,slN:"1hr/30hrs up to 40hrs/yr.",sch:false,schN:"None",r:"medium",ot:"Weekly 40",otD:false,otNote:"Follows FLSA",local:"None",laws:["Tipped: $6.75","PSL: 1hr/30hrs","Sunday premium phased out 2023"],minor:"Work permit required under 18.",brk:{rest:"None required by state law",meal:"30-min unpaid break per 6hrs worked",premium:"None specific; violation subject to civil fine",mealNote:"M.G.L. c.149 §100. One of the more strictly enforced meal break states."},src:"https://www.mass.gov/minimum-wage-program"},
-  {s:"Michigan",a:"MI",mw:10.56,chg:true,cd:"Feb 2026",nr:13.29,note:"→$13.29 Feb 2026. Tip credit phasing out by 2031.",tip:4.74,tc:5.82,sl:true,slN:"1hr/35hrs up to 72hrs/yr.",sch:false,schN:"None",r:"medium",ot:"Weekly 40",otD:false,otNote:"Follows FLSA",local:"None",laws:["Min wage → $12.48 Feb 2025, $13.29 Feb 2026","Tip credit eliminated by 2031","ESTA: 1hr/35hrs up to 72hrs/yr"],minor:"Work permit required under 18.",brk:{rest:"None required (FLSA only)",meal:"None required (FLSA only)",premium:"None",mealNote:"Short breaks <20 min must be paid per FLSA"},src:"https://www.michigan.gov/leo/bureaus-agencies/ors/wage-and-hour"},
-  {s:"Minnesota",a:"MN",mw:10.85,chg:true,cd:"Jan 1, 2026",nr:11.13,note:"Minneapolis $15.57. St. Paul $15.19.",tip:"Full MW",tc:"None",sl:true,slN:"1hr/30hrs up to 48hrs/yr.",sch:true,schN:"Minneapolis Fair Workweek: 14-day notice.",r:"high",ot:"Weekly 48",otD:false,otNote:"State OT after 48hrs/week (not 40).",local:"Minneapolis $15.57 | St. Paul $15.19",laws:["No tip credit — full MW required","Minneapolis local: $15.57","St. Paul local: $15.19","Minneapolis Fair Workweek: 14-day notice","PSL: 1hr/30hrs","State OT after 48hrs"],minor:"Work permit required under 16.",brk:{rest:"Sufficient time to use restroom per 4hrs (PAID if on-premises)",meal:"Sufficient time to eat — if <20 min, must be PAID",premium:"None specific",mealNote:"Minn. Stat. §177.253–177.254. On-premises breaks must be paid."},src:"https://www.dli.mn.gov/business/employment-practices/minimum-wage-minnesota"},
-  {s:"Mississippi",a:"MS",mw:7.25,chg:false,note:"No state law. Federal $7.25.",tip:2.13,tc:5.12,sl:false,slN:"None",sch:false,schN:"None",r:"low",ot:"Weekly 40",otD:false,otNote:"Follows FLSA",local:"None",laws:["Federal minimum applies","No state sick leave"],minor:"Follows FLSA.",brk:{rest:"None required (FLSA only)",meal:"None required (FLSA only)",premium:"None",mealNote:"Short breaks <20 min must be paid per FLSA"},src:"https://mdes.ms.gov/"},
-  {s:"Missouri",a:"MO",mw:13.75,chg:true,cd:"Jan 1, 2026",nr:15.00,note:"→$15.00 Jan 1, 2026 per Prop A.",tip:6.88,tc:6.87,sl:true,slN:"Prop A: 1hr/30hrs eff Jan 2026.",sch:false,schN:"None",r:"medium",ot:"Weekly 40",otD:false,otNote:"Follows FLSA",local:"None",laws:["Min wage → $15.00 Jan 2026","Prop A paid sick leave effective Jan 2026"],minor:"Follows FLSA.",brk:{rest:"None required (FLSA only)",meal:"None required (FLSA only)",premium:"None",mealNote:"Short breaks <20 min must be paid per FLSA"},src:"https://labor.mo.gov/DLS/MinimumWage"},
-  {s:"Montana",a:"MT",mw:10.30,chg:false,note:"Businesses >$110K gross. Others $4/hr.",tip:"Full MW",tc:"None",sl:false,slN:"None",sch:false,schN:"None",r:"low",ot:"Weekly 40",otD:false,otNote:"Follows FLSA",local:"None",laws:["No tip credit allowed","Small business exception $4/hr","No state sick leave"],minor:"Follows FLSA.",brk:{rest:"None required (FLSA only)",meal:"None required (FLSA only)",premium:"None",mealNote:"Short breaks <20 min must be paid per FLSA"},src:"https://dli.mt.gov/labor-standards/wage-and-hour"},
-  {s:"Nebraska",a:"NE",mw:13.50,chg:true,cd:"Jan 1, 2026",nr:15.00,note:"→$15.00 Jan 1, 2026.",tip:2.13,tc:11.37,sl:true,slN:"Prop 436: 1hr/30hrs eff Jan 2025.",sch:false,schN:"None",r:"medium",ot:"Weekly 40",otD:false,otNote:"Follows FLSA",local:"None",laws:["Min wage → $15.00 Jan 2026","Paid sick leave via Prop 436","Tipped: $2.13"],minor:"Follows FLSA.",brk:{rest:"None required (FLSA only)",meal:"None required (FLSA only)",premium:"None",mealNote:"Short breaks <20 min must be paid per FLSA"},src:"https://labor.nebraska.gov/"},
-  {s:"Nevada",a:"NV",mw:12.00,chg:false,note:"No tip credit. Daily OT after 8hrs if <$18/hr.",tip:"Full MW",tc:"None",sl:true,slN:"1hr/52hrs up to 40hrs/yr.",sch:false,schN:"None",r:"medium",ot:"Daily 8 + Weekly 40",otD:true,otNote:"OT after 8hrs/day if earning <$18/hr; also after 40hrs/week",local:"None",laws:["No tip credit allowed","Daily OT after 8hrs if paid under $18/hr","PSL: 1hr/52hrs"],minor:"Work permit required under 17.",brk:{rest:"10-min PAID rest per 4hrs worked",meal:"30-min unpaid meal per shift >8hrs",premium:"None specific; violation subject to labor board complaint",mealNote:"NRS §608.019. Both paid rest AND meal requirements."},src:"https://labor.nv.gov/"},
-  {s:"New Hampshire",a:"NH",mw:7.25,chg:false,note:"Federal rate.",tip:3.26,tc:3.99,sl:false,slN:"None",sch:false,schN:"None",r:"low",ot:"Weekly 40",otD:false,otNote:"Follows FLSA",local:"None",laws:["Federal minimum applies","No state sick leave"],minor:"Follows FLSA.",brk:{rest:"None required by state law",meal:"30-min unpaid meal per 5hrs worked",premium:"None",mealNote:"NH RSA 275:30-a."},src:"https://www.nh.gov/labor/"},
-  {s:"New Jersey",a:"NJ",mw:15.49,chg:true,cd:"Jan 1, 2027",nr:16.00,note:"CPI-indexed. Small/seasonal: $13.73.",tip:5.26,tc:10.23,sl:true,slN:"1hr/30hrs up to 40hrs/yr.",sch:false,schN:"None",r:"medium",ot:"Weekly 40",otD:false,otNote:"Follows FLSA",local:"None",laws:["CPI annual adjustment","Tipped: $5.26","PSL: 1hr/30hrs"],minor:"Work permit required under 18.",brk:{rest:"None required (FLSA only)",meal:"None required for adults",premium:"None",mealNote:"Minors under 18: 30-min break after 5hrs continuous work"},src:"https://www.nj.gov/labor/wageandhour/"},
-  {s:"New Mexico",a:"NM",mw:12.00,chg:false,note:"Las Cruces $13.50. Albuquerque $12.00.",tip:3.00,tc:9.00,sl:true,slN:"1hr/30hrs up to 64hrs/yr.",sch:false,schN:"None",r:"medium",ot:"Weekly 40",otD:false,otNote:"Follows FLSA",local:"Albuquerque $12.00 | Las Cruces $13.50",laws:["PSL: 1hr/30hrs","Tipped: $3.00 (credit $9.00)","Local rates apply"],minor:"Follows FLSA.",brk:{rest:"None required (FLSA only)",meal:"None required (FLSA only)",premium:"None",mealNote:"Short breaks <20 min must be paid per FLSA"},src:"https://www.dws.state.nm.us/"},
-  {s:"New York",a:"NY",mw:16.50,chg:false,note:"NYC/LI/Westchester $17. Fast food $17 statewide.",tip:11.35,tc:5.65,sl:true,slN:"1hr/30hrs up to 56hrs/yr.",sch:true,schN:"NYC Fair Workweek: 14-day notice.",r:"high",ot:"Weekly 40",otD:false,otNote:"FLSA weekly. NYC: spread-of-hours premium if shift >10hrs.",local:"NYC/LI/Westchester $17.00",laws:["NYC/LI/Westchester: $17.00","NYC Fair Workweek: 14-day notice","Fast food statewide: $17.00","Spread-of-hours premium","PSL: 1hr/30hrs"],minor:"Working papers required under 18.",brk:{rest:"None required by state law",meal:"30-min per 6hrs (general); 45-min for restaurant workers if shift includes 11am–2pm; 60-min for factory workers",premium:"None; violation subject to NYDOL enforcement",mealNote:"NY Labor Law §162. Restaurant-specific 45-min rule commonly violated."},src:"https://dol.ny.gov/minimum-wage"},
-  {s:"North Carolina",a:"NC",mw:7.25,chg:false,note:"Federal rate.",tip:2.13,tc:5.12,sl:false,slN:"None",sch:false,schN:"None",r:"low",ot:"Weekly 40",otD:false,otNote:"Follows FLSA",local:"None",laws:["Federal minimum applies","No state sick leave"],minor:"Follows FLSA.",brk:{rest:"None required (FLSA only)",meal:"30-min unpaid break per shift — required by DOL for employers 5+",premium:"None",mealNote:"NC Admin Code 13 NCAC 12.0104."},src:"https://www.labor.nc.gov/"},
-  {s:"North Dakota",a:"ND",mw:7.25,chg:false,note:"Federal rate.",tip:4.86,tc:2.39,sl:false,slN:"None",sch:false,schN:"None",r:"low",ot:"Weekly 40",otD:false,otNote:"Follows FLSA",local:"None",laws:["Federal minimum applies","No state sick leave"],minor:"Follows FLSA.",brk:{rest:"None required (FLSA only)",meal:"30-min unpaid meal per 5hrs",premium:"None",mealNote:"ND Century Code §34-06-03."},src:"https://www.nd.gov/labor/"},
-  {s:"Ohio",a:"OH",mw:10.70,chg:false,note:"CPI-indexed. Employers <$385K gross: $7.25.",tip:5.35,tc:5.35,sl:false,slN:"Cleveland PSL only",sch:false,schN:"None",r:"low",ot:"Weekly 40",otD:false,otNote:"Follows FLSA",local:"Cleveland PSL",laws:["CPI indexing","Tipped: $5.35 (50% of MW)","Cleveland sick leave ordinance"],minor:"Work permit required under 18.",brk:{rest:"None required (FLSA only)",meal:"None required (FLSA only)",premium:"None",mealNote:"Short breaks <20 min must be paid per FLSA"},src:"https://com.ohio.gov/divisions/industrial-compliance/wage-and-hour"},
-  {s:"Oklahoma",a:"OK",mw:7.25,chg:false,note:"Federal rate.",tip:2.13,tc:5.12,sl:false,slN:"None",sch:false,schN:"None",r:"low",ot:"Weekly 40",otD:false,otNote:"Follows FLSA",local:"None",laws:["Federal minimum applies","No state sick leave"],minor:"Follows FLSA.",brk:{rest:"None required (FLSA only)",meal:"None required (FLSA only)",premium:"None",mealNote:"Short breaks <20 min must be paid per FLSA"},src:"https://www.ok.gov/odol/"},
-  {s:"Oregon",a:"OR",mw:14.70,chg:true,cd:"Jul 1, 2026",nr:15.50,note:"Portland metro $15.95 → $16.80 Jul 2026.",tip:"Full MW",tc:"None",sl:true,slN:"PSST: 1hr/30hrs up to 40hrs/yr.",sch:true,schN:"Statewide Fair Scheduling: food service 500+ employees.",r:"high",ot:"Weekly 40",otD:false,otNote:"FLSA weekly. Clopening premium <10hrs between shifts.",local:"Portland metro $15.95 (→$16.80 Jul 2026)",laws:["No tip credit allowed","Portland metro → $16.80 Jul 2026","Statewide Fair Work Week: 14-day notice 500+","Clopening premium 1.5x if <10hr gap","PSST sick leave: 1hr/30hrs"],minor:"Work permit required under 18.",brk:{rest:"10-min PAID rest per 4hrs worked",meal:"30-min unpaid meal after 6hrs; 2nd meal per 14hrs",premium:"None specific; BOLI enforcement",mealNote:"ORS §653.261. Oregon enforces both rest and meal break requirements strictly."},src:"https://www.oregon.gov/boli/workers/Pages/minimum-wage.aspx"},
-  {s:"Pennsylvania",a:"PA",mw:7.25,chg:false,note:"Increases stalled. Federal rate remains.",tip:2.83,tc:4.42,sl:false,slN:"Philadelphia PSL",sch:false,schN:"None",r:"low",ot:"Weekly 40",otD:false,otNote:"Follows FLSA",local:"Philadelphia PSL",laws:["Federal minimum; state increases stalled","Philadelphia PSL ordinance","Tipped: $2.83"],minor:"Work permit required.",brk:{rest:"None required for adults",meal:"None required for adults",premium:"None",mealNote:"Minors under 18: 30-min break after 5hrs. PA Child Labor Act."},src:"https://www.dli.pa.gov/Individuals/Labor-Management-Relations/llc/Pages/Minimum-Wage.aspx"},
-  {s:"Rhode Island",a:"RI",mw:14.00,chg:true,cd:"Jan 1, 2026",nr:15.00,note:"→$15.00 Jan 1, 2026.",tip:3.89,tc:10.11,sl:true,slN:"1hr/35hrs up to 40hrs/yr.",sch:false,schN:"None",r:"medium",ot:"Weekly 40",otD:false,otNote:"Follows FLSA",local:"None",laws:["Min wage → $15.00 Jan 2026","Tipped: $3.89","PSL: 1hr/35hrs"],minor:"Work permit required.",brk:{rest:"None required by state law",meal:"20-min unpaid break per 6hrs worked",premium:"None",mealNote:"RI Gen. Laws §28-3-14."},src:"https://dlt.ri.gov/employers/wage-and-hour/minimum-wage"},
-  {s:"South Carolina",a:"SC",mw:7.25,chg:false,note:"No state law. Federal $7.25.",tip:2.13,tc:5.12,sl:false,slN:"None",sch:false,schN:"None",r:"low",ot:"Weekly 40",otD:false,otNote:"Follows FLSA",local:"None",laws:["Federal minimum applies","No state sick leave"],minor:"Follows FLSA.",brk:{rest:"None required (FLSA only)",meal:"None required (FLSA only)",premium:"None",mealNote:"Short breaks <20 min must be paid per FLSA"},src:"https://llr.sc.gov/"},
-  {s:"South Dakota",a:"SD",mw:11.20,chg:false,note:"CPI-indexed annually.",tip:5.60,tc:5.60,sl:false,slN:"None",sch:false,schN:"None",r:"low",ot:"Weekly 40",otD:false,otNote:"Follows FLSA",local:"None",laws:["CPI indexing","Tipped: $5.60 (50% of MW)","No state sick leave"],minor:"Follows FLSA.",brk:{rest:"None required (FLSA only)",meal:"None required (FLSA only)",premium:"None",mealNote:"Short breaks <20 min must be paid per FLSA"},src:"https://dlr.sd.gov/"},
-  {s:"Tennessee",a:"TN",mw:7.25,chg:false,note:"No state law. Federal $7.25.",tip:2.13,tc:5.12,sl:false,slN:"None",sch:false,schN:"None",r:"low",ot:"Weekly 40",otD:false,otNote:"Follows FLSA",local:"None",laws:["Federal minimum applies","No state sick leave"],minor:"Follows FLSA.",brk:{rest:"None required by state law",meal:"30-min unpaid meal per 6hrs for employers 5+",premium:"None",mealNote:"TCA §50-2-103."},src:"https://www.tn.gov/workforce/"},
-  {s:"Texas",a:"TX",mw:7.25,chg:false,note:"Federal rate. State preempts local.",tip:2.13,tc:5.12,sl:false,slN:"None",sch:false,schN:"None",r:"low",ot:"Weekly 40",otD:false,otNote:"Follows FLSA",local:"None",laws:["Federal minimum; state preempts local","No state sick leave"],minor:"Follows FLSA.",brk:{rest:"None required (FLSA only)",meal:"None required (FLSA only)",premium:"None",mealNote:"Short breaks <20 min must be paid per FLSA"},src:"https://www.twc.texas.gov/"},
-  {s:"Utah",a:"UT",mw:7.25,chg:false,note:"Federal rate.",tip:2.13,tc:5.12,sl:false,slN:"None",sch:false,schN:"None",r:"low",ot:"Weekly 40",otD:false,otNote:"Follows FLSA",local:"None",laws:["Federal minimum applies","No state sick leave"],minor:"Follows FLSA.",brk:{rest:"None required (FLSA only)",meal:"None required (FLSA only)",premium:"None",mealNote:"Short breaks <20 min must be paid per FLSA"},src:"https://laborcommission.utah.gov/"},
-  {s:"Vermont",a:"VT",mw:14.01,chg:false,note:"CPI-indexed annually.",tip:6.99,tc:7.02,sl:true,slN:"1hr/52hrs up to 40hrs/yr.",sch:false,schN:"None",r:"medium",ot:"Weekly 40",otD:false,otNote:"Follows FLSA",local:"None",laws:["CPI indexing","Tipped: $6.99","PSL: 1hr/52hrs"],minor:"Work permit required under 16.",brk:{rest:"None required by state law",meal:"Reasonable meal opportunity",premium:"None",mealNote:"21 VSA §309."},src:"https://labor.vermont.gov/"},
-  {s:"Virginia",a:"VA",mw:12.41,chg:true,cd:"Jan 1, 2026",nr:15.00,note:"→$15.00 Jan 1, 2026.",tip:2.13,tc:10.28,sl:true,slN:"1hr/40hrs up to 40hrs/yr.",sch:false,schN:"None",r:"medium",ot:"Weekly 40",otD:false,otNote:"Follows FLSA",local:"None",laws:["Min wage → $15.00 Jan 2026","PSL: 1hr/40hrs","Tipped: $2.13"],minor:"Work permit required under 16.",brk:{rest:"None required (FLSA only)",meal:"None required (FLSA only)",premium:"None",mealNote:"Short breaks <20 min must be paid per FLSA"},src:"https://www.doli.virginia.gov/"},
-  {s:"Washington",a:"WA",mw:16.66,chg:true,cd:"Jan 1, 2027",nr:17.00,note:"Seattle $20.76. Tukwila $21.10. SeaTac $19.71.",tip:"Full MW",tc:"None",sl:true,slN:"1hr/40hrs up to 40hrs/yr.",sch:true,schN:"Seattle Secure Scheduling: 14-day notice, clopening premium.",r:"high",ot:"Weekly 40",otD:false,otNote:"FLSA weekly. Seattle adds clopening premium.",local:"Seattle $20.76 | Tukwila $21.10 | SeaTac $19.71",laws:["No tip credit allowed","Seattle Secure Scheduling: 14-day notice","PSL: 1hr/40hrs","Annual CPI adjustments","Tukwila $21.10 — highest US city minimum"],minor:"Work permit required under 18.",brk:{rest:"10-min PAID rest per 4hrs worked",meal:"30-min unpaid meal per 5hrs worked",premium:"None specific; L&I enforcement",mealNote:"RCW §49.12.187. Both rest and meal breaks strictly required."},src:"https://lni.wa.gov/workers-rights/wages/minimum-wage/"},
-  {s:"West Virginia",a:"WV",mw:8.75,chg:false,note:"State min $8.75 for employers >6 workers.",tip:2.62,tc:6.13,sl:false,slN:"None",sch:false,schN:"None",r:"low",ot:"Weekly 40",otD:false,otNote:"Follows FLSA",local:"None",laws:["State MW $8.75 for larger employers","No state sick leave"],minor:"Follows FLSA.",brk:{rest:"None required (FLSA only)",meal:"20-min unpaid meal per 6hrs worked",premium:"None",mealNote:"WV Code §21-3-10a."},src:"https://labor.wv.gov/"},
-  {s:"Wisconsin",a:"WI",mw:7.25,chg:false,note:"Federal rate. State preempts local.",tip:2.33,tc:4.92,sl:false,slN:"None",sch:false,schN:"None",r:"low",ot:"Weekly 40",otD:false,otNote:"Follows FLSA",local:"None",laws:["Federal minimum; state preempts local","No state sick leave"],minor:"Work permit required under 16.",brk:{rest:"None required by state law",meal:"30-min unpaid meal per 6hrs — recommended",premium:"None",mealNote:"Wisconsin DWD Advisory. Not legally enforceable."},src:"https://dwd.wisconsin.gov/er/laborstandards/"},
-  {s:"Wyoming",a:"WY",mw:7.25,chg:false,note:"Federal rate.",tip:2.13,tc:5.12,sl:false,slN:"None",sch:false,schN:"None",r:"low",ot:"Weekly 40",otD:false,otNote:"Follows FLSA",local:"None",laws:["Federal minimum applies","No state sick leave"],minor:"Follows FLSA.",brk:{rest:"None required (FLSA only)",meal:"None required (FLSA only)",premium:"None",mealNote:"Short breaks <20 min must be paid per FLSA"},src:"https://wyomingworkforce.org/"},
-=======
 // ── Helpers ──────────────────────────────────────────────────────
 function rc(r){ return r==="critical"||r==="high" ? "#dc2626" : r==="medium" ? "#d97706" : "#16a34a"; }
 function rb(r){ return r==="critical" ? "rgba(220,38,38,.1)" : r==="high" ? "rgba(220,38,38,.07)" : r==="medium" ? "rgba(217,119,6,.1)" : "rgba(22,163,74,.08)"; }
@@ -179,202 +106,50 @@ var STATES=[
   {s:"West Virginia",a:"WV",mw:8.75,chg:false,note:"State min $8.75 for employers over 6 workers.",tip:2.62,tc:6.13,sl:false,slN:"None",sch:false,r:"low",ot:"Weekly 40",otD:false,otNote:"Follows FLSA",local:"None",laws:["State MW $8.75 for larger employers","No state sick leave"],minor:"Follows FLSA.",brk:{rest:"None (FLSA only)",meal:"20-min unpaid per 6hrs",premium:"None",note:"WV Code section 21-3-10a."},src:"https://labor.wv.gov/"},
   {s:"Wisconsin",a:"WI",mw:7.25,chg:false,note:"Federal rate. State preempts local.",tip:2.33,tc:4.92,sl:false,slN:"None",sch:false,r:"low",ot:"Weekly 40",otD:false,otNote:"Follows FLSA. State preempts local.",local:"None",laws:["Federal minimum; state preempts local","No state sick leave"],minor:"Work permit required under 16.",brk:{rest:"None required",meal:"30-min unpaid per 6hrs - recommended",premium:"None",note:"Wisconsin DWD Advisory. Not legally enforceable."},src:"https://dwd.wisconsin.gov/er/laborstandards/"},
   {s:"Wyoming",a:"WY",mw:7.25,chg:false,note:"Federal rate.",tip:2.13,tc:5.12,sl:false,slN:"None",sch:false,r:"low",ot:"Weekly 40",otD:false,otNote:"Follows FLSA",local:"None",laws:["Federal minimum applies","No state sick leave"],minor:"Follows FLSA.",brk:{rest:"None (FLSA only)",meal:"None (FLSA only)",premium:"None",note:"Short breaks under 20 min paid per FLSA"},src:"https://wyomingworkforce.org/"},
->>>>>>> Stashed changes
 ];
 
-const CASES = [
-  {yr:2025,co:"Starbucks",type:"Fair Workweek",laws:"NYC Fair Workweek Law",pen:"$38.9M",who:"~8,000 NYC workers",sev:"critical",detail:"500,000+ violations since 2021: irregular schedules, hours cut >15% without notice, failure to offer hours to existing workers."},
-  {yr:2024,co:"Chipotle (Seattle)",type:"Scheduling / Sick Leave",laws:"Seattle Secure Scheduling + PSST",pen:"$2.9M",who:"Seattle workers",sev:"high",detail:"Failed to provide sick leave at correct accrual rate; retaliated against workers; violated advance notice rules."},
-  {yr:2024,co:"McDonald's Franchisee (CA)",type:"Wage Theft / Daily OT",laws:"California Labor Code",pen:"$1.2M",who:"~300 workers",sev:"high",detail:"Failure to pay daily OT on shifts exceeding 8hrs; meal period violations across multiple CA locations."},
-  {yr:2024,co:"Denny's (FL)",type:"Tip Credit / 80-20 Rule",laws:"FLSA / FL Wage Law",pen:"$620K",who:"Servers, bussers",sev:"high",detail:"Applied tip credit to employees who spent more than 20% of time on non-tipped duties."},
-  {yr:2023,co:"Domino's Franchisee (NY)",type:"Minor Labor / Wage",laws:"NYLL / Child Labor",pen:"$900K",who:"Delivery minors",sev:"critical",detail:"Employed minors on hazardous delivery routes (e-bikes); failure to obtain working papers; school-week hour violations."},
-  {yr:2023,co:"Panera Bread (IL)",type:"Fair Workweek",laws:"Chicago Fair Workweek",pen:"$280K",who:"Chicago locations",sev:"medium",detail:"Failed to provide 14-day advance notice; did not pay required premiums for last-minute schedule changes."},
-];
-
-const FEDERAL_UPDATES = [
-  {cat:"FLSA",title:"OT Salary Threshold — Blocked at $35,568",date:"Nov 2024",status:"Blocked",sev:"medium",detail:"Biden DOL raised threshold to $58,656/yr. Federal judge vacated Nov 2024. Threshold remains $35,568.",src:"https://www.dol.gov/agencies/whd/overtime"},
-  {cat:"FLSA",title:"80/20 Tip Credit Rule — Actively Enforced",date:"2023–Ongoing",status:"Active",sev:"high",detail:"Tipped employees cannot spend >20% of shift on non-tipped duties. Top restaurant industry violation per DOL WHD.",src:"https://www.dol.gov/agencies/whd/restaurants"},
-  {cat:"Child Labor",title:"DOL Child Labor Enforcement Surge",date:"2024–2025",status:"Active",sev:"critical",detail:"950+ cases in 2024. Restaurant industry is #1 cited sector. Focus: delivery routes, equipment, hours violations.",src:"https://www.dol.gov/agencies/whd/child-labor"},
-  {cat:"I-9",title:"Remote I-9 Verification Expired",date:"Aug 2023",status:"Expired",sev:"medium",detail:"COVID-era remote verification ended Aug 2023. All I-9s must be physically inspected. Ongoing audit risk.",src:"https://www.uscis.gov/i-9-central"},
-  {cat:"Tip Credit",title:"Dual Jobs / Non-Tipped Duties Enforcement",date:"2024",status:"Active",sev:"high",detail:"WHD enforces sidework beyond 20% of shift. Average back-wage assessment: $1,400/employee.",src:"https://www.dol.gov/agencies/whd/restaurants"},
-  {cat:"Joint Employment",title:"Joint Employer Rule Withdrawn",date:"Mar 2024",status:"Resolved",sev:"medium",detail:"Biden-era joint employer rule vacated. Franchisors generally not liable for franchisee wage violations under current rule.",src:"https://www.dol.gov/agencies/whd/flsa"},
-];
-
-// --- MINOR LABOR AGE-SPECIFIC DATA ---
-const B14 = ["3hrs/school day","18hrs/school wk","8hrs/non-school day","40hrs/non-school wk","7am–7pm (9pm Jun–Labor Day)","No hazardous equipment"];
-const B16 = ["No federal hour restrictions","No hazardous work (under 18)","May work any shift"];
-
-const MINOR_AGES = {
-  AL:{a14:B14,a15:["Same rules as age 14"],a16:B16,a17:["Same as age 16"],permit:false,permitNote:"None required — follows FLSA"},
-  AK:{a14:B14,a15:["Same rules as age 14"],a16:B16,a17:["Same as age 16"],permit:true,permitNote:"Work permit required for all minors"},
-  AZ:{a14:[...B14,"Work permit required (under 16)"],a15:["Same rules as age 14","Work permit required"],a16:B16,a17:["Same as age 16"],permit:true,permitNote:"Required under 16"},
-  AR:{a14:B14,a15:["Same rules as age 14"],a16:B16,a17:["Same as age 16"],permit:false,permitNote:"None required"},
-  CA:{
-    a14:["3hrs/school day","18hrs/school wk","8hrs/non-school day","48hrs/summer wk","7am–7pm school nights","7am–9pm non-school nights","DLSE work permit required"],
-    a15:["Same rules as age 14","DLSE work permit required"],
-    a16:["4hrs/school day","28hrs/school wk","8hrs/non-school day","48hrs/non-school wk","Until 10pm school nights","Until 12:30am non-school nights","DLSE work permit required"],
-    a17:["Same rules as age 16","DLSE work permit required"],
-    permit:true,permitNote:"DLSE work permit required for ALL minors under 18"
-  },
-  CO:{a14:[...B14,"Work permit required (under 16)"],a15:["Same rules as age 14","Work permit required"],a16:[...B16,"Work permit required"],a17:["Same as age 16","Work permit recommended"],permit:true,permitNote:"Required under 16"},
-  CT:{a14:B14,a15:["Same rules as age 14"],a16:B16,a17:["Same as age 16"],permit:true,permitNote:"Work permit required for all minors under 18"},
-  DE:{a14:B14,a15:["Same rules as age 14"],a16:B16,a17:["Same as age 16"],permit:true,permitNote:"Work permit required under 18"},
-  FL:{
-    a14:["3hrs/school day","15hrs/school wk (FL — stricter than FLSA)","8hrs/non-school day","40hrs/non-school wk","7am–7pm (9pm Jun 1–Labor Day)","Work permit required"],
-    a15:["Same rules as age 14","Work permit required"],
-    a16:["8hrs/day","30hrs/school wk","40hrs/non-school wk","Until 11pm (school nights)","Until 1am (non-school nights)","Work permit required"],
-    a17:["Same rules as age 16","Work permit required"],
-    permit:true,permitNote:"Work permit required under 18 — FL Dept of Business & Professional Regulation"
-  },
-  GA:{a14:B14,a15:["Same rules as age 14"],a16:B16,a17:["Same as age 16"],permit:false,permitNote:"None required — follows FLSA"},
-  HI:{a14:[...B14,"Work permit required"],a15:["Same rules as age 14","Work permit required"],a16:B16,a17:["Same as age 16"],permit:true,permitNote:"Required under 16"},
-  ID:{a14:B14,a15:["Same rules as age 14"],a16:B16,a17:["Same as age 16"],permit:false,permitNote:"None required"},
-  IL:{
-    a14:[...B14,"Employment certificate required","7am–7pm school days (9pm non-school)"],
-    a15:["Same rules as age 14","Employment certificate required"],
-    a16:[...B16,"Employment certificate required"],
-    a17:["Same as age 16","Employment certificate required"],
-    permit:true,permitNote:"Employment certificate (work permit) required for all minors under 16; encouraged under 18"
-  },
-  IN:{
-    a14:[...B14,"Youth subminimum $4.25/hr allowed (first 90 days)"],
-    a15:["Same rules as age 14","Youth subminimum $4.25/hr allowed"],
-    a16:B16,
-    a17:["Same as age 16"],
-    permit:false,permitNote:"None required"
-  },
-  IA:{a14:B14,a15:["Same rules as age 14"],a16:B16,a17:["Same as age 16"],permit:false,permitNote:"Employment certificate recommended; not legally required"},
-  KS:{a14:B14,a15:["Same rules as age 14"],a16:B16,a17:["Same as age 16"],permit:false,permitNote:"None required"},
-  KY:{a14:B14,a15:["Same rules as age 14"],a16:B16,a17:["Same as age 16"],permit:false,permitNote:"None required"},
-  LA:{a14:B14,a15:["Same rules as age 14"],a16:B16,a17:["Same as age 16"],permit:false,permitNote:"None required"},
-  ME:{a14:B14,a15:["Same rules as age 14"],a16:B16,a17:["Same as age 16"],permit:true,permitNote:"Work permit required for all minors"},
-  MD:{
-    a14:[...B14,"Work permit required (under 16)"],
-    a15:["Same rules as age 14","Work permit required"],
-    a16:[...B16,"Work permit required"],
-    a17:["Same as age 16","Work permit required"],
-    permit:true,permitNote:"Required under 18"
-  },
-  MA:{
-    a14:["3hrs/school day","18hrs/school wk","8hrs/non-school day","40hrs/non-school wk","Until 9pm (school year)","Until 9pm Jun 1–Labor Day","Working papers required"],
-    a15:["Same rules as age 14","Working papers required"],
-    a16:["9hrs/day","48hrs/wk during school","Until 10pm Sun–Thu (school year)","Until 11:30pm Fri–Sat","Working papers required"],
-    a17:["Same rules as age 16","Working papers required"],
-    permit:true,permitNote:"Working papers required for all minors under 18"
-  },
-  MI:{a14:B14,a15:["Same rules as age 14"],a16:B16,a17:["Same as age 16"],permit:true,permitNote:"Work permit required under 18"},
-  MN:{a14:[...B14,"Work permit required (under 16)"],a15:["Same rules as age 14","Work permit required"],a16:B16,a17:["Same as age 16"],permit:true,permitNote:"Required under 16"},
-  MS:{a14:B14,a15:["Same rules as age 14"],a16:B16,a17:["Same as age 16"],permit:false,permitNote:"None required"},
-  MO:{a14:B14,a15:["Same rules as age 14"],a16:B16,a17:["Same as age 16"],permit:false,permitNote:"None required"},
-  MT:{a14:B14,a15:["Same rules as age 14"],a16:B16,a17:["Same as age 16"],permit:false,permitNote:"None required"},
-  NE:{a14:B14,a15:["Same rules as age 14"],a16:B16,a17:["Same as age 16"],permit:false,permitNote:"None required"},
-  NV:{
-    a14:[...B14,"Work permit required (under 17)"],
-    a15:["Same rules as age 14","Work permit required"],
-    a16:[...B16,"Work permit required"],
-    a17:["No hour restrictions","Work permit required","No hazardous work"],
-    permit:true,permitNote:"Required under 17"
-  },
-  NH:{a14:B14,a15:["Same rules as age 14"],a16:B16,a17:["Same as age 16"],permit:false,permitNote:"None required"},
-  NJ:{
-    a14:["3hrs/school day","18hrs/school wk","8hrs/non-school day","40hrs/non-school wk","Until 7pm school days","Until 9pm non-school days","Work permit required"],
-    a15:["Same rules as age 14","Work permit required"],
-    a16:["6hrs/school day","40hrs/school wk","8hrs/non-school day","48hrs/non-school wk","Until 11pm (10pm school nights)","Work permit required"],
-    a17:["8hrs/day","40hrs/school wk","50hrs/non-school wk","Until midnight","Work permit required"],
-    permit:true,permitNote:"Working papers required for all minors under 18"
-  },
-  NM:{a14:B14,a15:["Same rules as age 14"],a16:B16,a17:["Same as age 16"],permit:false,permitNote:"None required"},
-  NY:{
-    a14:["3hrs/school day","18hrs/school wk","8hrs/non-school day","40hrs/non-school wk","Until 7pm (9pm Jun 21–Labor Day)","Working papers required"],
-    a15:["Same rules as age 14","Working papers required"],
-    a16:["4hrs/school day","28hrs/school wk","8hrs/non-school day","48hrs/non-school wk","Until 10pm (midnight w/ parent consent)","Working papers required"],
-    a17:["8hrs/day","28hrs/school wk","48hrs/non-school wk","Until midnight","Working papers required"],
-    permit:true,permitNote:"Working papers (employment certificate) required under 18"
-  },
-  NC:{a14:B14,a15:["Same rules as age 14"],a16:B16,a17:["Same as age 16"],permit:false,permitNote:"None required"},
-  ND:{a14:B14,a15:["Same rules as age 14"],a16:B16,a17:["Same as age 16"],permit:false,permitNote:"None required"},
-  OH:{
-    a14:[...B14,"Work permit required"],
-    a15:["Same rules as age 14","Work permit required"],
-    a16:[...B16,"Work permit required"],
-    a17:["Same as age 16","Work permit required"],
-    permit:true,permitNote:"Required under 18"
-  },
-  OK:{a14:B14,a15:["Same rules as age 14"],a16:B16,a17:["Same as age 16"],permit:false,permitNote:"None required"},
-  OR:{
-    a14:[...B14,"Work permit required","No work during school hours"],
-    a15:["Same rules as age 14","Work permit required"],
-    a16:[...B16,"Until 10pm school nights","Work permit required"],
-    a17:["Same as age 16","Work permit required"],
-    permit:true,permitNote:"Work permit required under 18"
-  },
-  PA:{
-    a14:["3hrs/school day","18hrs/school wk","8hrs/non-school day","40hrs/non-school wk","Until 7pm school days","Work permit required"],
-    a15:["Same rules as age 14","Work permit required"],
-    a16:["8hrs/day","28hrs/school wk","48hrs/non-school wk","Until 12am (Fri–Sat & non-school nights)","Work permit required"],
-    a17:["8hrs/day","28hrs/school wk","48hrs/non-school wk","Until 12am","Work permit required"],
-    permit:true,permitNote:"PA Child Labor Act strictly enforced; work permit required"
-  },
-  RI:{a14:B14,a15:["Same rules as age 14"],a16:B16,a17:["Same as age 16"],permit:true,permitNote:"Work permit required"},
-  SC:{a14:B14,a15:["Same rules as age 14"],a16:B16,a17:["Same as age 16"],permit:false,permitNote:"None required"},
-  SD:{a14:B14,a15:["Same rules as age 14"],a16:B16,a17:["Same as age 16"],permit:false,permitNote:"None required"},
-  TN:{a14:B14,a15:["Same rules as age 14"],a16:B16,a17:["Same as age 16"],permit:false,permitNote:"None required"},
-  TX:{a14:B14,a15:["Same rules as age 14"],a16:B16,a17:["Same as age 16"],permit:false,permitNote:"None required"},
-  UT:{a14:B14,a15:["Same rules as age 14"],a16:B16,a17:["Same as age 16"],permit:false,permitNote:"None required"},
-  VT:{a14:[...B14,"Work permit required (under 16)"],a15:["Same rules as age 14"],a16:B16,a17:["Same as age 16"],permit:true,permitNote:"Required under 16"},
-  VA:{
-    a14:[...B14,"Work permit required (under 16)"],
-    a15:["Same rules as age 14","Work permit required"],
-    a16:[...B16,"Work permit required"],
-    a17:["Same as age 16","Work permit required"],
-    permit:true,permitNote:"Required under 16"
-  },
-  WA:{
-    a14:["3hrs/school day","16hrs/school wk (WA — stricter than FLSA)","8hrs/non-school day","40hrs/non-school wk","7am–7pm (9pm Jun 1–Labor Day)","Work permit required"],
-    a15:["Same rules as age 14","Work permit required"],
-    a16:["4hrs/school day","20hrs/school wk","8hrs/non-school day","48hrs/non-school wk","Until 10pm (school nights)","Until midnight (non-school nights)","Work permit required"],
-    a17:["Same rules as age 16","Work permit required"],
-    permit:true,permitNote:"Work permit required under 18; L&I strictly enforces"
-  },
-  WV:{a14:B14,a15:["Same rules as age 14"],a16:B16,a17:["Same as age 16"],permit:false,permitNote:"None required"},
-  WI:{a14:[...B14,"Work permit required (under 16)"],a15:["Same rules as age 14"],a16:B16,a17:["Same as age 16"],permit:true,permitNote:"Required under 16"},
-  WY:{a14:B14,a15:["Same rules as age 14"],a16:B16,a17:["Same as age 16"],permit:false,permitNote:"None required"},
+var MA_DEF={a14:B14,a15:["Same rules as age 14"],a16:B16,a17:["Same as age 16"],permit:false,permitNote:"None required"};
+var MINOR_AGES={
+  AL:MA_DEF,AR:MA_DEF,GA:MA_DEF,ID:MA_DEF,KS:MA_DEF,KY:MA_DEF,LA:MA_DEF,MS:MA_DEF,MT:MA_DEF,ND:MA_DEF,NH:MA_DEF,NC:MA_DEF,OK:MA_DEF,SC:MA_DEF,SD:MA_DEF,TN:MA_DEF,TX:MA_DEF,UT:MA_DEF,WV:MA_DEF,WY:MA_DEF,
+  IN:{a14:[...B14,"Youth subminimum $4.25/hr (first 90 days)"],a15:["Same as age 14"],a16:B16,a17:["Same as age 16"],permit:false,permitNote:"None required"},
+  IA:{a14:B14,a15:["Same as age 14"],a16:B16,a17:["Same as age 16"],permit:false,permitNote:"Certificate recommended"},
+  MO:MA_DEF,NE:MA_DEF,NM:MA_DEF,
+  AK:{...MA_DEF,permit:true,permitNote:"Work permit required for all minors"},
+  AZ:{a14:[...B14,"Work permit required (under 16)"],a15:["Same as age 14","Work permit required"],a16:B16,a17:["Same as age 16"],permit:true,permitNote:"Required under 16"},
+  CA:{a14:["3hrs/school day","18hrs/school wk","8hrs/non-school day","48hrs/summer wk","7am-7pm school nights","7am-9pm non-school nights","DLSE work permit required"],a15:["Same as age 14","DLSE work permit required"],a16:["4hrs/school day","28hrs/school wk","8hrs/non-school day","48hrs/non-school wk","Until 10pm school nights","DLSE work permit required"],a17:["Same as age 16","DLSE work permit required"],permit:true,permitNote:"DLSE work permit required for ALL minors under 18"},
+  CO:{a14:[...B14,"Work permit required (under 16)"],a15:["Same as age 14","Work permit required"],a16:[...B16,"Work permit required"],a17:["Same as age 16"],permit:true,permitNote:"Required under 16"},
+  CT:{...MA_DEF,permit:true,permitNote:"Work permit required under 18"},
+  DE:{...MA_DEF,permit:true,permitNote:"Work permit required under 18"},
+  FL:{a14:["3hrs/school day","15hrs/school wk (FL - stricter than FLSA)","8hrs/non-school day","40hrs/non-school wk","7am-7pm (9pm Jun 1 - Labor Day)","Work permit required"],a15:["Same as age 14","Work permit required"],a16:["8hrs/day","30hrs/school wk","40hrs/non-school wk","Until 11pm school nights","Work permit required"],a17:["Same as age 16","Work permit required"],permit:true,permitNote:"Work permit required under 18"},
+  HI:{a14:[...B14,"Work permit required"],a15:["Same as age 14","Work permit required"],a16:B16,a17:["Same as age 16"],permit:true,permitNote:"Required under 16"},
+  IL:{a14:[...B14,"Employment certificate required","7am-7pm school days"],a15:["Same as age 14","Employment certificate required"],a16:[...B16,"Employment certificate required"],a17:["Same as age 16","Employment certificate required"],permit:true,permitNote:"Employment certificate required for minors under 16"},
+  MD:{a14:[...B14,"Work permit required (under 16)"],a15:["Same as age 14","Work permit required"],a16:[...B16,"Work permit required"],a17:["Same as age 16","Work permit required"],permit:true,permitNote:"Required under 18"},
+  MA:{a14:["3hrs/school day","18hrs/school wk","8hrs/non-school day","40hrs/non-school wk","Until 9pm school year","Working papers required"],a15:["Same as age 14","Working papers required"],a16:["9hrs/day","48hrs/wk during school","Until 10pm Sun-Thu","Working papers required"],a17:["Same as age 16","Working papers required"],permit:true,permitNote:"Working papers required under 18"},
+  ME:{...MA_DEF,permit:true,permitNote:"Work permit required"},
+  MI:{...MA_DEF,permit:true,permitNote:"Work permit required under 18"},
+  MN:{a14:[...B14,"Work permit required (under 16)"],a15:["Same as age 14","Work permit required"],a16:B16,a17:["Same as age 16"],permit:true,permitNote:"Required under 16"},
+  NV:{a14:[...B14,"Work permit required (under 17)"],a15:["Same as age 14","Work permit required"],a16:[...B16,"Work permit required"],a17:["No hour restrictions","Work permit required","No hazardous work"],permit:true,permitNote:"Required under 17"},
+  NJ:{a14:["3hrs/school day","18hrs/school wk","8hrs/non-school day","40hrs/non-school wk","Until 7pm school days","Work permit required"],a15:["Same as age 14","Work permit required"],a16:["6hrs/school day","40hrs/school wk","48hrs/non-school wk","Work permit required"],a17:["8hrs/day","40hrs/school wk","50hrs/non-school wk","Work permit required"],permit:true,permitNote:"Working papers required under 18"},
+  NY:{a14:["3hrs/school day","18hrs/school wk","8hrs/non-school day","40hrs/non-school wk","Until 7pm (9pm Jun 21 - Labor Day)","Working papers required"],a15:["Same as age 14","Working papers required"],a16:["4hrs/school day","28hrs/school wk","8hrs/non-school day","48hrs/non-school wk","Until 10pm","Working papers required"],a17:["8hrs/day","28hrs/school wk","48hrs/non-school wk","Until midnight","Working papers required"],permit:true,permitNote:"Working papers (employment certificate) required under 18"},
+  OH:{a14:[...B14,"Work permit required"],a15:["Same as age 14","Work permit required"],a16:[...B16,"Work permit required"],a17:["Same as age 16","Work permit required"],permit:true,permitNote:"Required under 18"},
+  OR:{a14:[...B14,"Work permit required","No work during school hours"],a15:["Same as age 14","Work permit required"],a16:[...B16,"Until 10pm school nights","Work permit required"],a17:["Same as age 16","Work permit required"],permit:true,permitNote:"Work permit required under 18"},
+  PA:{a14:["3hrs/school day","18hrs/school wk","8hrs/non-school day","40hrs/non-school wk","Until 7pm school days","Work permit required"],a15:["Same as age 14","Work permit required"],a16:["8hrs/day","28hrs/school wk","48hrs/non-school wk","Until 12am Fri-Sat","Work permit required"],a17:["8hrs/day","28hrs/school wk","48hrs/non-school wk","Until 12am","Work permit required"],permit:true,permitNote:"PA Child Labor Act strictly enforced"},
+  RI:{...MA_DEF,permit:true,permitNote:"Work permit required"},
+  VA:{a14:[...B14,"Work permit required (under 16)"],a15:["Same as age 14","Work permit required"],a16:[...B16,"Work permit required"],a17:["Same as age 16","Work permit required"],permit:true,permitNote:"Required under 16"},
+  VT:{a14:[...B14,"Work permit required (under 16)"],a15:["Same as age 14"],a16:B16,a17:["Same as age 16"],permit:true,permitNote:"Required under 16"},
+  WA:{a14:["3hrs/school day","16hrs/school wk (WA - stricter than FLSA)","8hrs/non-school day","40hrs/non-school wk","7am-7pm (9pm Jun 1 - Labor Day)","Work permit required"],a15:["Same as age 14","Work permit required"],a16:["4hrs/school day","20hrs/school wk","8hrs/non-school day","48hrs/non-school wk","Until 10pm school nights","Work permit required"],a17:["Same as age 16","Work permit required"],permit:true,permitNote:"Work permit required under 18"},
+  WI:{a14:[...B14,"Work permit required (under 16)"],a15:["Same as age 14"],a16:B16,a17:["Same as age 16"],permit:true,permitNote:"Required under 16"},
 };
 
-const UPCOMING = [
-  {cat:"Min Wage",j:"Florida",title:"Minimum Wage → $15.00 / Tipped → $11.98",eff:"Sep 30, 2026",yr:2026,detail:"Florida Amendment 2 annual step. Tipped minimum rises to $11.98/hr simultaneously. Update POS and payroll before Aug 2026.",impact:"high",src:"https://floridajobs.org/workforce-board-resources/policy-and-technical-assistance/labor-laws"},
-  {cat:"Min Wage",j:"Alaska",title:"Minimum Wage → $14.00",eff:"Jul 1, 2026",yr:2026,detail:"Per 2024 Measure 1. No tip credit — full $14.00 required for all employees. Paid sick leave for all employers also in effect since Jul 2025.",impact:"medium",src:"https://labor.alaska.gov/lss/whhome.htm"},
-  {cat:"Min Wage",j:"Oregon",title:"Statewide → $15.50 / Portland Metro → $16.80 / Non-Urban → $14.20",eff:"Jul 1, 2026",yr:2026,detail:"Annual three-tier increase. No tip credit — full rate required. Update payroll before Jun 30 pay cycle.",impact:"high",src:"https://www.oregon.gov/boli/workers/Pages/minimum-wage.aspx"},
-  {cat:"Min Wage",j:"Connecticut",title:"Minimum Wage → $17.00",eff:"Jan 1, 2027",yr:2027,detail:"Multi-year staircase reaches $17.00. Tipped wage adjusts proportionally. Update payroll models before Q4 2026.",impact:"medium",src:"https://www.ctdol.state.ct.us/wgwkstnd/wage-hour.htm"},
-  {cat:"Min Wage",j:"Colorado",title:"Minimum Wage → ~$15+ (CPI-indexed)",eff:"Jan 1, 2027",yr:2027,detail:"Annual COMPS Order CPI adjustment expected to push minimum above $15. Denver local rate increases proportionally. Updated COMPS Order published each October.",impact:"medium",src:"https://cdle.colorado.gov/wages"},
-  {cat:"Min Wage",j:"Washington",title:"Minimum Wage → ~$17.00+ (CPI-indexed)",eff:"Jan 1, 2027",yr:2027,detail:"Annual CPI increase. Seattle, Tukwila ($21+), SeaTac local rates all rise further. No tip credit statewide.",impact:"high",src:"https://lni.wa.gov/workers-rights/wages/minimum-wage/"},
-  {cat:"Min Wage",j:"New Jersey",title:"Minimum Wage → ~$16.00 (CPI-indexed)",eff:"Jan 1, 2027",yr:2027,detail:"Annual CPI adjustment. Small/seasonal employer subrate also adjusts. Final rate announced each October by NJ DOL.",impact:"medium",src:"https://www.nj.gov/labor/wageandhour/"},
-  {cat:"Min Wage",j:"Maine",title:"Minimum Wage → ~$15+ (CPI-indexed)",eff:"Jan 1, 2027",yr:2027,detail:"Annual CPI adjustment. Portland local rate exceeds $15.50. Tipped rate remains 50% of standard MW.",impact:"medium",src:"https://www.maine.gov/labor/labor_laws/"},
-  {cat:"Tipped Wage",j:"Michigan",title:"Tip Credit Phase-Out — Continues Annually to 2031",eff:"Feb 2026",yr:2026,detail:"Michigan Supreme Court-ordered phase-out advances in Feb 2026. Full MW parity required by 2031. Average tipped-to-MW gap currently ~$8.55. Model annual cost impact and update payroll each February.",impact:"high",src:"https://www.michigan.gov/leo/bureaus-agencies/ors/wage-and-hour"},
-  {cat:"Tipped Wage",j:"Federal (Congress)",title:"WAGES Act — Federal Tip Credit Elimination Bill",eff:"Pending — 2026 Congress",yr:2026,detail:"Proposes phasing out the federal $2.13 tipped minimum over 5 years. No Senate majority as of March 2026. If passed, impacts all 43 states using tip credit. Estimated annual cost: $2,000–$5,000 per tipped employee.",impact:"critical",src:"https://www.congress.gov/"},
-  {cat:"Sick Leave",j:"Missouri",title:"Proposition A — New Statewide Paid Sick Leave",eff:"Jan 1, 2026",yr:2026,detail:"15+ employees: 1hr/30hrs up to 56hrs/yr. Under 15: 1hr/30hrs up to 48hrs/yr. Active enforcement began Jan 2026. New accrual tracking and recordkeeping required.",impact:"high",src:"https://labor.mo.gov/DLS/MinimumWage"},
-  {cat:"Sick Leave",j:"Michigan",title:"ESTA Expanded to ALL Employers",eff:"Feb 2025 (Active Enforcement 2026)",yr:2026,detail:"Earned Sick Time Act now covers all employer sizes. 1hr/30hrs up to 72hrs/yr (large) / 40hrs/yr (small). WHD enforcement increasing in 2026.",impact:"high",src:"https://www.michigan.gov/leo/bureaus-agencies/ors/wage-and-hour"},
-  {cat:"Sick Leave",j:"California",title:"AB 406 — Safe Time Leave Expansion",eff:"Jan 1, 2026",yr:2026,detail:"Expands 'safe time' under CA PSL to cover additional domestic violence, sexual assault, and stalking protections. Update employee handbooks and leave policy documentation.",impact:"medium",src:"https://www.dir.ca.gov/dlse/"},
-  {cat:"Sick Leave",j:"Nebraska",title:"Proposition 436 — New Statewide Sick Leave",eff:"Jan 1, 2025 (Active 2026)",yr:2026,detail:"All employers: paid sick leave 1hr/30hrs. Ongoing enforcement and employee awareness campaigns in 2026.",impact:"medium",src:"https://labor.nebraska.gov/"},
-  {cat:"Scheduling",j:"New York State",title:"Potential Statewide Fair Workweek Expansion",eff:"Pending 2026–2027",yr:2026,detail:"Legislature considering expanding NYC Fair Workweek rules statewide to all fast food and restaurant employers — 14-day advance notice, call-in pay, and schedule change premiums for all NY locations.",impact:"high",src:"https://www.nysenate.gov/legislation"},
-  {cat:"Scheduling",j:"Chicago, IL",title:"Fair Workweek — Employer Threshold Reduction Proposed",eff:"Proposed 2026",yr:2026,detail:"Chicago considering lowering Fair Workweek threshold from 100 employees to 50. Would extend 14-day notice and premium pay to many more mid-size restaurant groups.",impact:"medium",src:"https://www.chicago.gov/city/en/depts/dol/provdrs/labor-standards.html"},
-  {cat:"Scheduling",j:"Seattle, WA",title:"Secure Scheduling — Delivery Platform Expansion",eff:"2026",yr:2026,detail:"Seattle expanding Secure Scheduling to third-party delivery platform workers at restaurant locations. Restaurants may face new notification and record obligations.",impact:"medium",src:"https://www.seattle.gov/laborstandards"},
-  {cat:"Minor Labor",j:"Federal (DOL)",title:"Increased Civil Penalties — Child Labor Enforcement Surge",eff:"2026 (ongoing)",yr:2026,detail:"DOL WHD enforcement budget increased significantly. Max civil penalty now $71,818 per willful minor violation. Restaurant industry #1 targeted sector: kitchen equipment, delivery routes, late-night hours for 14–17 year olds.",impact:"critical",src:"https://www.dol.gov/agencies/whd/child-labor"},
-  {cat:"Minor Labor",j:"California",title:"DLSE — Enhanced QSR Minor Labor Audits",eff:"2026",yr:2026,detail:"DLSE increasing random audits of QSR employers for minor work permit compliance, hours violations, and prohibited equipment. Penalties doubled for repeat violations.",impact:"medium",src:"https://www.dir.ca.gov/dlse/DLSE_Minors.html"},
-  {cat:"Overtime",j:"Federal (DOL)",title:"New OT Salary Threshold Rulemaking — Expected 2026–2027",eff:"2026–2027",yr:2026,detail:"After $58,656 threshold was vacated, new rulemaking expected. Likely range $43,000–$55,000. Restaurant managers, shift leads, and assistant managers at risk of reclassification. Audit exempt employee salaries now.",impact:"high",src:"https://www.dol.gov/agencies/whd/overtime"},
-  {cat:"Overtime",j:"Minnesota",title:"OT Threshold — Proposal to Reduce from 48hrs to 40hrs",eff:"Pending 2026–2027",yr:2027,detail:"Legislature considering aligning MN OT threshold with federal 40hr standard (currently 48hrs). If passed, significantly increases OT costs for MN restaurant operators.",impact:"high",src:"https://www.dli.mn.gov/business/employment-practices/minimum-wage-minnesota"},
-  {cat:"Break Laws",j:"Federal (DOL)",title:"PUMP Act — Nursing Break Enforcement Expansion",eff:"2026 (ongoing)",yr:2026,detail:"PUMP for Nursing Mothers Act enforcement expanding. Restaurants must provide private, non-restroom lactation space. No employer size exemption. Breaks under 20 min are paid time.",impact:"medium",src:"https://www.dol.gov/agencies/whd/nursing-mothers"},
-  {cat:"Break Laws",j:"Oregon",title:"BOLI — Digital Break Waiver Recordkeeping Requirement",eff:"Jul 1, 2026",yr:2026,detail:"Oregon BOLI requiring digital recordkeeping of all meal break waivers and premium pay events for employers with 10+ locations. Paper waivers no longer accepted during audits.",impact:"medium",src:"https://www.oregon.gov/boli/workers/Pages/meal-and-rest-periods.aspx"},
-  {cat:"Restaurant-Specific",j:"California",title:"FAST Recovery Act — Fast Food Council Activity Ongoing",eff:"2026 (ongoing)",yr:2026,detail:"California Fast Food Council continues quarterly meetings with authority to set industry-wide standards beyond $20/hr minimum — including scheduling, training, safety equipment, and enhanced break rules for QSR chains (60+ locations).",impact:"high",src:"https://www.dir.ca.gov/dlse/fast-food-council.html"},
-  {cat:"Restaurant-Specific",j:"New York City",title:"App-Based Delivery Worker Minimum Pay Expansion",eff:"2026",yr:2026,detail:"NYC expanding delivery worker minimum pay rate (CPI-adjusted 2026). May extend to restaurant-employed in-house delivery staff. Monitor NYC DCA rulemaking closely.",impact:"medium",src:"https://www.nyc.gov/site/dca/workers/delivery-workers.page"},
-  {cat:"Restaurant-Specific",j:"Federal (Congress)",title:"Raise the Wage Act — Federal Minimum to $17 by 2028",eff:"Pending 2026–2027",yr:2027,detail:"Phases federal minimum to $17/hr by 2028, tip credit phased out over 7 years. No current Senate majority. Restaurant industry identified as #1 most-impacted sector.",impact:"critical",src:"https://www.congress.gov/"},
-  {cat:"Restaurant-Specific",j:"Federal (FTC)",title:"FTC Scrutiny of AI-Driven Scheduling Tools",eff:"2026–2027",yr:2026,detail:"FTC guidance warns AI scheduling tools may suppress hours and wages. Operators using algorithmic scheduling should audit for Fair Workweek and anti-retaliation compliance.",impact:"medium",src:"https://www.ftc.gov/business-guidance/blog"},
-  {cat:"Restaurant-Specific",j:"Federal (DOL)",title:"Joint Employer Standard — Potential Rule Reversal",eff:"2026–2027",yr:2027,detail:"Current administration may revisit joint employer standard. If reversed, franchisors could be held liable for franchisee labor violations — large-scale cost and litigation exposure for franchise systems.",impact:"high",src:"https://www.dol.gov/agencies/whd/flsa"},
+var CASES=[
+  {yr:2025,co:"Starbucks",type:"Fair Workweek",pen:"$38.9M",who:"~8,000 NYC workers",sev:"critical",detail:"500,000+ violations since 2021: irregular schedules, hours cut over 15% without notice."},
+  {yr:2024,co:"Chipotle (Seattle)",type:"Scheduling/Sick Leave",pen:"$2.9M",who:"Seattle workers",sev:"high",detail:"Failed sick leave accrual rate; retaliated against workers; violated advance notice rules."},
+  {yr:2024,co:"McDonald's (CA)",type:"Wage Theft/Daily OT",pen:"$1.2M",who:"~300 workers",sev:"high",detail:"Failure to pay daily OT on shifts exceeding 8hrs; meal period violations."},
+  {yr:2024,co:"Denny's (FL)",type:"Tip Credit/80-20 Rule",pen:"$620K",who:"Servers, bussers",sev:"high",detail:"Applied tip credit to employees spending over 20% of time on non-tipped duties."},
+  {yr:2023,co:"Domino's (NY)",type:"Minor Labor/Wage",pen:"$900K",who:"Delivery minors",sev:"critical",detail:"Minors on hazardous delivery routes (e-bikes); no working papers; school-week hour violations."},
+  {yr:2023,co:"Panera Bread (IL)",type:"Fair Workweek",pen:"$280K",who:"Chicago locations",sev:"medium",detail:"Failed 14-day advance notice; did not pay premiums for last-minute schedule changes."},
 ];
 
-<<<<<<< Updated upstream
-const CAT_COLORS = {
-=======
 var FEDERAL_UPDATES=[
   {cat:"Tax/Payroll",title:"OBBBA No Tax on Tips & Overtime - W-2 Reporting Effective Jan 1 2026",date:"Jul 2025 (signed); Jan 1 2026 (W-2 reporting)",status:"Active",sev:"critical",detail:"One Big Beautiful Bill Act signed Jul 4 2025. Employees may deduct up to $25K qualified tips and $12.5K ($25K joint) qualified OT premium from federal income tax (tax years 2025-2028). Phase-out begins $150K AGI single / $300K joint. Employer compliance burden: starting 2026 W-2s, must separately report qualified tips (Box 12 Code TP), qualified OT comp (Box 12 Code TT), and Treasury Tipped Occupation Code TTOC (Box 14b). FICA/Medicare still apply. Restaurant employers must update payroll, timekeeping, and HR systems before year-end 2026 W-2 filing.",src:"https://www.irs.gov/newsroom/one-big-beautiful-bill-provisions"},
   {cat:"FLSA",title:"OT Salary Threshold - Reverted to $35,568",date:"Nov 2024 (court vacated)",status:"Reverted",sev:"medium",detail:"Biden DOL raised threshold to $58,656/yr; Texas federal court vacated Nov 2024. Threshold remains $35,568 ($684/wk) federally. Trump DOL has not yet issued replacement rule. Restaurant managers and shift leads near the old threshold remain vulnerable to reclassification when a new rule is issued. CA state threshold separately set at $70,304 (2026); WA $80,168.40 (2026).",src:"https://www.dol.gov/agencies/whd/overtime"},
@@ -549,7 +324,6 @@ var UPCOMING=[
 
 
 var CAT_COLORS={
->>>>>>> Stashed changes
   "Min Wage":{c:"#7c3aed",bg:"rgba(124,58,237,.08)"},
   "Tipped Wage":{c:"#0284c7",bg:"rgba(2,132,199,.08)"},
   "Sick Leave":{c:"#16a34a",bg:"rgba(22,163,74,.08)"},
@@ -560,101 +334,85 @@ var CAT_COLORS={
   "Restaurant-Specific":{c:"#db2777",bg:"rgba(219,39,119,.08)"},
 };
 
-const TABS = ["Overview","Min Wage","Tipped Wage","Minor Laws","Break Laws","Overtime","Scheduling","Federal Updates","Upcoming Changes"];
+var TABS=["Overview","Min Wage","Tipped Wage","Minor Laws","Break Laws","Overtime","Scheduling","Federal Updates","Upcoming Changes","Risk Calculator"];
 
-async function fetchLatestChanges(onChunk) {
-  const prompt = `You are a labor law compliance expert for the US restaurant industry. Today is March 2026.
-
-Search the web for the LATEST confirmed and proposed labor law changes for 2026 and 2027 that impact the restaurant industry. Focus on:
-- Minimum wage increases (state and federal)
-- Tipped wage / tip credit changes
-- Paid sick leave new laws or expansions
-- Minor / child labor law updates or enforcement changes
-- Break law changes
-- Overtime rule changes
-- Fair Workweek / predictive scheduling laws
-- Restaurant-specific legislation (e.g. Fast Food councils, delivery worker laws)
-- Federal bills (Raise the Wage Act, WAGES Act, etc.)
-
-Return a JSON array (no markdown, no explanation, raw JSON only) of objects. Each object must have exactly these fields:
-{
-  "cat": one of ["Min Wage","Tipped Wage","Sick Leave","Minor Labor","Break Laws","Overtime","Scheduling","Restaurant-Specific"],
-  "j": jurisdiction (state name, city, or "Federal (DOL)" / "Federal (Congress)"),
-  "title": short descriptive title (max 80 chars),
-  "eff": effective date or "Pending YYYY" if not yet law,
-  "yr": 2026 or 2027 (integer),
-  "detail": 2-3 sentence explanation of what changed and what operators must do,
-  "impact": one of ["critical","high","medium","low"],
-  "src": official government URL (dol.gov, state labor dept, congress.gov, etc.)
+// ── API ───────────────────────────────────────────────────────────
+function getApiKey(){
+  if(typeof window!=="undefined"&&window.__ANTHROPIC_KEY__) return window.__ANTHROPIC_KEY__;
+  // CRA/webpack substitutes process.env.REACT_APP_* at build time as a string literal.
+  // Wrapping in try/catch in case process is fully undefined.
+  try { if(process.env.REACT_APP_ANTHROPIC_API_KEY) return process.env.REACT_APP_ANTHROPIC_API_KEY; } catch(e){}
+  return null;
 }
-
-<<<<<<< Updated upstream
-Return 20-30 items. Only include items relevant to restaurants. Prioritize confirmed laws over speculation. Raw JSON array only — no other text.`;
-
-  const resp = await fetch("https://api.anthropic.com/v1/messages", {
-    method:"POST",
-    headers:{"Content-Type":"application/json"},
-    body: JSON.stringify({
-      model:"claude-sonnet-4-20250514",
-      max_tokens:4000,
-      stream:true,
-      tools:[{type:"web_search_20250305",name:"web_search"}],
-      messages:[{role:"user",content:prompt}]
-    })
-  });
-
-  if(!resp.ok) throw new Error(`API error: ${resp.status}`);
-
-  const reader = resp.body.getReader();
-  const decoder = new TextDecoder();
-  let fullText = "";
-  let searchCount = 0;
-
-  while(true) {
-    const {done,value} = await reader.read();
-    if(done) break;
-    const chunk = decoder.decode(value);
-    const lines = chunk.split("\n");
-    for(const line of lines) {
-      if(!line.startsWith("data:")) continue;
-      const data = line.slice(5).trim();
-      if(data==="[DONE]") continue;
-      try {
-        const ev = JSON.parse(data);
-        if(ev.type==="content_block_start" && ev.content_block?.type==="tool_use" && ev.content_block?.name==="web_search") {
-          searchCount++;
-          onChunk({type:"search", count:searchCount});
-        }
-        if(ev.type==="content_block_delta" && ev.delta?.type==="text_delta") {
-          fullText += ev.delta.text;
-          onChunk({type:"text", text:fullText});
-        }
-      } catch(e){}
-    }
+// Builds request headers for the Anthropic API.
+// In Claude.ai artifacts the platform authenticates the call for you, so NO key
+// is sent (sending one, or the direct-browser header, can interfere). When this
+// file is self-hosted as a real deployment, a key from window/env is attached
+// along with the headers the API requires for direct browser access.
+function anthropicHeaders(){
+  var apiKey=getApiKey();
+  var headers={"Content-Type":"application/json"};
+  if(apiKey){
+    headers["anthropic-version"]="2023-06-01";
+    headers["anthropic-dangerous-direct-browser-access"]="true";
+    headers["x-api-key"]=apiKey;
   }
-  return fullText;
+  return headers;
+}
+async function fetchLatestChanges(onChunk){
+  var todayStr=new Date().toISOString().slice(0,10);
+  var prompt="You are a labor law compliance research assistant for the US restaurant industry. Today is "+todayStr+".\n\n"+
+    "Search the web COMPREHENSIVELY for ALL confirmed and proposed labor law changes affecting US restaurants for "+(new Date()).getFullYear()+" and "+((new Date()).getFullYear()+1)+". Be EXHAUSTIVE - your goal is comprehensive coverage, not curated highlights.\n\n"+
+    "REQUIRED CATEGORY COVERAGE - you must return at least the minimums below for each category:\n\n"+
+    "1) MIN WAGE (return at least 8 items): All states with wage increases this year and next, including mid-year increases (FL Sep 30, AK Jul 1, OR Jul 1, DC Jul 1, Chicago Jul 1). Include both state-level and major city/county increases (NYC, LA, SF, Seattle, Denver, Portland metro, Minneapolis, Boulder, etc.).\n\n"+
+    "2) TIPPED WAGE (return at least 5 items): Tip credit changes - DC Initiative 82 final phase, Michigan stepped tipped wage increases, Chicago tip credit elimination ongoing, any state phasing out tip credit, federal RAISE Act / Wage Act proposals.\n\n"+
+    "3) SICK LEAVE (return at least 6 items): New state mandates (MO Prop A, NE Prop 436, AK Initiative 1), expansions (CA AB 406, MA new accrual rules, CT all-employer expansion, NY accrual changes), municipal ordinances.\n\n"+
+    "4) MINOR LABOR (return at least 4 items): State child labor enforcement priorities, Iowa/Kentucky/Indiana youth-hours expansion bills, federal proposed minor labor protections, state hazardous occupation rules updated for restaurants.\n\n"+
+    "5) BREAK LAWS (return at least 4 items): Meal/rest break new rules, Oregon digital waiver recordkeeping, California meal premium enforcement updates, state attorney general enforcement priorities, new break recordkeeping requirements.\n\n"+
+    "6) OVERTIME (return at least 4 items): Federal OT salary threshold rulemaking (DOL post-Restoring Overtime Pay Act activity), state OT threshold increases (CA, NY, WA, AK), tipped overtime calculation guidance, daily OT enforcement.\n\n"+
+    "7) SCHEDULING (return at least 12 items - CRITICAL CATEGORY, BE COMPREHENSIVE): ALL Fair Workweek and Predictive Scheduling laws - include each ACTIVE jurisdiction (San Francisco FW, Seattle Secure Scheduling, NYC Fair Workweek, Philadelphia FW, Chicago FW, Emeryville FW, Berkeley FW, Los Angeles FW, LA County FW, Evanston FW, Euless TX, Oregon statewide) AND ALL upcoming/proposed ones (NY statewide proposal, Boston FW, Minneapolis FW expansion, St. Paul FW, Pittsburgh FW). Include any 2026/2027 amendments, threshold changes (employee count), penalty changes, predictability pay adjustments, or new ordinances. This is the most underrepresented category - be exhaustive.\n\n"+
+    "8) RESTAURANT-SPECIFIC (return at least 6 items): CA AB 1228 fast food council adjustments, NYC fast food laws, OBBBA W-2 reporting requirements (Box 12 TT/TP, occupation codes), franchise liability changes, AI tools laws affecting hiring (Colorado AI Act delay), heat illness rules, joint employer rulemaking, state pay transparency expansions.\n\n"+
+    "TARGET: Return 50-70 items minimum. If you have data for more than 70, include them all. DO NOT artificially limit count. Comprehensive coverage matters more than brevity.\n\n"+
+    "FORMAT: Return ONLY a raw JSON array (no markdown, no preamble). Each object: "+
+    "{\"cat\":\"Min Wage|Tipped Wage|Sick Leave|Minor Labor|Break Laws|Overtime|Scheduling|Restaurant-Specific\","+
+    "\"j\":\"jurisdiction (state name or 'City, ST' or 'Federal')\","+
+    "\"title\":\"short title max 80 chars\","+
+    "\"eff\":\"effective date as text - use specific date if known, otherwise year only\","+
+    "\"yr\":2026,"+
+    "\"detail\":\"2-3 sentence explanation of what restaurant operators need to do\","+
+    "\"impact\":\"critical|high|medium|low\","+
+    "\"src\":\"official source URL (state DOL, federal agency, or municipal site)\"}.\n\n"+
+    "Prefer official .gov sources. Skip exact duplicates only. Include items even if you have only partial details. Raw JSON array only.";
+  var headers=anthropicHeaders();
+  var resp;
+  try{resp=await fetch("https://api.anthropic.com/v1/messages",{method:"POST",headers:headers,body:JSON.stringify({model:"claude-sonnet-4-6",max_tokens:16000,stream:true,tools:[{type:"web_search_20250305",name:"web_search"}],messages:[{role:"user",content:prompt}]})});}
+  catch(e){throw new Error("Network error: "+e.message);}
+  if(resp.status===401)throw new Error("Auth failed (401). Inside Claude.ai this runs with no key. For a self-hosted build, set REACT_APP_ANTHROPIC_API_KEY in .env (project root) and restart, or window.__ANTHROPIC_KEY__ in console.");
+  if(resp.status===429){
+    var retryAfter=resp.headers.get("retry-after")||resp.headers.get("anthropic-ratelimit-input-tokens-reset")||"";
+    var waitMsg=retryAfter?(" Wait ~"+retryAfter+" seconds before retrying."):" Wait 60 seconds before retrying.";
+    var bodyTxt=await resp.text().catch(function(){return "";});
+    var rateLine="";
+    var m=bodyTxt.match(/rate limit of ([0-9,]+) input tokens per minute/);
+    if(m) rateLine=" (You have a "+m[1]+" input tokens/minute limit on your API tier.)";
+    throw new Error("Rate limit hit."+waitMsg+rateLine+" The Risk Calculator and Sync Latest both consume tokens - avoid running them back-to-back.");
+  }
+  if(!resp.ok){
+    var t=await resp.text().catch(function(){return "";});
+    var ulMatch=t.match(/regain access on ([\d-]+) at ([\d:]+ UTC)/);
+    if(ulMatch){
+      throw new Error("API usage limit reached. You set a spend limit on your Anthropic account that has been hit. Access restored on "+ulMatch[1]+" at "+ulMatch[2]+". To raise it now, sign into console.anthropic.com -> Settings -> Limits.");
+    }
+    if(t.indexOf("usage limits")>=0||t.indexOf("usage_limit")>=0){
+      throw new Error("API usage limit reached on your Anthropic account. Sign into console.anthropic.com -> Settings -> Limits to raise your spend cap.");
+    }
+    throw new Error("API error "+resp.status+": "+t.slice(0,200));
+  }
+  var reader=resp.body.getReader();var dec=new TextDecoder();var text="";var sc=0;
+  while(true){var chunk=await reader.read();if(chunk.done)break;var lines=dec.decode(chunk.value).split("\n");for(var li=0;li<lines.length;li++){var line=lines[li];if(line.indexOf("data:")!==0)continue;var d=line.slice(5).trim();if(d==="[DONE]")continue;try{var ev=JSON.parse(d);if(ev.type==="content_block_start"&&ev.content_block&&ev.content_block.type==="tool_use"&&ev.content_block.name==="web_search"){sc++;onChunk({type:"search",count:sc});}if(ev.type==="content_block_delta"&&ev.delta&&ev.delta.type==="text_delta"){text+=ev.delta.text;onChunk({type:"text",text:text});}}catch(e){}}}
+  return text;
 }
 
-function AgeCell({rules,bg}) {
-  return (
-    <td style={{padding:"7px 9px",borderBottom:"1px solid #f1f5f9",verticalAlign:"top",background:bg,minWidth:160,maxWidth:200}}>
-      {(rules||[]).map((r,i)=>(
-        <div key={i} style={{display:"flex",gap:4,marginBottom:2,alignItems:"flex-start"}}>
-          <span style={{color:"#a5b4fc",flexShrink:0,fontSize:9,marginTop:2}}>▸</span>
-          <span style={{fontSize:10,color:"#334155",lineHeight:1.4}}>{r}</span>
-        </div>
-      ))}
-    </td>
-  );
-}
-
-function StateModal({st, onClose}) {
-  const m = MINOR_AGES[st.a] || {};
-  return (
-    <div onClick={onClose} style={{position:"fixed",inset:0,background:"rgba(15,23,42,.6)",zIndex:2000,display:"flex",alignItems:"center",justifyContent:"center",padding:20}}>
-      <div onClick={e=>e.stopPropagation()} style={{background:"#fff",borderRadius:14,maxWidth:680,width:"100%",maxHeight:"88vh",overflowY:"auto",padding:28,boxShadow:"0 20px 60px rgba(0,0,0,.2)"}}>
-        <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start",marginBottom:18}}>
-=======
 // ── Compliance Calc Helpers ───────────────────────────────────────
 // ── Upload column validation (tolerant header matching + clear errors) ─────
 function normHdr(h){ return String(h==null?"":h).toLowerCase().replace(/[^a-z0-9]/g,""); }
@@ -833,18 +591,52 @@ function LoaderOverlay(props){
 // Peer-baseline method: within each assigned labor-law state, the configuration
 // the majority of stores use is treated as the compliant baseline. A store that
 // is missing a rule its in-state peers have, or whose value diverges from the
-// peer-majority value, is flagged. Severity and $ exposure are modeled by
-// category. This runs entirely in the browser - no AI, no key.
+// peer-majority value, is flagged. Severity is modeled by category.
+// This runs entirely in the browser - no AI, no key.
 // ── Fixed statewide baseline (precomputed from the full store portfolio) ───
 // Used as the compliance reference so a single-org upload is judged against the
 // same statewide expectation as a full-portfolio run (not just against itself).
-var LAW_NAMES={"adtAllowMealBrkWaiver":"Allow Meal Waiver","adtApproachingOTAlertHours":"Hours for Approaching OT Alert in Weekly Timekeeping","adtApproachingOTAlertHoursSalaried":"Approaching Weekly OT Alert Mgr","adtAssumeFullTipCredit":"Assume Full Tip Credit for Job Code","adtCloserPunchLookMin":"Closer Punch Lookout Minutes","adtDailyDT":"Daily shift length prior to Dbl Time","adtDailyDTSalaried":"Daily shift length prior to Dbl Time for Salaried Manager","adtDailyOT":"Daily shift length prior to OT","adtDailyOTSalaried":"Daily shift length prior to OT for Salaried Manager","adtDaysPerWeek":"Max number of days/week","adtDtPercent":"DT Percentage","adtDtPercentSalaried":"DT Percentage for Managers","adtEnableEarnedBreakConcept":"Enable Earned Break Concept","adtHrsForClopening":"Hours For Rest Between the Shifts","adtMaxDailyHrsPartTimeEmp":"Max Daily Hours For Part Time Employee","adtMaxShiftLength":"Max Shift Length","adtMaxWage":"Maximum Wage","adtMaxWeeklyHrPartTimeForEmp":"Max Weekly Hour For Part Time Employee","adtMealBreak":"Meal Break length","adtMealBrkPayRate":"Meal Break Premium Pay Rate","adtMealBrkPremiumPayMins":"Meal Break Premium Pay Hours","adtMinCashPercForTips":"Min. Cash Percentage for Tips","adtMinCreditCardPercForTips":"Min. Credit Card Percentage for Tips","adtMinLengthTimeBetweenTwoShifts":"Minimum length of time between two shifts","adtMinShiftGapForRgtToRstShift":"Right to Rest Gap between two shifts","adtMinShiftLength":"Min Shift Length","adtMinShiftMinsGapForSplitShift":"Minimum gap of time for Split Shift","adtMinToAddCloserPunch":"Minutes to auto add for Closer Punches","adtMinToAddOpenerPunch":"Minutes to auto add for Opener Punches","adtMinWage":"Minimum Wage","adtMinWageForTippedEmp":"Min. Wage for Tipped Employees","adtNVSpreadOfHours":"Nevada Spread of Hours (Rolling 24 hour shift length prior to OT)","adtNYBreakRules":"NY Break Rules","adtOpenerPunchLookMin":"Opener Punch Lookout Minutes","adtOtPercent":"OT Percentage","adtOtPercentSalaried":"OT Percentage for Managers","adtPostSchPriorToXDays":"Schedule Advance Notice (days)","adtPredPrmPayHrs":"Track Schedule Changes (no gain/loss) - Premium Pay Hours","adtPredPrmPayHrsForHrsAdded":"Track Hours Added - Premium Pay Hours","adtPredPrmPayHrsLess24Reduce":"Track Hours Reduced less than 24 hours - Premium Pay Hours","adtPredPrmPayHrsMore24Reduce":"Track Hours Reduced more than 24 hours - Premium Pay Hours","adtPredPrmPayRateForHrsAdded":"Track Hours Added - Premium Pay Rate","adtPredPrmPayRateForHrsReduced":"Track Hours Reduced - Premium Pay Rate","adtPredPrmPayRateLessFortDays":"Premium Pay Rate less than 14 days(no gain/loss)","adtPredPrmPayRateLessFortDaysAdded":"Hours Added-Premium Pay Rate less than 14 days","adtPredPrmPayRateLessFortDaysReduced":"Hours Reduced-Premium Pay Rate less than 14 days","adtPredPrmPayRateLessHours":"Premium Pay Rate less than 24 Hours(no gain/loss)","adtPredPrmPayRateLessHoursAdded":"Hours Added-Premium Pay Rate less than 24 Hours","adtPredPrmPayRateLessHoursReduced":"Hours Reduced-Premium Pay Rate less than 24 Hours","adtPredPrmPayRateLessSevenDays":"Premium Pay Rate less than 7 days(no gain/loss)","adtPredPrmPayRateLessSevenDaysAdded":"Hours Added-Premium Pay Rate less than 7 days","adtPredPrmPayRateLessSevenDaysReduced":"Hours Reduced-Premium Pay Rate less than 7 days","adtPredPrmPayRatePercForHrsReduced":"Track Hours Reduced - Premium Pay Hours","adtPredPrmPayRatePercLess24Reduce":"Track Hours Reduced less than 24 hours - Premium Pay Rate","adtPredPrmPayRatePercMore24Reduce":"Track Hours Reduced more than 24 hours - Premium Pay Rate","adtPredPrmPayRateTipEmp":"Predictive Premium Pay Rate for Tipped Employees","adtPredictivePunchOffset":"Actual Punch Allowed Offset","adtPredictiveScheduling":"Enable Predictive Scheduling","adtPunchPrintout":"Punch Printout","adtRestBreak":"Rest Break length","adtRestBrkPayRate":"Rest Break Premium Pay Rate","adtRestBrkPremiumPayMins":"Rest Break Premium Pay Hours","adtRgtToRstPercent":"Right to Rest Pay Rate %","adtRstReqInSplitShifts":"Rest Period Required Between Split Shifts (Hrs)","adtShiftLengthMeal_1":"Shift length for 1st Meal Break","adtShiftLengthMeal_2":"Shift length for 2nd Meal Break","adtShiftLengthRest_0":"Shift length for No Rest Break","adtShiftLengthRest_1":"Shift length for 1st Rest Break","adtShiftLengthRest_2":"Shift length for 2nd Rest Break","adtShiftLengthRest_3":"Shift length for 3rd Rest Break","adtShiftLengthRest_4":"Shift length for 4th Rest Break","adtShowRsnOnSchAftrSchPublish":"Show Shift Edit Reasons","adtSpecialTermPaycheck":"Special Termination Paycheck","adtSplitShiftPayRate":"Split Shift Premium Pay Rate","adtSplitShiftPremiumPayMins":"Minutes For Split Shift Premium Pay","adtTrackSchChangePrmPayRate":"Track Schedule Changes (no gain/loss)- Premium Pay Rate","adtTrackSchHrsAddition":"Track Hours Added","adtTrackSchHrsReduction":"Track Hours Reduced","adtTrackSchNoHrsChange":"Track Schedule Changes (no gain/loss)","adtWeeklyDT":"Weekly hrs prior to Dbl Time","adtWeeklyOT":"Weekly hrs prior to OT","adtWeeklyOTSalaried":"Weekly hrs prior to OT for Salaried Manager","mnrAdtDailyOT":"Daily shift length prior to OT For Minors","mnrConsecutiveNights":"Max consecutive days - school next day","mnrDaysPerWeekInSession":"Max days/week - school in session","mnrDaysPerWeekNotInSession":"Max days/week - school not in session","mnrEarliestStartTimeNotInSession":"Earliest start time - school not in session","mnrHrsPerDayInSession":"Max hrs/day - school in session","mnrHrsPerDayNotInSession":"Max hrs/day - school not in session","mnrHrsPerWeekInSession":"Max hrs/week - school in session","mnrHrsPerWeekNotInSession":"Max hrs/week - school not in session","mnrLatestEndTime":"Latest end time - no school next day","mnrLatestEndTimeSchool":"Latest end time - school next day","mnrMinWage":"Minor Minimum Wage","mnrNYBreakRules":"NY Break Rules","mnrSchoolAndWorkHours":"Max school+work hrs/day - school in session","mnrShiftLengthMeal_1":"Shift length for 1st Meal Break","mnrShiftLengthMeal_2":"Shift length for 2nd Meal Break","mnrShiftLengthRest_0":"Shift Length for No Rest Break","mnrShiftLengthRest_1":"Shift length for 1st Rest Break","mnrShiftLengthRest_2":"Shift length for 2nd Rest Break","mnrShiftLengthRest_3":"Shift length for 3rd Rest Break","mnrShiftLengthRest_4":"Shift length for 4th Rest Break","mnrTimeBetweenSchoolEndAndShiftStart":"Length of time between school end and shift start*","seventhDayRuleCA":"7th Day Rule - CA","seventhDayRuleCT":"7th Day Rule - CT","seventhDayRuleKY":"7th Day Rule - KY"};
-var STATE_BASELINE={"AK":[["adtDailyOT",0,"08:00:00",100,100],["adtMealBreak",0,"00:30:00",100,100],["adtMinWage",0,"11.73",100,100],["adtOtPercent",0,"1.5",100,100],["adtRestBreak",0,"00:15:00",100,100],["adtShiftLengthMeal_1",0,"05:00:00",100,100],["adtShiftLengthMeal_2",0,"08:00:00",100,100],["adtShiftLengthRest_0",0,"04:59:00",100,100],["adtShiftLengthRest_1",0,"05:00:00",100,100],["adtShiftLengthRest_2",0,"08:00:00",100,100],["adtShiftLengthRest_3",0,"10:00:00",100,100],["adtShiftLengthRest_4",0,"10:00:00",100,100],["adtSpecialTermPaycheck",0,"ON",100,100],["adtWeeklyOT",0,"1 day, 16:00:00",100,100],["mnrDaysPerWeekInSession",14,"6",100,100],["mnrDaysPerWeekInSession",15,"6",100,100],["mnrDaysPerWeekInSession",16,"6",100,100],["mnrDaysPerWeekInSession",17,"6",100,100],["mnrDaysPerWeekNotInSession",14,"6",100,100],["mnrDaysPerWeekNotInSession",15,"6",100,100],["mnrDaysPerWeekNotInSession",16,"6",100,100],["mnrDaysPerWeekNotInSession",17,"6",100,100],["mnrHrsPerWeekInSession",14,"23:00:00",100,100],["mnrHrsPerWeekInSession",15,"23:00:00",100,100],["mnrLatestEndTimeSchool",14,"1260",100,100],["mnrLatestEndTimeSchool",15,"1260",100,100],["mnrSchoolAndWorkHours",14,"09:00:00",100,100],["mnrSchoolAndWorkHours",15,"09:00:00",100,100],["mnrShiftLengthMeal_1",14,"05:00:00",100,100],["mnrShiftLengthMeal_1",15,"05:00:00",100,100],["mnrShiftLengthMeal_1",16,"05:00:00",100,100],["mnrShiftLengthMeal_1",17,"05:00:00",100,100],["mnrShiftLengthMeal_2",14,"-",100,100],["mnrShiftLengthMeal_2",15,"-",100,100],["mnrShiftLengthMeal_2",16,"-",100,100],["mnrShiftLengthMeal_2",17,"-",100,100],["mnrShiftLengthRest_0",16,"-",100,100],["mnrShiftLengthRest_0",17,"-",100,100],["mnrShiftLengthRest_1",14,"05:00:00",100,100],["mnrShiftLengthRest_1",15,"05:00:00",100,100],["mnrShiftLengthRest_1",16,"05:00:00",100,100],["mnrShiftLengthRest_1",17,"05:00:00",100,100],["mnrShiftLengthRest_2",14,"-",100,100],["mnrShiftLengthRest_2",15,"-",100,100],["mnrShiftLengthRest_2",16,"-",100,100],["mnrShiftLengthRest_2",17,"-",100,100],["mnrShiftLengthRest_3",14,"-",100,100],["mnrShiftLengthRest_3",15,"-",100,100],["mnrShiftLengthRest_3",16,"-",100,100],["mnrShiftLengthRest_3",17,"-",100,100],["mnrShiftLengthRest_4",14,"-",100,100],["mnrShiftLengthRest_4",15,"-",100,100],["mnrShiftLengthRest_4",16,"-",100,100],["mnrShiftLengthRest_4",17,"-",100,100],["mnrTimeBetweenSchoolEndAndShiftStart",14,"00:30:00",100,100],["mnrTimeBetweenSchoolEndAndShiftStart",15,"00:30:00",100,100],["mnrTimeBetweenSchoolEndAndShiftStart",16,"00:30:00",100,100],["mnrTimeBetweenSchoolEndAndShiftStart",17,"00:30:00",100,100]],"AL":[["adtMinWage",0,"7.25",89,100],["adtOtPercent",0,"150",80,99],["adtWeeklyOT",0,"1 day, 16:00:00",97,100],["mnrLatestEndTimeSchool",16,"1320",68,85],["mnrTimeBetweenSchoolEndAndShiftStart",16,"00:30:00",86,100],["mnrTimeBetweenSchoolEndAndShiftStart",17,"00:30:00",88,100]],"AR":[["adtWeeklyOT",0,"1 day, 16:00:00",100,98]],"AZ":[["adtMinWage",0,"11",98,68],["adtOtPercent",0,"150",90,100],["adtWeeklyOT",0,"1 day, 16:00:00",100,100],["mnrTimeBetweenSchoolEndAndShiftStart",16,"00:30:00",81,100],["mnrTimeBetweenSchoolEndAndShiftStart",17,"00:30:00",81,100]],"CA":[["adtApproachingOTAlertHours",0,"1 day, 6:00:00",76,85],["adtDailyDT",0,"12:00:00",88,98],["adtDailyOT",0,"08:00:00",92,99],["adtDailyOTSalaried",0,"12:00:00",68,61],["adtDtPercent",0,"200",78,98],["adtDtPercentSalaried",0,"200",80,98],["adtEnableEarnedBreakConcept",0,"1",71,94],["adtMaxWage",0,"40",70,88],["adtMealBreak",0,"00:30:00",90,100],["adtMealBrkPayRate",0,"1",75,68],["adtMealBrkPremiumPayMins",0,"01:00:00",76,96],["adtMinLengthTimeBetweenTwoShifts",0,"08:00:00",69,62],["adtMinShiftMinsGapForSplitShift",0,"01:00:00",74,97],["adtMinWage",0,"15",92,49],["adtOtPercent",0,"150",81,99],["adtOtPercentSalaried",0,"150",81,100],["adtRestBreak",0,"00:10:00",90,50],["adtShiftLengthMeal_1",0,"05:00:00",90,87],["adtShiftLengthMeal_2",0,"10:00:00",90,91],["adtShiftLengthRest_0",0,"00:00:00",90,81],["adtShiftLengthRest_1",0,"00:00:00",90,49],["adtShiftLengthRest_2",0,"00:00:00",90,49],["adtShiftLengthRest_3",0,"00:00:00",90,51],["adtShiftLengthRest_4",0,"00:00:00",90,78],["adtSplitShiftPayRate",0,"1",78,51],["adtSplitShiftPremiumPayMins",0,"01:00:00",76,93],["adtWeeklyOT",0,"1 day, 16:00:00",97,98],["adtWeeklyOTSalaried",0,"1 day, 16:00:00",67,96],["mnrDaysPerWeekInSession",16,"5",67,77],["mnrEarliestStartTimeNotInSession",16,"330",67,59],["mnrHrsPerDayInSession",16,"03:30:00",83,52],["mnrHrsPerDayInSession",17,"03:30:00",69,63],["mnrHrsPerDayNotInSession",16,"07:30:00",71,55],["mnrHrsPerWeekInSession",16,"22:30:00",74,53],["mnrHrsPerWeekNotInSession",16,"1 day, 13:30:00",71,56],["mnrLatestEndTime",16,"1350",71,67],["mnrLatestEndTimeSchool",16,"1350",76,53],["mnrShiftLengthMeal_1",16,"05:00:00",71,83],["mnrShiftLengthMeal_2",16,"10:00:00",71,85],["mnrShiftLengthRest_0",16,"00:00:00",71,88],["mnrShiftLengthRest_1",16,"00:00:00",71,65],["mnrShiftLengthRest_2",16,"00:00:00",71,67],["mnrShiftLengthRest_3",16,"00:00:00",71,67],["mnrShiftLengthRest_4",16,"00:00:00",71,90],["mnrTimeBetweenSchoolEndAndShiftStart",16,"00:30:00",89,98],["mnrTimeBetweenSchoolEndAndShiftStart",17,"00:30:00",75,97],["seventhDayRuleCA",0,"ON",84,100]],"CO":[["adtMinWage",0,"11.1",97,27],["adtWeeklyOT",0,"1 day, 16:00:00",87,94],["mnrTimeBetweenSchoolEndAndShiftStart",16,"00:30:00",74,100],["mnrTimeBetweenSchoolEndAndShiftStart",17,"00:30:00",71,100]],"CT":[["adtMinWage",0,"14",80,75],["adtWeeklyOT",0,"1 day, 16:00:00",100,100],["mnrTimeBetweenSchoolEndAndShiftStart",16,"00:30:00",80,100]],"DC":[["adtMinWage",0,"15",100,100],["adtWeeklyOT",0,"1 day, 16:00:00",100,100]],"DE":[["adtMealBreak",0,"00:30:00",88,100],["adtMinWage",0,"11.75",88,57],["adtOtPercent",0,"150",88,100],["adtRestBreak",0,"00:15:00",88,100],["adtShiftLengthMeal_1",0,"08:00:00",88,57],["adtShiftLengthMeal_2",0,"14:00:00",88,57],["adtShiftLengthRest_0",0,"05:00:00",88,57],["adtShiftLengthRest_1",0,"05:00:00",88,57],["adtShiftLengthRest_2",0,"10:00:00",88,57],["adtShiftLengthRest_3",0,"12:00:00",88,57],["adtShiftLengthRest_4",0,"16:00:00",88,57],["adtWeeklyOT",0,"1 day, 16:00:00",100,88]],"FL":[["adtMinWage",0,"8.46",99,57],["adtOtPercent",0,"150",76,91],["adtWeeklyOT",0,"1 day, 16:00:00",95,100],["mnrTimeBetweenSchoolEndAndShiftStart",16,"00:30:00",78,92]],"GA":[["adtMinWage",0,"7.25",99,85],["adtWeeklyOT",0,"1 day, 16:00:00",99,100]],"HI":[["adtMinWage",0,"10.1",100,67],["adtWeeklyOT",0,"1 day, 16:00:00",100,100],["mnrTimeBetweenSchoolEndAndShiftStart",14,"00:30:00",67,100],["mnrTimeBetweenSchoolEndAndShiftStart",15,"00:30:00",67,100],["mnrTimeBetweenSchoolEndAndShiftStart",16,"00:30:00",100,67],["mnrTimeBetweenSchoolEndAndShiftStart",17,"00:30:00",100,67]],"IA":[["adtMinWage",0,"7.25",100,79],["adtWeeklyOT",0,"1 day, 16:00:00",95,89],["mnrTimeBetweenSchoolEndAndShiftStart",16,"00:30:00",74,93],["mnrTimeBetweenSchoolEndAndShiftStart",17,"00:30:00",68,100]],"ID":[["adtMinWage",0,"7.25",100,90],["adtSpecialTermPaycheck",0,"ON",81,100],["adtWeeklyOT",0,"1 day, 16:00:00",90,100],["mnrHrsPerWeekInSession",14,"18:00:00",81,100],["mnrLatestEndTime",14,"1140",81,100],["mnrLatestEndTimeSchool",14,"1140",81,100],["mnrTimeBetweenSchoolEndAndShiftStart",14,"00:30:00",81,100]],"IL":[["adtMinWage",0,"8.25",94,50],["adtOtPercent",0,"150",81,97],["adtWeeklyOT",0,"1 day, 16:00:00",97,94]],"IN":[["adtMinWage",0,"7.25",88,74],["adtWeeklyOT",0,"1 day, 16:00:00",98,100]],"KS":[["adtMinWage",0,"7.25",100,100],["adtOtPercent",0,"150",89,100],["adtWeeklyOT",0,"1 day, 16:00:00",100,100]],"KY":[["adtMinWage",0,"7.25",91,71],["adtWeeklyOT",0,"1 day, 16:00:00",72,100]],"LA":[["adtMinWage",0,"7.25",100,98],["adtWeeklyOT",0,"1 day, 16:00:00",95,100],["mnrTimeBetweenSchoolEndAndShiftStart",16,"00:30:00",84,97],["mnrTimeBetweenSchoolEndAndShiftStart",17,"00:30:00",70,100]],"MA":[["adtMinWage",0,"15",100,100],["adtOtPercent",0,"150",69,78],["adtWeeklyOT",0,"1 day, 16:00:00",85,100]],"MD":[["adtMinWage",0,"15",100,44],["adtWeeklyOT",0,"1 day, 16:00:00",100,100],["mnrTimeBetweenSchoolEndAndShiftStart",14,"00:30:00",71,100]],"ME":[["adtMealBreak",0,"00:00:00",100,100],["adtMinWage",0,"15.1",100,100],["adtRestBreak",0,"00:00:00",100,100],["adtShiftLengthMeal_1",0,"00:00:00",100,100],["adtShiftLengthMeal_2",0,"00:00:00",100,100],["adtShiftLengthRest_0",0,"00:00:00",100,100],["adtShiftLengthRest_1",0,"00:00:00",100,100],["adtShiftLengthRest_2",0,"00:00:00",100,100],["adtShiftLengthRest_3",0,"00:00:00",100,100],["adtShiftLengthRest_4",0,"00:00:00",100,100],["adtWeeklyOT",0,"1 day, 16:00:00",100,100],["mnrConsecutiveNights",16,"5",100,100],["mnrDaysPerWeekInSession",16,"5",100,100],["mnrDaysPerWeekNotInSession",16,"5",100,100],["mnrEarliestStartTimeNotInSession",16,"480",100,100],["mnrHrsPerDayInSession",16,"05:30:00",100,100],["mnrHrsPerDayNotInSession",16,"08:00:00",100,100],["mnrHrsPerWeekInSession",16,"1 day, 0:00:00",100,100],["mnrHrsPerWeekNotInSession",16,"2 days, 1:00:00",100,100],["mnrLatestEndTime",16,"1320",100,100],["mnrLatestEndTimeSchool",16,"1200",100,100],["mnrSchoolAndWorkHours",16,"15:00:00",100,100],["mnrTimeBetweenSchoolEndAndShiftStart",16,"00:30:00",100,100]],"MI":[["adtMinWage",0,"9.45",91,22],["adtOtPercent",0,"150",71,91],["adtWeeklyOT",0,"1 day, 16:00:00",97,99]],"MN":[["adtWeeklyOT",0,"1 day, 16:00:00",100,100],["mnrTimeBetweenSchoolEndAndShiftStart",14,"12:00:00",68,59]],"MO":[["adtMinWage",0,"8.6",95,38],["adtWeeklyOT",0,"1 day, 16:00:00",97,100]],"MS":[["adtMinWage",0,"7.25",88,95],["adtWeeklyOT",0,"1 day, 16:00:00",98,98],["mnrTimeBetweenSchoolEndAndShiftStart",16,"00:30:00",74,87]],"MT":[["adtMinWage",0,"10.55",100,23],["adtWeeklyOT",0,"1 day, 16:00:00",100,100]],"NC":[["adtMinWage",0,"7.25",92,97],["adtWeeklyOT",0,"1 day, 16:00:00",99,98]],"ND":[["adtMinWage",0,"7.25",100,100],["adtOtPercent",0,"150",89,100],["adtWeeklyOT",0,"1 day, 16:00:00",100,100],["mnrTimeBetweenSchoolEndAndShiftStart",15,"00:30:00",100,100]],"NE":[["adtMinWage",0,"-",67,29],["adtWeeklyOT",0,"1 day, 16:00:00",90,79],["mnrTimeBetweenSchoolEndAndShiftStart",14,"00:30:00",71,40]],"NJ":[["adtMinWage",0,"15.49",95,89],["adtWeeklyOT",0,"1 day, 16:00:00",100,100]],"NM":[["adtMealBreak",0,"00:30:00",100,100],["adtMinWage",0,"10.5",100,100],["adtOtPercent",0,"150",100,100],["adtRestBreak",0,"00:30:00",100,100],["adtShiftLengthMeal_1",0,"00:30:00",100,100],["adtShiftLengthMeal_2",0,"00:30:00",100,100],["adtShiftLengthRest_0",0,"00:00:00",100,100],["adtShiftLengthRest_1",0,"00:30:00",100,100],["adtShiftLengthRest_2",0,"00:30:00",100,100],["adtShiftLengthRest_3",0,"00:30:00",100,100],["adtShiftLengthRest_4",0,"00:30:00",100,100],["adtWeeklyOT",0,"1 day, 16:00:00",100,100],["mnrTimeBetweenSchoolEndAndShiftStart",14,"00:30:00",100,100],["mnrTimeBetweenSchoolEndAndShiftStart",15,"00:30:00",100,100],["mnrTimeBetweenSchoolEndAndShiftStart",16,"00:30:00",100,100],["mnrTimeBetweenSchoolEndAndShiftStart",17,"00:30:00",100,100]],"NV":[["adtMaxWage",0,"30",70,100],["adtMealBreak",0,"00:30:00",76,100],["adtMinWage",0,"8.25",76,74],["adtRestBreak",0,"00:00:00",76,71],["adtShiftLengthMeal_1",0,"08:00:00",76,97],["adtShiftLengthMeal_2",0,"00:00:00",76,77],["adtShiftLengthRest_0",0,"00:00:00",76,77],["adtShiftLengthRest_1",0,"00:00:00",76,71],["adtShiftLengthRest_2",0,"00:00:00",76,77],["adtShiftLengthRest_3",0,"00:00:00",76,77],["adtShiftLengthRest_4",0,"00:00:00",76,77],["mnrTimeBetweenSchoolEndAndShiftStart",16,"00:30:00",96,100],["mnrTimeBetweenSchoolEndAndShiftStart",17,"00:30:00",96,100]],"NY":[["adtMinWage",0,"15",89,46],["adtWeeklyOT",0,"1 day, 16:00:00",99,99]],"OH":[["adtMinWage",0,"8.55",87,19],["adtWeeklyOT",0,"1 day, 16:00:00",95,99],["mnrTimeBetweenSchoolEndAndShiftStart",16,"00:30:00",71,61]],"OK":[["adtMinWage",0,"7.25",84,100],["adtOtPercent",0,"150",81,100],["adtWeeklyOT",0,"1 day, 16:00:00",100,100],["mnrTimeBetweenSchoolEndAndShiftStart",14,"01:00:00",95,56],["mnrTimeBetweenSchoolEndAndShiftStart",16,"00:30:00",88,98],["mnrTimeBetweenSchoolEndAndShiftStart",17,"00:30:00",88,98]],"OR":[["adtMealBreak",0,"00:30:00",95,97],["adtMinWage",0,"12.5",90,61],["adtOtPercent",0,"150",68,93],["adtRestBreak",0,"00:10:00",95,76],["adtShiftLengthMeal_1",0,"05:59:00",95,53],["adtShiftLengthMeal_2",0,"10:00:00",95,55],["adtShiftLengthRest_0",0,"00:00:00",95,92],["adtShiftLengthRest_1",0,"00:00:00",95,58],["adtShiftLengthRest_2",0,"08:00:00",95,58],["adtShiftLengthRest_3",0,"12:00:00",95,58],["adtShiftLengthRest_4",0,"00:00:00",95,87],["adtSpecialTermPaycheck",0,"ON",88,100],["adtWeeklyOT",0,"1 day, 16:00:00",100,100],["mnrHrsPerWeekInSession",16,"1 day, 16:00:00",78,65],["mnrHrsPerWeekInSession",17,"1 day, 16:00:00",72,69],["mnrHrsPerWeekNotInSession",16,"1 day, 16:00:00",75,67],["mnrHrsPerWeekNotInSession",17,"1 day, 16:00:00",72,69],["mnrShiftLengthMeal_1",16,"-",80,62],["mnrShiftLengthMeal_2",16,"-",80,62],["mnrShiftLengthRest_0",16,"-",80,62],["mnrShiftLengthRest_1",16,"02:00:00",80,62],["mnrShiftLengthRest_2",16,"-",80,62],["mnrShiftLengthRest_3",16,"-",80,62],["mnrShiftLengthRest_4",16,"-",80,62],["mnrTimeBetweenSchoolEndAndShiftStart",16,"01:00:00",90,56],["mnrTimeBetweenSchoolEndAndShiftStart",17,"01:00:00",78,65]],"PA":[["adtMinWage",0,"7.25",89,100],["adtWeeklyOT",0,"1 day, 16:00:00",99,100]],"RI":[["adtMinWage",0,"14",100,75],["adtOtPercent",0,"150",100,100],["adtWeeklyOT",0,"1 day, 16:00:00",100,100]],"SC":[["adtMinWage",0,"7.25",88,97],["adtWeeklyOT",0,"1 day, 16:00:00",99,100],["mnrTimeBetweenSchoolEndAndShiftStart",14,"00:30:00",67,69]],"SD":[["adtMinWage",0,"9.25",100,38],["adtWeeklyOT",0,"1 day, 16:00:00",88,100]],"TN":[["adtMinWage",0,"7.25",82,95],["adtWeeklyOT",0,"1 day, 16:00:00",100,100],["mnrTimeBetweenSchoolEndAndShiftStart",16,"00:30:00",88,98]],"TX":[["adtMinWage",0,"7.25",99,96],["adtOtPercent",0,"150",77,99],["adtWeeklyOT",0,"1 day, 16:00:00",99,100],["mnrTimeBetweenSchoolEndAndShiftStart",16,"00:30:00",87,100],["mnrTimeBetweenSchoolEndAndShiftStart",17,"00:30:00",80,100]],"UT":[["adtMinWage",0,"7.25",88,100],["adtOtPercent",0,"150",88,100],["adtWeeklyOT",0,"1 day, 16:00:00",100,100],["mnrHrsPerDayInSession",14,"03:00:00",88,50],["mnrTimeBetweenSchoolEndAndShiftStart",14,"00:30:00",88,50]],"VA":[["adtMinWage",0,"12.77",93,42],["adtOtPercent",0,"150",79,93],["adtWeeklyOT",0,"1 day, 16:00:00",100,100],["mnrTimeBetweenSchoolEndAndShiftStart",16,"00:30:00",70,92]],"VT":[["adtAllowMealBrkWaiver",0,"01:00:00",100,100],["adtApproachingOTAlertHours",0,"1 day, 14:00:00",100,100],["adtApproachingOTAlertHoursSalaried",0,"1 day, 16:00:00",100,100],["adtAssumeFullTipCredit",0,"YES",100,100],["adtMealBreak",0,"00:15:00",100,100],["adtMinShiftMinsGapForSplitShift",0,"01:00:00",100,100],["adtMinWage",0,"12.55",100,100],["adtMinWageForTippedEmp",0,"7.25",100,100],["adtOtPercent",0,"150",100,100],["adtRestBreak",0,"00:15:00",100,100],["adtShiftLengthMeal_1",0,"05:00:00",100,100],["adtShiftLengthMeal_2",0,"08:00:00",100,100],["adtShiftLengthRest_0",0,"04:00:00",100,100],["adtShiftLengthRest_1",0,"05:00:00",100,100],["adtShiftLengthRest_2",0,"08:00:00",100,100],["adtShiftLengthRest_3",0,"12:00:00",100,100],["adtShiftLengthRest_4",0,"16:00:00",100,100],["adtSpecialTermPaycheck",0,"ON",100,100],["adtWeeklyOT",0,"1 day, 16:00:00",100,100],["mnrConsecutiveNights",16,"2",100,100],["mnrDaysPerWeekInSession",16,"5",100,100],["mnrDaysPerWeekNotInSession",16,"5",100,100],["mnrEarliestStartTimeNotInSession",16,"480",100,100],["mnrHrsPerDayInSession",16,"04:00:00",100,100],["mnrHrsPerDayNotInSession",16,"06:00:00",100,100],["mnrHrsPerWeekInSession",16,"20:00:00",100,100],["mnrHrsPerWeekNotInSession",16,"06:00:00",100,100],["mnrLatestEndTime",16,"1320",100,100],["mnrLatestEndTimeSchool",16,"1260",100,100],["mnrMinWage",16,"10.67",100,100],["mnrSchoolAndWorkHours",16,"12:00:00",100,100],["mnrShiftLengthMeal_1",16,"08:00:00",100,100],["mnrShiftLengthMeal_2",16,"08:00:00",100,100],["mnrShiftLengthRest_0",16,"04:00:00",100,100],["mnrShiftLengthRest_1",16,"05:00:00",100,100],["mnrShiftLengthRest_2",16,"12:00:00",100,100],["mnrShiftLengthRest_3",16,"16:00:00",100,100],["mnrShiftLengthRest_4",16,"20:00:00",100,100],["mnrTimeBetweenSchoolEndAndShiftStart",16,"01:00:00",100,100]],"WA":[["adtMealBreak",0,"00:30:00",68,100],["adtMinWage",0,"17.13",98,36],["adtRestBreak",0,"00:10:00",68,100],["adtShiftLengthMeal_1",0,"05:00:00",68,93],["adtShiftLengthMeal_2",0,"12:00:00",68,43],["adtShiftLengthRest_0",0,"03:00:00",68,43],["adtShiftLengthRest_1",0,"04:00:00",68,68],["adtShiftLengthRest_2",0,"08:00:00",68,70],["adtShiftLengthRest_3",0,"10:00:00",68,61],["adtShiftLengthRest_4",0,"14:00:00",68,41],["adtWeeklyOT",0,"1 day, 16:00:00",97,98]],"WI":[["adtMinWage",0,"7.25",75,70],["adtOtPercent",0,"150",68,100],["adtWeeklyOT",0,"1 day, 16:00:00",100,100]],"WV":[["adtMinWage",0,"8.75",100,85],["adtWeeklyOT",0,"1 day, 16:00:00",100,100]],"WY":[["adtMinWage",0,"7.25",100,100],["adtWeeklyOT",0,"1 day, 16:00:00",91,80],["mnrTimeBetweenSchoolEndAndShiftStart",16,"00:30:00",73,100]]};
+var LAW_NAMES={"mnrShiftLengthRest_1":"Shift length for 1st Rest Break","mnrShiftLengthMeal_2":"Shift length for 2nd Meal Break","mnrShiftLengthMeal_1":"Shift length for 1st Meal Break","mnrSchoolAndWorkHours":"Max school+work hrs/day - school in session","mnrLatestEndTimeSchool":"Latest end time - school next day","mnrLatestEndTime":"Latest end time - no school next day","mnrHrsPerWeekNotInSession":"Max hrs/week - school not in session","mnrHrsPerWeekInSession":"Max hrs/week - school in session","mnrHrsPerDayNotInSession":"Max hrs/day - school not in session","mnrShiftLengthRest_4":"Shift length for 4th Rest Break","mnrHrsPerDayInSession":"Max hrs/day - school in session","mnrEarliestStartTimeNotInSession":"Earliest start time - school not in session","mnrDaysPerWeekNotInSession":"Max days/week - school not in session","adtDailyDT":"Daily shift length prior to Dbl Time","mnrDaysPerWeekInSession":"Max days/week - school in session","mnrConsecutiveNights":"Max consecutive days - school next day","adtWeeklyDT":"Weekly hrs prior to Dbl Time","adtSpecialTermPaycheck":"Special Termination Paycheck","adtMinWage":"Minimum Wage","adtDaysPerWeek":"Max number of days/week","adtDailyOT":"Daily shift length prior to OT","mnrTimeBetweenSchoolEndAndShiftStart":"Length of time between school end and shift start*","mnrShiftLengthRest_3":"Shift length for 3rd Rest Break","mnrShiftLengthRest_2":"Shift length for 2nd Rest Break","adtPunchPrintout":"Punch Printout","adtAssumeFullTipCredit":"Assume Full Tip Credit for Job Code","adtMinWageForTippedEmp":"Min. Wage for Tipped Employees","adtApproachingOTAlertHoursSalaried":"Approaching Weekly OT Alert Mgr","mnrMinWage":"Minor Minimum Wage","adtRestBrkPayRate":"Rest Break Premium Pay Rate","adtRestBrkPremiumPayMins":"Rest Break Premium Pay Hours","adtSplitShiftPremiumPayMins":"Minutes For Split Shift Premium Pay","adtMinShiftMinsGapForSplitShift":"Minimum gap of time for Split Shift","adtAllowMealBrkWaiver":"Allow Meal Waiver","adtMinLengthTimeBetweenTwoShifts":"Minimum length of time between two shifts","adtDtPercent":"DT Percentage","adtMaxWage":"Maximum Wage","adtMealBrkPayRate":"Meal Break Premium Pay Rate","adtApproachingOTAlertHours":"Hours for Approaching OT Alert in Weekly Timekeeping","adtMealBrkPremiumPayMins":"Meal Break Premium Pay Hours","adtOtPercent":"OT Percentage","adtSplitShiftPayRate":"Split Shift Premium Pay Rate","adtWeeklyOTSalaried":"Weekly hrs prior to OT for Salaried Manager","mnrShiftLengthRest_0":"Shift Length for No Rest Break","adtMinCreditCardPercForTips":"Min. Credit Card Percentage for Tips","adtMaxDailyHrsPartTimeEmp":"Max Daily Hours For Part Time Employee","adtMinCashPercForTips":"Min. Cash Percentage for Tips","adtMaxWeeklyHrPartTimeForEmp":"Max Weekly Hour For Part Time Employee","adtWeeklyOT":"Weekly hrs prior to OT","adtMealBreak":"Meal Break length","adtShiftLengthRest_3":"Shift length for 3rd Rest Break","adtShiftLengthRest_1":"Shift length for 1st Rest Break","adtShiftLengthRest_0":"Shift length for No Rest Break","adtShiftLengthRest_4":"Shift length for 4th Rest Break","adtShiftLengthRest_2":"Shift length for 2nd Rest Break","adtShiftLengthMeal_2":"Shift length for 2nd Meal Break","adtShiftLengthMeal_1":"Shift length for 1st Meal Break","adtRestBreak":"Rest Break length","mnrAdtDailyOT":"Daily shift length prior to OT For Minors","adtDailyOTSalaried":"Daily shift length prior to OT for Salaried Manager","adtDtPercentSalaried":"DT Percentage for Managers","adtDailyDTSalaried":"Daily shift length prior to Dbl Time for Salaried Manager","adtOtPercentSalaried":"OT Percentage for Managers","seventhDayRuleCA":"7th Day Rule - CA","adtEnableEarnedBreakConcept":"Enable Earned Break Concept","adtCloserPunchLookMin":"Closer Punch Lookout Minutes","adtMinToAddCloserPunch":"Minutes to auto add for Closer Punches","adtMinToAddOpenerPunch":"Minutes to auto add for Opener Punches","adtOpenerPunchLookMin":"Opener Punch Lookout Minutes","adtPredictivePunchOffset":"Actual Punch Allowed Offset","adtRstReqInSplitShifts":"Rest Period Required Between Split Shifts (Hrs)","adtShowRsnOnSchAftrSchPublish":"Show Shift Edit Reasons","adtTrackSchHrsAddition":"Track Hours Added","adtTrackSchHrsReduction":"Track Hours Reduced","adtTrackSchNoHrsChange":"Track Schedule Changes (no gain/loss)","adtPostSchPriorToXDays":"Schedule Advance Notice (days)","adtPredictiveScheduling":"Enable Predictive Scheduling","adtHrsForClopening":"Hours For Rest Between the Shifts","adtMinShiftGapForRgtToRstShift":"Right to Rest Gap between two shifts","adtPredPrmPayHrs":"Track Schedule Changes (no gain/loss) - Premium Pay Hours","adtPredPrmPayHrsForHrsAdded":"Track Hours Added - Premium Pay Hours","adtPredPrmPayHrsMore24Reduce":"Track Hours Reduced more than 24 hours - Premium Pay Hours","adtPredPrmPayRateForHrsAdded":"Track Hours Added - Premium Pay Rate","adtPredPrmPayRateForHrsReduced":"Track Hours Reduced - Premium Pay Rate","adtPredPrmPayRateLessFortDays":"Premium Pay Rate less than 14 days(no gain/loss)","adtPredPrmPayRateLessFortDaysAdded":"Hours Added-Premium Pay Rate less than 14 days","adtPredPrmPayRateLessFortDaysReduced":"Hours Reduced-Premium Pay Rate less than 14 days","adtPredPrmPayRateLessHours":"Premium Pay Rate less than 24 Hours(no gain/loss)","adtPredPrmPayRateLessHoursAdded":"Hours Added-Premium Pay Rate less than 24 Hours","adtPredPrmPayRateLessHoursReduced":"Hours Reduced-Premium Pay Rate less than 24 Hours","adtPredPrmPayRateLessSevenDays":"Premium Pay Rate less than 7 days(no gain/loss)","adtPredPrmPayRateLessSevenDaysAdded":"Hours Added-Premium Pay Rate less than 7 days","adtPredPrmPayRateLessSevenDaysReduced":"Hours Reduced-Premium Pay Rate less than 7 days","adtPredPrmPayRatePercForHrsReduced":"Track Hours Reduced - Premium Pay Hours","adtPredPrmPayRatePercMore24Reduce":"Track Hours Reduced more than 24 hours - Premium Pay Rate","adtPredPrmPayRateTipEmp":"Predictive Premium Pay Rate for Tipped Employees","adtRgtToRstPercent":"Right to Rest Pay Rate %","adtTrackSchChangePrmPayRate":"Track Schedule Changes (no gain/loss)- Premium Pay Rate","adtPredPrmPayHrsLess24Reduce":"Track Hours Reduced less than 24 hours - Premium Pay Hours","adtPredPrmPayRatePercLess24Reduce":"Track Hours Reduced less than 24 hours - Premium Pay Rate","adtNVSpreadOfHours":"Nevada Spread of Hours (Rolling 24 hour shift length prior to OT)","seventhDayRuleKY":"7th Day Rule - KY","adtMinShiftLength":"Min Shift Length","adtMaxShiftLength":"Max Shift Length","adtNYBreakRules":"NY Break Rules","mnrNYBreakRules":"NY Break Rules","seventhDayRuleCT":"7th Day Rule - CT"};
+var STATE_BASELINE={"MI":[["adtMinWage",0,"9.45",91,22],["adtWeeklyOT",0,"40:00:00",97,99],["adtOtPercent",0,"150",71,91]],"OH":[["mnrTimeBetweenSchoolEndAndShiftStart",16,"0:30",71,61],["adtMinWage",0,"8.55",87,19],["adtWeeklyOT",0,"40:00:00",95,99]],"WI":[["adtWeeklyOT",0,"40:00:00",100,100],["adtMinWage",0,"7.25",75,70],["adtOtPercent",0,"150",68,100]],"CA":[["adtMinShiftMinsGapForSplitShift",0,"1:00",74,97],["adtMaxWage",0,"40",70,88],["adtSplitShiftPremiumPayMins",0,"1:00",76,93],["adtSplitShiftPayRate",0,"1",78,51],["adtMinLengthTimeBetweenTwoShifts",0,"8:00",69,62],["adtMealBrkPremiumPayMins",0,"1:00",76,96],["adtMealBrkPayRate",0,"1",75,68],["adtDailyOTSalaried",0,"12:00",68,61],["adtDtPercent",0,"200",78,98],["adtDtPercentSalaried",0,"200",80,98],["adtApproachingOTAlertHours",0,"30:00:00",76,85],["adtWeeklyOTSalaried",0,"40:00:00",67,96],["adtOtPercent",0,"150",81,99],["adtOtPercentSalaried",0,"150",81,100],["mnrTimeBetweenSchoolEndAndShiftStart",17,"0:30",75,97],["mnrLatestEndTimeSchool",16,"1350",76,53],["mnrLatestEndTime",16,"1350",71,67],["mnrHrsPerWeekNotInSession",16,"37:30:00",71,56],["mnrHrsPerWeekInSession",16,"22:30",74,53],["mnrHrsPerDayNotInSession",16,"7:30",71,55],["mnrHrsPerDayInSession",17,"3:30",69,63],["mnrHrsPerDayInSession",16,"3:30",83,52],["mnrEarliestStartTimeNotInSession",16,"330",67,59],["adtDailyDT",0,"12:00",88,98],["mnrDaysPerWeekInSession",16,"5",67,77],["adtWeeklyOT",0,"40:00:00",97,98],["adtShiftLengthRest_4",0,"0:00",90,78],["adtShiftLengthRest_3",0,"0:00",90,51],["adtShiftLengthRest_2",0,"0:00",90,49],["adtShiftLengthRest_1",0,"0:00",90,49],["adtShiftLengthMeal_2",0,"10:00",90,91],["adtShiftLengthMeal_1",0,"5:00",90,87],["adtRestBreak",0,"0:10",90,50],["adtMinWage",0,"15",92,49],["adtMealBreak",0,"0:30",90,100],["seventhDayRuleCA",0,"ON",84,100],["adtDailyOT",0,"8:00",92,99],["mnrTimeBetweenSchoolEndAndShiftStart",16,"0:30",89,98],["mnrShiftLengthMeal_1",16,"5:00",71,83],["adtShiftLengthRest_0",0,"0:00",90,81],["adtEnableEarnedBreakConcept",0,"1",71,94],["mnrShiftLengthMeal_2",16,"10:00",71,85],["mnrShiftLengthRest_4",16,"0:00",71,90],["mnrShiftLengthRest_3",16,"0:00",71,67],["mnrShiftLengthRest_2",16,"0:00",71,67],["mnrShiftLengthRest_1",16,"0:00",71,65],["mnrShiftLengthRest_0",16,"0:00",71,88]],"IL":[["adtMinWage",0,"8.25",94,50],["adtWeeklyOT",0,"40:00:00",97,94],["adtOtPercent",0,"150",81,97]],"IN":[["adtWeeklyOT",0,"40:00:00",98,100],["adtMinWage",0,"7.25",88,74]],"FL":[["mnrTimeBetweenSchoolEndAndShiftStart",16,"0:30",78,92],["adtMinWage",0,"8.46",99,57],["adtWeeklyOT",0,"40:00:00",95,100],["adtOtPercent",0,"150",76,91]],"AZ":[["adtOtPercent",0,"150",90,100],["mnrTimeBetweenSchoolEndAndShiftStart",16,"0:30",81,100],["mnrTimeBetweenSchoolEndAndShiftStart",17,"0:30",81,100],["adtMinWage",0,"11",98,68],["adtWeeklyOT",0,"40:00:00",100,100]],"NV":[["adtShiftLengthRest_0",0,"0:00",76,77],["mnrTimeBetweenSchoolEndAndShiftStart",17,"0:30",96,100],["mnrTimeBetweenSchoolEndAndShiftStart",16,"0:30",96,100],["adtShiftLengthRest_4",0,"0:00",76,77],["adtShiftLengthRest_3",0,"0:00",76,77],["adtShiftLengthRest_2",0,"0:00",76,77],["adtShiftLengthRest_1",0,"0:00",76,71],["adtShiftLengthMeal_2",0,"0:00",76,77],["adtShiftLengthMeal_1",0,"8:00",76,97],["adtRestBreak",0,"0:00",76,71],["adtMinWage",0,"8.25",76,74],["adtMealBreak",0,"0:30",76,100],["adtMaxWage",0,"30",70,100]],"TX":[["mnrTimeBetweenSchoolEndAndShiftStart",17,"0:30",80,100],["mnrTimeBetweenSchoolEndAndShiftStart",16,"0:30",87,100],["adtWeeklyOT",0,"40:00:00",99,100],["adtMinWage",0,"7.25",99,96],["adtOtPercent",0,"150",77,99]],"SC":[["adtWeeklyOT",0,"40:00:00",99,100],["mnrTimeBetweenSchoolEndAndShiftStart",14,"0:30",67,69],["adtMinWage",0,"7.25",88,97]],"KY":[["adtWeeklyOT",0,"40:00:00",72,100],["adtMinWage",0,"7.25",91,71]],"WV":[["adtMinWage",0,"8.75",100,85],["adtWeeklyOT",0,"40:00:00",100,100]],"OK":[["mnrTimeBetweenSchoolEndAndShiftStart",14,"1:00",95,56],["mnrTimeBetweenSchoolEndAndShiftStart",16,"0:30",88,98],["mnrTimeBetweenSchoolEndAndShiftStart",17,"0:30",88,98],["adtMinWage",0,"7.25",84,100],["adtWeeklyOT",0,"40:00:00",100,100],["adtOtPercent",0,"150",81,100]],"PA":[["adtMinWage",0,"7.25",89,100],["adtWeeklyOT",0,"40:00:00",99,100]],"NY":[["adtWeeklyOT",0,"40:00:00",99,99],["adtMinWage",0,"15",89,46]],"CO":[["adtWeeklyOT",0,"40:00:00",87,94],["adtMinWage",0,"11.1",97,27],["mnrTimeBetweenSchoolEndAndShiftStart",17,"0:30",71,100],["mnrTimeBetweenSchoolEndAndShiftStart",16,"0:30",74,100]],"NC":[["adtMinWage",0,"7.25",92,97],["adtWeeklyOT",0,"40:00:00",99,98]],"AR":[["adtWeeklyOT",0,"40:00:00",100,98]],"AL":[["mnrTimeBetweenSchoolEndAndShiftStart",17,"0:30",88,100],["adtMinWage",0,"7.25",89,100],["adtWeeklyOT",0,"40:00:00",97,100],["mnrTimeBetweenSchoolEndAndShiftStart",16,"0:30",86,100],["mnrLatestEndTimeSchool",16,"1320",68,85],["adtOtPercent",0,"150",80,99]],"MS":[["mnrTimeBetweenSchoolEndAndShiftStart",16,"0:30",74,87],["adtWeeklyOT",0,"40:00:00",98,98],["adtMinWage",0,"7.25",88,95]],"TN":[["mnrTimeBetweenSchoolEndAndShiftStart",16,"0:30",88,98],["adtWeeklyOT",0,"40:00:00",100,100],["adtMinWage",0,"7.25",82,95]],"WA":[["adtMinWage",0,"17.13",98,36],["adtWeeklyOT",0,"40:00:00",97,98],["adtMealBreak",0,"0:30",68,100],["adtRestBreak",0,"0:10",68,100],["adtShiftLengthMeal_1",0,"5:00",68,93],["adtShiftLengthMeal_2",0,"12:00",68,43],["adtShiftLengthRest_1",0,"4:00",68,68],["adtShiftLengthRest_2",0,"8:00",68,70],["adtShiftLengthRest_3",0,"10:00",68,61],["adtShiftLengthRest_4",0,"14:00",68,41],["adtShiftLengthRest_0",0,"3:00",68,43]],"GA":[["adtWeeklyOT",0,"40:00:00",99,100],["adtMinWage",0,"7.25",99,85]],"MO":[["adtMinWage",0,"8.6",95,38],["adtWeeklyOT",0,"40:00:00",97,100]],"VA":[["mnrTimeBetweenSchoolEndAndShiftStart",16,"0:30",70,92],["adtMinWage",0,"12.77",93,42],["adtWeeklyOT",0,"40:00:00",100,100],["adtOtPercent",0,"150",79,93]],"OR":[["mnrHrsPerWeekInSession",16,"40:00:00",78,65],["mnrHrsPerWeekInSession",17,"40:00:00",73,69],["mnrHrsPerWeekNotInSession",16,"40:00:00",75,67],["mnrHrsPerWeekNotInSession",17,"40:00:00",73,69],["mnrShiftLengthMeal_1",16,"-",80,63],["mnrShiftLengthMeal_2",16,"-",80,63],["mnrShiftLengthRest_1",16,"2:00",80,63],["mnrShiftLengthRest_2",16,"-",80,63],["mnrShiftLengthRest_3",16,"-",80,63],["mnrShiftLengthRest_4",16,"-",80,63],["adtMealBreak",0,"0:30",95,97],["adtMinWage",0,"12.5",90,61],["adtRestBreak",0,"0:10",95,76],["mnrTimeBetweenSchoolEndAndShiftStart",16,"1:00",90,56],["mnrShiftLengthRest_0",16,"-",80,63],["adtShiftLengthRest_0",0,"0:00",95,92],["adtShiftLengthMeal_1",0,"5:59",95,53],["mnrTimeBetweenSchoolEndAndShiftStart",17,"1:00",78,65],["adtShiftLengthMeal_2",0,"10:00",95,55],["adtShiftLengthRest_1",0,"0:00",95,58],["adtShiftLengthRest_2",0,"8:00",95,58],["adtShiftLengthRest_3",0,"12:00",95,58],["adtShiftLengthRest_4",0,"0:00",95,87],["adtSpecialTermPaycheck",0,"ON",88,100],["adtWeeklyOT",0,"40:00:00",100,100],["adtOtPercent",0,"150",68,93]],"MD":[["adtMinWage",0,"15",100,44],["adtWeeklyOT",0,"40:00:00",100,100],["mnrTimeBetweenSchoolEndAndShiftStart",14,"0:30",71,100]],"ND":[["adtWeeklyOT",0,"40:00:00",100,100],["adtMinWage",0,"7.25",100,100],["mnrTimeBetweenSchoolEndAndShiftStart",15,"0:30",100,100],["adtOtPercent",0,"150",89,100]],"ID":[["mnrLatestEndTimeSchool",14,"1140",81,100],["mnrHrsPerWeekInSession",14,"18:00",81,100],["adtWeeklyOT",0,"40:00:00",90,100],["adtSpecialTermPaycheck",0,"ON",81,100],["adtMinWage",0,"7.25",100,90],["mnrTimeBetweenSchoolEndAndShiftStart",14,"0:30",81,100],["mnrLatestEndTime",14,"1140",81,100]],"MT":[["adtMinWage",0,"9",100,23],["adtWeeklyOT",0,"40:00:00",100,100]],"NE":[["adtWeeklyOT",0,"40:00:00",90,79],["mnrTimeBetweenSchoolEndAndShiftStart",14,"0:30",71,40],["adtMinWage",0,"9",67,29]],"UT":[["adtWeeklyOT",0,"40:00:00",100,100],["adtMinWage",0,"7.25",88,100],["adtOtPercent",0,"150",88,100],["mnrHrsPerDayInSession",14,"3:00",88,50],["mnrTimeBetweenSchoolEndAndShiftStart",14,"0:30",88,50]],"LA":[["adtWeeklyOT",0,"40:00:00",95,100],["adtMinWage",0,"7.25",100,98],["mnrTimeBetweenSchoolEndAndShiftStart",16,"0:30",84,97],["mnrTimeBetweenSchoolEndAndShiftStart",17,"0:30",70,100]],"IA":[["adtWeeklyOT",0,"40:00:00",95,89],["adtMinWage",0,"7.25",100,79],["mnrTimeBetweenSchoolEndAndShiftStart",17,"0:30",68,100],["mnrTimeBetweenSchoolEndAndShiftStart",16,"0:30",74,93]],"MA":[["adtWeeklyOT",0,"40:00:00",85,100],["adtMinWage",0,"15",100,100],["adtOtPercent",0,"150",69,78]],"MN":[["adtWeeklyOT",0,"40:00:00",100,100],["mnrTimeBetweenSchoolEndAndShiftStart",14,"12:00",68,59]],"DC":[["adtWeeklyOT",0,"40:00:00",100,100],["adtMinWage",0,"15",100,100]],"CT":[["mnrTimeBetweenSchoolEndAndShiftStart",16,"0:30",80,100],["adtWeeklyOT",0,"40:00:00",100,100],["adtMinWage",0,"14",80,75]],"WY":[["mnrTimeBetweenSchoolEndAndShiftStart",16,"0:30",73,100],["adtMinWage",0,"7.25",100,100],["adtWeeklyOT",0,"40:00:00",91,80]],"KS":[["adtWeeklyOT",0,"40:00:00",100,100],["adtMinWage",0,"7.25",100,100],["adtOtPercent",0,"150",89,100]],"SD":[["adtWeeklyOT",0,"40:00:00",88,100],["adtMinWage",0,"9.25",100,38]],"NM":[["adtShiftLengthRest_4",0,"0:30",100,100],["adtShiftLengthRest_3",0,"0:30",100,100],["adtShiftLengthRest_2",0,"0:30",100,100],["adtShiftLengthRest_1",0,"0:30",100,100],["adtShiftLengthMeal_2",0,"0:30",100,100],["adtShiftLengthMeal_1",0,"0:30",100,100],["adtRestBreak",0,"0:30",100,100],["adtMinWage",0,"10.5",100,100],["adtMealBreak",0,"0:30",100,100],["adtShiftLengthRest_0",0,"0:00",100,100],["mnrTimeBetweenSchoolEndAndShiftStart",14,"0:30",100,100],["mnrTimeBetweenSchoolEndAndShiftStart",15,"0:30",100,100],["mnrTimeBetweenSchoolEndAndShiftStart",17,"0:30",100,100],["adtWeeklyOT",0,"40:00:00",100,100],["mnrTimeBetweenSchoolEndAndShiftStart",16,"0:30",100,100],["adtOtPercent",0,"150",100,100]],"NJ":[["adtMinWage",0,"15.49",95,89],["adtWeeklyOT",0,"40:00:00",100,100]],"HI":[["mnrTimeBetweenSchoolEndAndShiftStart",16,"0:30",100,67],["mnrTimeBetweenSchoolEndAndShiftStart",15,"0:30",67,100],["mnrTimeBetweenSchoolEndAndShiftStart",14,"0:30",67,100],["mnrTimeBetweenSchoolEndAndShiftStart",17,"0:30",100,67],["adtWeeklyOT",0,"40:00:00",100,100],["adtMinWage",0,"10.1",100,67]],"ME":[["mnrSchoolAndWorkHours",16,"15:00",100,100],["mnrConsecutiveNights",16,"5",100,100],["mnrTimeBetweenSchoolEndAndShiftStart",16,"0:30",100,100],["adtShiftLengthRest_0",0,"0:00",100,100],["mnrLatestEndTimeSchool",16,"1200",100,100],["mnrLatestEndTime",16,"1320",100,100],["mnrHrsPerWeekNotInSession",16,"49:00:00",100,100],["mnrHrsPerWeekInSession",16,"24:00:00",100,100],["mnrHrsPerDayNotInSession",16,"8:00",100,100],["mnrHrsPerDayInSession",16,"5:30",100,100],["mnrEarliestStartTimeNotInSession",16,"480",100,100],["mnrDaysPerWeekNotInSession",16,"5",100,100],["mnrDaysPerWeekInSession",16,"5",100,100],["adtWeeklyOT",0,"40:00:00",100,100],["adtShiftLengthRest_4",0,"0:00",100,100],["adtShiftLengthRest_3",0,"0:00",100,100],["adtShiftLengthRest_2",0,"0:00",100,100],["adtShiftLengthRest_1",0,"0:00",100,100],["adtShiftLengthMeal_1",0,"0:00",100,100],["adtMealBreak",0,"0:00",100,100],["adtRestBreak",0,"0:00",100,100],["adtShiftLengthMeal_2",0,"0:00",100,100],["adtMinWage",0,"15.1",100,100]],"AK":[["adtMealBreak",0,"0:30",100,100],["adtRestBreak",0,"0:15",100,100],["adtShiftLengthMeal_1",0,"5:00",100,100],["adtShiftLengthMeal_2",0,"8:00",100,100],["adtShiftLengthRest_1",0,"5:00",100,100],["adtShiftLengthRest_2",0,"8:00",100,100],["adtShiftLengthRest_3",0,"10:00",100,100],["adtShiftLengthRest_4",0,"10:00",100,100],["adtSpecialTermPaycheck",0,"ON",100,100],["adtWeeklyOT",0,"40:00:00",100,100],["mnrDaysPerWeekInSession",14,"6",100,100],["mnrDaysPerWeekInSession",15,"6",100,100],["mnrDaysPerWeekInSession",16,"6",100,100],["mnrDaysPerWeekInSession",17,"6",100,100],["mnrDaysPerWeekNotInSession",14,"6",100,100],["mnrDaysPerWeekNotInSession",15,"6",100,100],["mnrDaysPerWeekNotInSession",16,"6",100,100],["mnrHrsPerWeekInSession",14,"23:00",100,100],["mnrHrsPerWeekInSession",15,"23:00",100,100],["mnrLatestEndTimeSchool",14,"1260",100,100],["mnrLatestEndTimeSchool",15,"1260",100,100],["mnrSchoolAndWorkHours",14,"9:00",100,100],["mnrSchoolAndWorkHours",15,"9:00",100,100],["mnrShiftLengthMeal_1",14,"5:00",100,100],["mnrShiftLengthMeal_1",15,"5:00",100,100],["mnrShiftLengthMeal_1",16,"5:00",100,100],["mnrShiftLengthMeal_1",17,"5:00",100,100],["mnrShiftLengthMeal_2",14,"-",100,100],["mnrShiftLengthMeal_2",15,"-",100,100],["mnrShiftLengthMeal_2",17,"-",100,100],["mnrShiftLengthRest_1",14,"5:00",100,100],["mnrShiftLengthRest_1",16,"5:00",100,100],["mnrShiftLengthRest_1",17,"5:00",100,100],["mnrShiftLengthRest_2",14,"-",100,100],["mnrShiftLengthRest_2",15,"-",100,100],["mnrShiftLengthRest_2",17,"-",100,100],["mnrShiftLengthRest_3",14,"-",100,100],["mnrShiftLengthRest_3",15,"-",100,100],["mnrShiftLengthRest_3",17,"-",100,100],["mnrShiftLengthRest_4",14,"-",100,100],["mnrShiftLengthRest_4",16,"-",100,100],["mnrShiftLengthRest_4",17,"-",100,100],["mnrTimeBetweenSchoolEndAndShiftStart",14,"0:30",100,100],["mnrTimeBetweenSchoolEndAndShiftStart",15,"0:30",100,100],["mnrTimeBetweenSchoolEndAndShiftStart",16,"0:30",100,100],["adtDailyOT",0,"8:00",100,100],["mnrDaysPerWeekNotInSession",17,"6",100,100],["mnrTimeBetweenSchoolEndAndShiftStart",17,"0:30",100,100],["mnrShiftLengthRest_4",15,"-",100,100],["mnrShiftLengthRest_1",15,"5:00",100,100],["mnrShiftLengthRest_3",16,"-",100,100],["mnrShiftLengthMeal_2",16,"-",100,100],["mnrShiftLengthRest_2",16,"-",100,100],["mnrShiftLengthRest_0",17,"-",100,100],["adtShiftLengthRest_0",0,"4:59",100,100],["mnrShiftLengthRest_0",16,"-",100,100],["adtOtPercent",0,"1.5",100,100],["adtMinWage",0,"11.73",100,100]],"VT":[["adtShiftLengthRest_3",0,"12:00",100,100],["adtRestBreak",0,"0:15",100,100],["adtShiftLengthMeal_2",0,"8:00",100,100],["mnrHrsPerDayNotInSession",16,"6:00",100,100],["mnrHrsPerWeekNotInSession",16,"6:00",100,100],["mnrShiftLengthRest_4",16,"20:00",100,100],["mnrShiftLengthRest_1",16,"5:00",100,100],["mnrLatestEndTimeSchool",16,"1260",100,100],["adtMinWageForTippedEmp",0,"7.25",100,100],["adtAssumeFullTipCredit",0,"YES",100,100],["adtMinShiftMinsGapForSplitShift",0,"1:00",100,100],["mnrMinWage",16,"10.67",100,100],["adtAllowMealBrkWaiver",0,"1:00",100,100],["adtApproachingOTAlertHoursSalaried",0,"40:00:00",100,100],["adtApproachingOTAlertHours",0,"38:00:00",100,100],["adtOtPercent",0,"150",100,100],["adtShiftLengthRest_0",0,"4:00",100,100],["mnrShiftLengthRest_0",16,"4:00",100,100],["mnrShiftLengthMeal_2",16,"8:00",100,100],["mnrShiftLengthMeal_1",16,"8:00",100,100],["mnrSchoolAndWorkHours",16,"12:00",100,100],["mnrLatestEndTime",16,"1320",100,100],["mnrHrsPerWeekInSession",16,"20:00",100,100],["mnrHrsPerDayInSession",16,"4:00",100,100],["mnrEarliestStartTimeNotInSession",16,"480",100,100],["mnrDaysPerWeekNotInSession",16,"5",100,100],["mnrTimeBetweenSchoolEndAndShiftStart",16,"1:00",100,100],["mnrShiftLengthRest_3",16,"16:00",100,100],["mnrShiftLengthRest_2",16,"12:00",100,100],["mnrDaysPerWeekInSession",16,"5",100,100],["mnrConsecutiveNights",16,"2",100,100],["adtWeeklyOT",0,"40:00:00",100,100],["adtSpecialTermPaycheck",0,"ON",100,100],["adtShiftLengthRest_4",0,"16:00",100,100],["adtShiftLengthRest_2",0,"8:00",100,100],["adtShiftLengthRest_1",0,"5:00",100,100],["adtShiftLengthMeal_1",0,"5:00",100,100],["adtMinWage",0,"12.55",100,100],["adtMealBreak",0,"0:15",100,100]],"DE":[["adtOtPercent",0,"150",88,100],["adtWeeklyOT",0,"40:00:00",100,88],["adtMealBreak",0,"0:30",88,100],["adtRestBreak",0,"0:15",88,100],["adtShiftLengthMeal_1",0,"8:00",88,57],["adtShiftLengthMeal_2",0,"14:00",88,57],["adtShiftLengthRest_1",0,"5:00",88,57],["adtShiftLengthRest_2",0,"10:00",88,57],["adtShiftLengthRest_3",0,"12:00",88,57],["adtShiftLengthRest_4",0,"16:00",88,57],["adtShiftLengthRest_0",0,"5:00",88,57],["adtMinWage",0,"11.75",88,57]],"RI":[["adtWeeklyOT",0,"40:00:00",100,100],["adtOtPercent",0,"150",100,100],["adtMinWage",0,"14",100,75]]};
+
+// Canonicalize a setting so equivalent values compare equal regardless of format
+// (e.g. "40:00:00" == "1 day, 16:00:00" == 144000s; "8:00" == "8:00:00").
+function normalizeSetting(v){
+  var s=String(v==null?"":v).trim(); if(!s||s==="-") return s.toLowerCase();
+  var d=s.match(/^(\d+)\s*days?[, ]+\s*(\d{1,3}):(\d{1,2})(?::(\d{1,2}))?$/i);
+  if(d) return "dur:"+(parseInt(d[1],10)*86400+parseInt(d[2],10)*3600+parseInt(d[3],10)*60+(d[4]?parseInt(d[4],10):0));
+  var t=s.match(/^(\d{1,4}):(\d{1,2})(?::(\d{1,2}))?$/);
+  if(t) return "dur:"+(parseInt(t[1],10)*3600+parseInt(t[2],10)*60+(t[3]?parseInt(t[3],10):0));
+  return s.toLowerCase();
+}
+// Treat OT/DT percent and multiplier forms as equal (150 == 1.5x); used for value compares.
+function normalizeForLaw(lawId, v){
+  var s=String(v==null?"":v).trim();
+  if(lawId && lawId.toLowerCase().indexOf("percent")>=0){
+    var n=parseFloat(s.replace(/%/g,""));
+    if(!isNaN(n)){ if(n>=10) n=n/100; return "x"+n; }
+  }
+  return normalizeSetting(v);
+}
+// A setting that is effectively "off"/zero/unset, so it is not a meaningful peer standard.
+function isZeroSetting(v){
+  var s=String(v==null?"":v).trim();
+  if(s===""||s==="-") return true;
+  if(normalizeSetting(s)==="dur:0") return true;
+  var n=parseFloat(s); if(!isNaN(n)&&n===0) return true;
+  return false;
+}
+function parseWageNum(v){ var n=parseFloat(String(v==null?"":v).replace(/[^0-9.]/g,"")); return isNaN(n)?null:n; }
+function RingPc(pc,color){var r=15.5,c=2*Math.PI*r,p2=Math.max(0,Math.min(100,pc)),off=c*(1-p2/100);return (<svg width="46" height="46" viewBox="0 0 36 36" style={{flexShrink:0}}><circle cx="18" cy="18" r={r} fill="none" stroke="#e8edf3" strokeWidth="4"/><circle cx="18" cy="18" r={r} fill="none" stroke={color} strokeWidth="4" strokeDasharray={c} strokeDashoffset={off} strokeLinecap="round" transform="rotate(-90 18 18)"/></svg>);}
+// Operator adoption per state per rule (distinct operators with the rule ON / total operators in state).
+var STATE_ORG_BASELINE={"MI":{"t":72,"l":{"adtMinWage":61,"adtWeeklyOT":67,"adtOtPercent":28}},"OH":{"t":44,"l":{"mnrTimeBetweenSchoolEndAndShiftStart@16":24,"adtMinWage":38,"adtWeeklyOT":38}},"WI":{"t":15,"l":{"adtWeeklyOT":15,"adtMinWage":8,"adtOtPercent":4}},"CA":{"t":95,"l":{"adtMinShiftMinsGapForSplitShift":42,"adtMaxWage":46,"adtSplitShiftPremiumPayMins":41,"adtSplitShiftPayRate":43,"adtMinLengthTimeBetweenTwoShifts":37,"adtMealBrkPremiumPayMins":39,"adtMealBrkPayRate":43,"adtDailyOTSalaried":43,"adtDtPercent":43,"adtDtPercentSalaried":45,"adtApproachingOTAlertHours":46,"adtWeeklyOTSalaried":39,"adtOtPercent":52,"adtOtPercentSalaried":47,"mnrTimeBetweenSchoolEndAndShiftStart@17":46,"mnrLatestEndTimeSchool@16":40,"mnrLatestEndTime@16":34,"mnrHrsPerWeekNotInSession@16":35,"mnrHrsPerWeekInSession@16":37,"mnrHrsPerDayNotInSession@16":36,"mnrHrsPerDayInSession@17":33,"mnrHrsPerDayInSession@16":50,"mnrEarliestStartTimeNotInSession@16":32,"adtDailyDT":61,"mnrDaysPerWeekInSession@16":33,"adtWeeklyOT":85,"adtShiftLengthRest_4":67,"adtShiftLengthRest_3":67,"adtShiftLengthRest_2":67,"adtShiftLengthRest_1":67,"adtShiftLengthMeal_2":67,"adtShiftLengthMeal_1":67,"adtRestBreak":67,"adtMinWage":78,"adtMealBreak":67,"seventhDayRuleCA":57,"adtDailyOT":72,"mnrTimeBetweenSchoolEndAndShiftStart@16":65,"mnrShiftLengthMeal_1@16":34,"adtShiftLengthRest_0":67,"adtEnableEarnedBreakConcept":32,"mnrShiftLengthMeal_2@16":34,"mnrShiftLengthRest_4@16":34,"mnrShiftLengthRest_3@16":34,"mnrShiftLengthRest_2@16":34,"mnrShiftLengthRest_1@16":34,"mnrShiftLengthRest_0@16":34}},"IL":{"t":24,"l":{"adtMinWage":22,"adtWeeklyOT":23,"adtOtPercent":11}},"IN":{"t":21,"l":{"adtWeeklyOT":19,"adtMinWage":17}},"FL":{"t":43,"l":{"mnrTimeBetweenSchoolEndAndShiftStart@16":28,"adtMinWage":42,"adtWeeklyOT":42,"adtOtPercent":24}},"AZ":{"t":16,"l":{"adtOtPercent":12,"mnrTimeBetweenSchoolEndAndShiftStart@16":10,"mnrTimeBetweenSchoolEndAndShiftStart@17":10,"adtMinWage":15,"adtWeeklyOT":16}},"NV":{"t":10,"l":{"adtShiftLengthRest_0":5,"mnrTimeBetweenSchoolEndAndShiftStart@17":9,"mnrTimeBetweenSchoolEndAndShiftStart@16":9,"adtShiftLengthRest_4":5,"adtShiftLengthRest_3":5,"adtShiftLengthRest_2":5,"adtShiftLengthRest_1":5,"adtShiftLengthMeal_2":5,"adtShiftLengthMeal_1":5,"adtRestBreak":5,"adtMinWage":5,"adtMealBreak":5,"adtMaxWage":3}},"TX":{"t":60,"l":{"mnrTimeBetweenSchoolEndAndShiftStart@17":31,"mnrTimeBetweenSchoolEndAndShiftStart@16":38,"adtWeeklyOT":58,"adtMinWage":58,"adtOtPercent":33}},"SC":{"t":17,"l":{"adtWeeklyOT":16,"mnrTimeBetweenSchoolEndAndShiftStart@14":8,"adtMinWage":12}},"KY":{"t":32,"l":{"adtWeeklyOT":28,"adtMinWage":26}},"WV":{"t":9,"l":{"adtMinWage":9,"adtWeeklyOT":9}},"OK":{"t":8,"l":{"mnrTimeBetweenSchoolEndAndShiftStart@14":7,"mnrTimeBetweenSchoolEndAndShiftStart@16":6,"mnrTimeBetweenSchoolEndAndShiftStart@17":6,"adtMinWage":7,"adtWeeklyOT":8,"adtOtPercent":5}},"PA":{"t":18,"l":{"adtMinWage":14,"adtWeeklyOT":17}},"NY":{"t":26,"l":{"adtWeeklyOT":25,"adtMinWage":21}},"CO":{"t":16,"l":{"adtWeeklyOT":13,"adtMinWage":15,"mnrTimeBetweenSchoolEndAndShiftStart@17":8,"mnrTimeBetweenSchoolEndAndShiftStart@16":9}},"NC":{"t":34,"l":{"adtMinWage":29,"adtWeeklyOT":33}},"AR":{"t":9,"l":{"adtWeeklyOT":9}},"AL":{"t":14,"l":{"mnrTimeBetweenSchoolEndAndShiftStart@17":9,"adtMinWage":11,"adtWeeklyOT":11,"mnrTimeBetweenSchoolEndAndShiftStart@16":8,"mnrLatestEndTimeSchool@16":4,"adtOtPercent":7}},"MS":{"t":17,"l":{"mnrTimeBetweenSchoolEndAndShiftStart@16":12,"adtWeeklyOT":16,"adtMinWage":15}},"TN":{"t":27,"l":{"mnrTimeBetweenSchoolEndAndShiftStart@16":24,"adtWeeklyOT":27,"adtMinWage":21}},"WA":{"t":18,"l":{"adtMinWage":17,"adtWeeklyOT":17,"adtMealBreak":10,"adtRestBreak":10,"adtShiftLengthMeal_1":10,"adtShiftLengthMeal_2":10,"adtShiftLengthRest_1":10,"adtShiftLengthRest_2":10,"adtShiftLengthRest_3":10,"adtShiftLengthRest_4":10,"adtShiftLengthRest_0":10}},"GA":{"t":35,"l":{"adtWeeklyOT":34,"adtMinWage":33}},"MO":{"t":20,"l":{"adtMinWage":17,"adtWeeklyOT":19}},"VA":{"t":18,"l":{"mnrTimeBetweenSchoolEndAndShiftStart@16":11,"adtMinWage":15,"adtWeeklyOT":18,"adtOtPercent":9}},"OR":{"t":14,"l":{"mnrHrsPerWeekInSession@16":7,"mnrHrsPerWeekInSession@17":7,"mnrHrsPerWeekNotInSession@16":6,"mnrHrsPerWeekNotInSession@17":7,"mnrShiftLengthMeal_1@16":7,"mnrShiftLengthMeal_2@16":7,"mnrShiftLengthRest_1@16":7,"mnrShiftLengthRest_2@16":7,"mnrShiftLengthRest_3@16":7,"mnrShiftLengthRest_4@16":7,"adtMealBreak":12,"adtMinWage":13,"adtRestBreak":12,"mnrTimeBetweenSchoolEndAndShiftStart@16":10,"mnrShiftLengthRest_0@16":7,"adtShiftLengthRest_0":12,"adtShiftLengthMeal_1":12,"mnrTimeBetweenSchoolEndAndShiftStart@17":8,"adtShiftLengthMeal_2":12,"adtShiftLengthRest_1":12,"adtShiftLengthRest_2":12,"adtShiftLengthRest_3":12,"adtShiftLengthRest_4":12,"adtSpecialTermPaycheck":10,"adtWeeklyOT":14,"adtOtPercent":4}},"MD":{"t":10,"l":{"adtMinWage":10,"adtWeeklyOT":10,"mnrTimeBetweenSchoolEndAndShiftStart@14":6}},"ND":{"t":3,"l":{"adtWeeklyOT":3,"adtMinWage":3,"mnrTimeBetweenSchoolEndAndShiftStart@15":3,"adtOtPercent":2}},"ID":{"t":4,"l":{"mnrLatestEndTimeSchool@14":1,"mnrHrsPerWeekInSession@14":1,"adtWeeklyOT":3,"adtSpecialTermPaycheck":1,"adtMinWage":4,"mnrTimeBetweenSchoolEndAndShiftStart@14":1,"mnrLatestEndTime@14":1}},"MT":{"t":6,"l":{"adtMinWage":6,"adtWeeklyOT":6}},"NE":{"t":14,"l":{"adtWeeklyOT":12,"mnrTimeBetweenSchoolEndAndShiftStart@14":9,"adtMinWage":8}},"UT":{"t":4,"l":{"adtWeeklyOT":4,"adtMinWage":2,"adtOtPercent":2,"mnrHrsPerDayInSession@14":2,"mnrTimeBetweenSchoolEndAndShiftStart@14":2}},"LA":{"t":15,"l":{"adtWeeklyOT":14,"adtMinWage":15,"mnrTimeBetweenSchoolEndAndShiftStart@16":12,"mnrTimeBetweenSchoolEndAndShiftStart@17":11}},"IA":{"t":9,"l":{"adtWeeklyOT":8,"adtMinWage":9,"mnrTimeBetweenSchoolEndAndShiftStart@17":4,"mnrTimeBetweenSchoolEndAndShiftStart@16":5}},"MA":{"t":5,"l":{"adtWeeklyOT":4,"adtMinWage":5,"adtOtPercent":3}},"MN":{"t":11,"l":{"adtWeeklyOT":11,"mnrTimeBetweenSchoolEndAndShiftStart@14":4}},"DC":{"t":1,"l":{"adtWeeklyOT":1,"adtMinWage":1}},"CT":{"t":3,"l":{"mnrTimeBetweenSchoolEndAndShiftStart@16":2,"adtWeeklyOT":3,"adtMinWage":2}},"WY":{"t":5,"l":{"mnrTimeBetweenSchoolEndAndShiftStart@16":3,"adtMinWage":5,"adtWeeklyOT":4}},"KS":{"t":5,"l":{"adtWeeklyOT":5,"adtMinWage":5,"adtOtPercent":4}},"SD":{"t":5,"l":{"adtWeeklyOT":4,"adtMinWage":5}},"NM":{"t":1,"l":{"adtShiftLengthRest_4":1,"adtShiftLengthRest_3":1,"adtShiftLengthRest_2":1,"adtShiftLengthRest_1":1,"adtShiftLengthMeal_2":1,"adtShiftLengthMeal_1":1,"adtRestBreak":1,"adtMinWage":1,"adtMealBreak":1,"adtShiftLengthRest_0":1,"mnrTimeBetweenSchoolEndAndShiftStart@14":1,"mnrTimeBetweenSchoolEndAndShiftStart@15":1,"mnrTimeBetweenSchoolEndAndShiftStart@17":1,"adtWeeklyOT":1,"mnrTimeBetweenSchoolEndAndShiftStart@16":1,"adtOtPercent":1}},"NJ":{"t":6,"l":{"adtMinWage":5,"adtWeeklyOT":6}},"HI":{"t":2,"l":{"mnrTimeBetweenSchoolEndAndShiftStart@16":2,"mnrTimeBetweenSchoolEndAndShiftStart@15":1,"mnrTimeBetweenSchoolEndAndShiftStart@14":1,"mnrTimeBetweenSchoolEndAndShiftStart@17":2,"adtWeeklyOT":2,"adtMinWage":2}},"ME":{"t":1,"l":{"mnrSchoolAndWorkHours@16":1,"mnrConsecutiveNights@16":1,"mnrTimeBetweenSchoolEndAndShiftStart@16":1,"adtShiftLengthRest_0":1,"mnrLatestEndTimeSchool@16":1,"mnrLatestEndTime@16":1,"mnrHrsPerWeekNotInSession@16":1,"mnrHrsPerWeekInSession@16":1,"mnrHrsPerDayNotInSession@16":1,"mnrHrsPerDayInSession@16":1,"mnrEarliestStartTimeNotInSession@16":1,"mnrDaysPerWeekNotInSession@16":1,"mnrDaysPerWeekInSession@16":1,"adtWeeklyOT":1,"adtShiftLengthRest_4":1,"adtShiftLengthRest_3":1,"adtShiftLengthRest_2":1,"adtShiftLengthRest_1":1,"adtShiftLengthMeal_1":1,"adtMealBreak":1,"adtRestBreak":1,"adtShiftLengthMeal_2":1,"adtMinWage":1}},"AK":{"t":1,"l":{"adtMealBreak":1,"adtRestBreak":1,"adtShiftLengthMeal_1":1,"adtShiftLengthMeal_2":1,"adtShiftLengthRest_1":1,"adtShiftLengthRest_2":1,"adtShiftLengthRest_3":1,"adtShiftLengthRest_4":1,"adtSpecialTermPaycheck":1,"adtWeeklyOT":1,"mnrDaysPerWeekInSession@14":1,"mnrDaysPerWeekInSession@15":1,"mnrDaysPerWeekInSession@16":1,"mnrDaysPerWeekInSession@17":1,"mnrDaysPerWeekNotInSession@14":1,"mnrDaysPerWeekNotInSession@15":1,"mnrDaysPerWeekNotInSession@16":1,"mnrHrsPerWeekInSession@14":1,"mnrHrsPerWeekInSession@15":1,"mnrLatestEndTimeSchool@14":1,"mnrLatestEndTimeSchool@15":1,"mnrSchoolAndWorkHours@14":1,"mnrSchoolAndWorkHours@15":1,"mnrShiftLengthMeal_1@14":1,"mnrShiftLengthMeal_1@15":1,"mnrShiftLengthMeal_1@16":1,"mnrShiftLengthMeal_1@17":1,"mnrShiftLengthMeal_2@14":1,"mnrShiftLengthMeal_2@15":1,"mnrShiftLengthMeal_2@17":1,"mnrShiftLengthRest_1@14":1,"mnrShiftLengthRest_1@16":1,"mnrShiftLengthRest_1@17":1,"mnrShiftLengthRest_2@14":1,"mnrShiftLengthRest_2@15":1,"mnrShiftLengthRest_2@17":1,"mnrShiftLengthRest_3@14":1,"mnrShiftLengthRest_3@15":1,"mnrShiftLengthRest_3@17":1,"mnrShiftLengthRest_4@14":1,"mnrShiftLengthRest_4@16":1,"mnrShiftLengthRest_4@17":1,"mnrTimeBetweenSchoolEndAndShiftStart@14":1,"mnrTimeBetweenSchoolEndAndShiftStart@15":1,"mnrTimeBetweenSchoolEndAndShiftStart@16":1,"adtDailyOT":1,"mnrDaysPerWeekNotInSession@17":1,"mnrTimeBetweenSchoolEndAndShiftStart@17":1,"mnrShiftLengthRest_4@15":1,"mnrShiftLengthRest_1@15":1,"mnrShiftLengthRest_3@16":1,"mnrShiftLengthMeal_2@16":1,"mnrShiftLengthRest_2@16":1,"mnrShiftLengthRest_0@17":1,"adtShiftLengthRest_0":1,"mnrShiftLengthRest_0@16":1,"adtOtPercent":1,"adtMinWage":1}},"VT":{"t":1,"l":{"adtShiftLengthRest_3":1,"adtRestBreak":1,"adtShiftLengthMeal_2":1,"mnrHrsPerDayNotInSession@16":1,"mnrHrsPerWeekNotInSession@16":1,"mnrShiftLengthRest_4@16":1,"mnrShiftLengthRest_1@16":1,"mnrLatestEndTimeSchool@16":1,"adtMinWageForTippedEmp":1,"adtAssumeFullTipCredit":1,"adtMinShiftMinsGapForSplitShift":1,"mnrMinWage@16":1,"adtAllowMealBrkWaiver":1,"adtApproachingOTAlertHoursSalaried":1,"adtApproachingOTAlertHours":1,"adtOtPercent":1,"adtShiftLengthRest_0":1,"mnrShiftLengthRest_0@16":1,"mnrShiftLengthMeal_2@16":1,"mnrShiftLengthMeal_1@16":1,"mnrSchoolAndWorkHours@16":1,"mnrLatestEndTime@16":1,"mnrHrsPerWeekInSession@16":1,"mnrHrsPerDayInSession@16":1,"mnrEarliestStartTimeNotInSession@16":1,"mnrDaysPerWeekNotInSession@16":1,"mnrTimeBetweenSchoolEndAndShiftStart@16":1,"mnrShiftLengthRest_3@16":1,"mnrShiftLengthRest_2@16":1,"mnrDaysPerWeekInSession@16":1,"mnrConsecutiveNights@16":1,"adtWeeklyOT":1,"adtSpecialTermPaycheck":1,"adtShiftLengthRest_4":1,"adtShiftLengthRest_2":1,"adtShiftLengthRest_1":1,"adtShiftLengthMeal_1":1,"adtMinWage":1,"adtMealBreak":1}},"DE":{"t":3,"l":{"adtOtPercent":2,"adtWeeklyOT":3,"adtMealBreak":2,"adtRestBreak":2,"adtShiftLengthMeal_1":2,"adtShiftLengthMeal_2":2,"adtShiftLengthRest_1":2,"adtShiftLengthRest_2":2,"adtShiftLengthRest_3":2,"adtShiftLengthRest_4":2,"adtShiftLengthRest_0":2,"adtMinWage":2}},"RI":{"t":2,"l":{"adtWeeklyOT":2,"adtOtPercent":2,"adtMinWage":2}}};
+
+// Pre-baked US state SVG paths (geoAlbersUsa, viewBox 0 0 900 520) for the map view.
+var STATE_PATHS={"AL":"M580,411L580,411L580,411ZM574,324L613,320L629,369L630,392L590,396L592,409L578,409Z","AK":"M146,454L146,454L146,454ZM145,466L145,466L145,466ZM142,467L142,467L142,467ZM142,467L142,467L142,467ZM141,467L141,467L141,467ZM141,473L141,473L141,473ZM141,468L141,468L141,468ZM140,459L140,459L140,459ZM140,468L140,468L140,468ZM139,460L139,460L139,460ZM136,474L136,474L136,474ZM136,465L136,465L136,465ZM134,483L134,483L134,483ZM133,484L133,484L133,484ZM132,478L140,475L134,482ZM131,484L131,484L131,484ZM128,488L128,488L128,488ZM124,487L124,487L124,487ZM124,486L124,486L124,486ZM123,483L123,483L123,483ZM120,485L120,485L120,485ZM117,488L117,488L117,488ZM116,487L116,487L116,487ZM115,494L115,494L115,494ZM115,488L115,488L115,488ZM114,493L114,493L114,493ZM114,494L114,494L114,494ZM114,492L114,492L114,492ZM113,494L113,494L113,494ZM113,492L113,492L113,492ZM112,490L112,490L112,490ZM111,493L111,493L111,493ZM113,469L113,469L113,469ZM111,490L111,490L111,490ZM113,469L113,469L113,469ZM109,490L109,490L109,490ZM111,469L111,469L111,469ZM107,491L107,491L107,491ZM106,491L106,491L106,491ZM105,491L105,491L105,491ZM103,492L103,492L103,492ZM110,437L110,437L110,437ZM101,495L101,495L101,495ZM101,489L101,489L101,489ZM94,495L94,495L94,495ZM92,496L92,496L92,496ZM91,496L91,496L91,496ZM91,496L91,496L91,496ZM91,495L91,495L91,495ZM89,495L89,495L89,495ZM89,496L89,496L89,496ZM92,456L92,456L92,456ZM82,499L82,499L82,499ZM97,421L108,417L109,421L116,420L115,415L104,405L111,402L117,394L128,389L154,396L158,395L164,397L175,456L181,456L188,462L193,455L202,461L211,470L218,471L219,480L209,474L194,458L197,464L192,465L178,459L166,459L156,453L154,460L142,467L142,455L136,468L118,484L118,487L94,494L122,477L124,469L117,471L114,466L109,469L108,459L103,461L97,448L106,438L115,436L115,429L111,431L101,429ZM76,501L76,501L76,501ZM75,501L75,501L75,501ZM74,499L74,499L74,499ZM79,477L79,477L79,477ZM74,499L74,499L74,499ZM73,500L73,500L73,500ZM72,500L72,500L72,500ZM72,501L72,501L72,501ZM78,473L78,473L78,473ZM69,501L69,501L69,501ZM68,500L68,500L68,500ZM67,501L67,501L67,501ZM84,432L92,436L89,437ZM62,501L62,501L62,501ZM75,450L75,450L75,450ZM75,448L75,448L75,448ZM56,500L56,500L56,500ZM51,499L51,499L51,499ZM50,499L50,499L50,499ZM51,498L51,498L51,498ZM50,499L50,499L50,499ZM49,499L49,499L49,499ZM48,498L48,498L48,498ZM47,499L47,499L47,499ZM44,499L44,499L44,499ZM43,497L43,497L43,497ZM42,498L42,498L42,498ZM40,496L40,496L40,496ZM38,497L38,497L38,497ZM37,497L37,497L37,497ZM37,496L37,496L37,496ZM36,498L36,498L36,498ZM35,498L35,498L35,498ZM32,492L32,492L32,492ZM28,493L28,493L28,493ZM28,491L28,491L28,491ZM27,491L27,491L27,491ZM27,490L27,490L27,490ZM23,489L23,489L23,489ZM20,484L20,484L20,484ZM15,479L15,479L15,479ZM14,478L14,478L14,478ZM14,478L14,478L14,478ZM11,479L11,479L11,479ZM10,475L10,475L10,475ZM216,479L216,479L216,479ZM216,480L216,480L216,480ZM215,480L215,480L215,480ZM215,480L215,480L215,480ZM213,478L213,478L213,478ZM209,472L209,472L209,472ZM209,473L209,473L209,473ZM209,472L209,472L209,472ZM211,482L211,482L211,482ZM208,474L208,474L208,474ZM207,473L207,473L207,473ZM208,479L208,479L208,479ZM209,483L209,483L209,483ZM207,478L207,478L207,478ZM207,478L207,478L207,478ZM207,480L207,480L207,480ZM206,477L207,474L214,482ZM203,468L203,468L203,468ZM205,477L205,477L205,477ZM204,477L204,477L204,477ZM202,472L209,471L204,476ZM197,463L197,463L197,463ZM197,462L197,462L197,462ZM195,459L195,459L195,459ZM197,470L197,470L197,470ZM195,464L195,464L195,464ZM196,471L196,471L196,471ZM193,463L193,463L193,463ZM194,465L194,465L194,465ZM193,467L193,467L193,467ZM161,457L161,457L161,457ZM159,457L159,457L159,457ZM155,455L155,455L155,455ZM155,456L155,456L155,456ZM155,459L155,459L155,459ZM154,462L154,462L154,462ZM153,459L153,459L153,459ZM153,456L153,456L153,456Z","AZ":"M173,342L188,316L183,301L198,267L270,279L256,382L224,378Z","CO":"M280,205L348,213L376,215L374,233L371,289L357,288L270,279Z","FL":"M714,494L714,494L714,494ZM713,495L713,495L713,495ZM708,497L708,497L708,497ZM697,502L697,502L697,502ZM694,503L694,503L694,503ZM691,503L691,503L691,503ZM684,465L684,465L684,465ZM678,503L678,503L678,503ZM638,414L638,414L638,414ZM630,392L686,390L719,453L708,490L672,445L672,426L644,407L592,409L590,396Z","GA":"M613,320L632,318L650,315L647,322L691,365L686,390L630,392L629,369Z","IN":"M573,199L583,197L610,196L616,243L602,265L573,272L579,254Z","KS":"M374,233L468,236L478,252L479,291L371,289Z","ME":"M815,106L815,106L815,106ZM814,107L814,107L814,107ZM813,104L813,104L813,104ZM809,107L809,107L809,107ZM810,114L810,114L810,114ZM808,110L808,110L808,110ZM808,108L808,108L808,108ZM791,135L776,96L788,52L807,54L829,90Z","MA":"M806,165L806,165L806,165ZM798,166L798,166L798,166ZM760,149L770,147L791,139L794,164L792,161L791,161L782,157L760,162Z","MN":"M444,71L538,86L509,112L500,147L522,170L452,171L451,127Z","NJ":"M742,212L743,211L743,209L747,178L758,188L758,189L756,193L742,213Z","NC":"M754,279L754,279L754,279ZM754,296L754,296L754,296ZM666,283L750,269L755,286L721,326L680,308L650,315L632,318Z","ND":"M361,67L444,71L451,127L356,122Z","OK":"M357,288L371,289L479,291L479,301L481,353L441,352L399,335L400,300L356,297Z","PA":"M667,182L676,175L735,169L747,178L743,209L739,211L688,221L671,207Z","SD":"M354,139L356,122L451,127L452,171L453,190L425,180L351,176Z","TX":"M356,297L400,300L399,335L441,352L481,353L488,355L488,355L488,365L497,398L493,426L451,451L435,469L436,496L407,485L402,465L372,422L344,435L323,421L296,379L349,380Z","WY":"M354,139L351,176L348,213L280,205L253,201L256,183L263,138L264,128Z","CT":"M760,162L782,157L785,170L762,182Z","MO":"M462,225L522,227L558,288L554,297L553,298L553,298L550,307L544,298L479,301L479,291L478,252L468,236Z","WV":"M648,252L669,224L671,207L688,221L714,224L689,245L684,263L660,267Z","IL":"M522,227L535,204L530,188L568,185L573,199L579,254L573,272L558,288Z","NM":"M270,279L357,288L356,297L349,380L296,379L256,382Z","AR":"M479,301L544,298L550,307L543,326L532,363L488,365L488,355L488,355L481,353Z","CA":"M119,316L119,316L119,316ZM117,324L117,324L117,324ZM112,314L112,314L112,314ZM109,303L109,303L109,303ZM103,316L103,316L103,316ZM102,300L102,300L102,300ZM97,301L97,301L97,301ZM94,299L94,299L94,299ZM83,143L137,158L137,158L124,212L183,301L188,316L173,342L137,338L122,306L96,292L72,199L71,173Z","DE":"M742,212L742,213L742,212ZM739,211L743,209L743,211L754,232Z","DC":"M723,229L725,232L723,229Z","HI":"M303,486L303,486L303,486ZM292,464L292,464L292,464ZM292,471L292,471L292,471ZM286,465L286,465L286,465ZM281,461L281,461L281,461ZM265,452L265,452L265,452ZM239,444L239,444L239,444ZM231,447L231,447L231,447Z","IA":"M452,171L522,170L530,188L535,204L522,227L462,225L453,190Z","KY":"M558,288L573,272L602,265L616,243L648,252L660,267L638,287L554,297ZM553,298L553,298L553,298Z","MD":"M743,244L742,244L743,244ZM741,241L741,241L741,241ZM734,230L734,230L734,230ZM688,221L739,211L754,232L753,240L747,243L724,235L725,232L723,229L714,224Z","MI":"M603,119L603,119L603,119ZM594,122L594,122L594,122ZM592,121L592,121L592,121ZM591,126L591,126L591,126ZM590,123L590,123L590,123ZM588,129L588,129L588,129ZM587,135L587,135L587,135ZM586,137L586,137L586,137ZM578,127L578,127L578,127ZM583,197L589,184L585,143L602,121L619,127L639,168L628,193L610,196ZM542,88L542,88L542,88ZM529,113L556,95L567,111L597,103L617,117L573,123L567,137L563,133L563,133L530,114L530,114Z","MS":"M577,412L577,412L577,412ZM573,412L573,412L573,412ZM569,413L569,413L569,413ZM567,412L567,412L567,412ZM532,363L543,326L574,324L578,409L561,414L556,399L527,401Z","MT":"M216,45L361,67L356,122L354,139L264,128L263,138L238,134L229,92L214,74Z","NH":"M772,103L776,96L791,135L791,139L770,147Z","NY":"M783,172L783,172L783,172ZM782,175L782,175L782,175ZM781,174L781,174L781,174ZM758,189L756,193L758,189ZM715,138L715,138L715,138ZM714,138L714,138L714,138ZM676,175L682,156L710,150L730,113L749,109L760,149L760,162L762,182L758,188L747,178L735,169Z","OH":"M638,194L638,194L638,194ZM637,193L637,193L637,193ZM610,196L628,193L642,197L667,182L671,207L669,224L648,252L616,243Z","OR":"M114,70L126,88L194,96L176,168L137,158L137,158L137,158L83,143L109,71Z","TN":"M550,307L553,298L553,298L554,297L638,287L666,283L632,318L613,320L574,324L543,326Z","UT":"M216,176L256,183L253,201L280,205L270,279L198,267Z","VA":"M743,246L743,246L743,246ZM747,243L753,240L747,243ZM743,244L742,244L743,244ZM660,267L684,263L689,245L714,224L723,229L725,232L724,235L750,269L666,283L638,287Z","WA":"M132,55L132,55L132,55ZM136,34L136,34L136,34ZM136,30L136,30L136,30ZM135,33L135,33L135,33ZM133,39L133,39L133,39ZM133,28L133,28L133,28ZM132,29L132,29L132,29ZM133,24L133,24L133,24ZM130,31L130,31L130,31ZM130,29L130,29L130,29ZM205,43L194,96L126,88L114,70L112,29L138,44L137,25Z","WI":"M575,132L575,132L575,132ZM570,135L570,135L570,135ZM528,105L528,105L528,105ZM527,107L527,107L527,107ZM526,107L526,107L526,107ZM524,108L524,108L524,108ZM525,106L525,106L525,106ZM524,105L524,105L524,105ZM524,109L524,109L524,109ZM521,106L521,106L521,106ZM509,112L529,113L530,114L530,114L563,133L563,133L567,137L568,185L530,188L522,170L500,147Z","NE":"M351,176L425,180L453,190L462,225L468,236L374,233L376,215L348,213Z","SC":"M650,315L680,308L721,326L691,365L647,322Z","ID":"M194,96L205,43L216,45L214,74L229,92L238,134L263,138L256,183L216,176L176,168Z","NV":"M137,158L137,158L176,168L216,176L198,267L183,301L124,212Z","VT":"M749,109L772,103L770,147L760,149Z","LA":"M571,415L571,415L571,415ZM564,416L564,416L564,416ZM560,426L560,426L560,426ZM549,434L549,434L549,434ZM546,435L546,435L546,435ZM543,436L543,436L543,436ZM522,427L522,427L522,427ZM488,365L532,363L527,401L556,399L561,414L542,436L524,422L493,426L497,398Z","RI":"M792,161L794,164L792,161ZM790,162L790,162L790,162ZM790,166L790,166L790,166ZM789,172L789,172L789,172ZM785,170L782,157L791,161Z"};
 
 function classifyComplianceLaw(lid){
   var l=String(lid||"");
-  // hours = modeled annual hours of pay/premium exposed per employee for this rule type.
-  // Per-store $ = (employees per location) x (state minimum wage) x hours.
+  // hours = relative severity weight kept for a future risk model (currently unused).
   function R(cat,sev,hours,uniform){ return {cat:cat,sev:sev,hours:hours,uniform:uniform}; }
   if(l.indexOf("seventhDayRule")===0) return R("Overtime","critical",15,true);
   if(l==="adtDailyOT"||l==="adtDailyOTSalaried"||l==="adtDailyDT"||l==="adtDailyDTSalaried"||
@@ -871,7 +663,7 @@ function classifyComplianceLaw(lid){
 }
 
 function runDeterministicAudit(agg, states){
-  var EXPECT=0.66, MODAL_MIN=0.60, EMP_COUNT=20, FED_MIN=7.25;
+  var EXPECT=0.66, MODAL_MIN=0.60, FED_MIN=7.25;
   var configs=(agg&&agg.configs)?agg.configs:[];
   var stateInfo={}, si;
   for(si=0; si<states.length; si++){ stateInfo[states[si].a]={src:states[si].src||"", mw:(typeof states[si].mw==="number"?states[si].mw:null)}; }
@@ -920,69 +712,94 @@ function runDeterministicAudit(agg, states){
       }
     }
   }
-  var configFindings=[], totalExposure=0, catExposure={}, stateExposure={}, lawExposure={}, ci, x, ek;
+  var configFindings=[], totalIssues=0, catIssues={}, stateIssues={}, lawIssues={}, ci, x, ek;
   for(ci=0;ci<configs.length;ci++){
     var cf2=configs[ci]; var sc=(cf2.storeNumbers?cf2.storeNumbers.length:1); var stb=cf2.assignedState||"";
+    var _ob=(typeof STATE_ORG_BASELINE!=="undefined"&&STATE_ORG_BASELINE[stb])||null; var oTot=_ob?_ob.t:0; var oLaws=_ob?_ob.l:{};
     var exp=expected[stb]||{}; var checks=[], configured=0, missing=0, hasFail=false, hasWarn=false;
     var have={};
     for(x=0;x<cf2.settings.length;x++){ var ss=cf2.settings[x]; if(ss.isActive===1){ var hk=ss.lawId; if(ss.minorAge&&ss.minorAge>0) hk=ss.lawId+"@"+ss.minorAge; have[hk]={val:String(ss.currentSetting==null?"":ss.currentSetting)}; } }
     for(ek in exp){
       if(!exp.hasOwnProperty(ek)) continue;
-      var E=exp[ek]; var cls=classifyComplianceLaw(E.lawId); var lname=(typeof LAW_NAMES!=="undefined"&&LAW_NAMES[E.lawId])||nameById[E.lawId]||E.lawId;
-      var cite=(stateInfo[stb]&&stateInfo[stb].src)||""; var got=have[ek]; var chk;
+      var E=exp[ek]; var cls=classifyComplianceLaw(E.lawId);
+      var lname=(typeof LAW_NAMES!=="undefined"&&LAW_NAMES[E.lawId])||nameById[E.lawId]||E.lawId;
+      var cite=(stateInfo[stb]&&stateInfo[stb].src)||""; var got=have[ek]; var chk=null;
       var mw=(stateInfo[stb]&&typeof stateInfo[stb].mw==="number")?stateInfo[stb].mw:FED_MIN;
-      var baseExp=Math.round(EMP_COUNT*mw*cls.hours);
-      if(got){
+      var stName=cf2.assignedStateName||stb;
+      var pctOn=Math.round(E.share*100), pctModal=Math.round(E.modalShare*100);
+      if(E.lawId==="adtMinWage" && got){
+        // Regulation-grounded: compare the configured wage to the state legal minimum.
         configured++;
-        if(cls.uniform && E.modalShare>=MODAL_MIN && got.val!==E.modal && got.val!==""){
-          hasWarn=true;
-          chk={category:cls.cat,lawId:E.lawId,lawName:lname,minorAge:E.minorAge,configurable:true,csvHasRow:true,
-               status:"warn",severity:cls.sev,
-               expected:"Peer baseline "+stb+": '"+E.modal+"' ("+Math.round(E.modalShare*100)+"% of in-state stores)",
-               actual:"Configured '"+got.val+"'",
-               issue:"Setting differs from the "+stb+" peer-majority value.",
-               recommendation:"Align "+lname+" to '"+E.modal+"' or document the local exception.",
-               citation:cite,perStoreExposureUSD:Math.round(baseExp*0.5)};
+        var wageNum=parseWageNum(got.val);
+        if(wageNum!==null && wageNum > 1 && wageNum < mw-0.005){
+          hasFail=true;
+          chk={category:"Min Wage",lawId:E.lawId,lawName:lname,minorAge:E.minorAge,configurable:true,csvHasRow:true,basis:"regulation",
+               status:"fail",severity:"critical",
+               expected:"At least $"+mw.toFixed(2)+" ("+stName+" minimum wage)",
+               actual:"$"+wageNum.toFixed(2),
+               issue:"Minimum wage here is set to $"+wageNum.toFixed(2)+", which is below "+stName+"'s legal minimum of $"+mw.toFixed(2)+".",
+               recommendation:"Raise the minimum wage setting to at least $"+mw.toFixed(2)+" so this location meets "+stName+" law.",
+               citation:cite,perStoreExposureUSD:0};
         } else {
-          chk={category:cls.cat,lawId:E.lawId,lawName:lname,minorAge:E.minorAge,configurable:true,csvHasRow:true,
+          chk={category:"Min Wage",lawId:E.lawId,lawName:lname,minorAge:E.minorAge,configurable:true,csvHasRow:true,basis:"regulation",
                status:"pass",severity:"info",
-               expected:"Active in "+Math.round(E.share*100)+"% of "+stb+" stores",
-               actual:"Configured '"+got.val+"'",issue:"",recommendation:"",citation:cite,perStoreExposureUSD:0};
+               expected:"At least $"+mw.toFixed(2)+" ("+stName+" minimum wage)",
+               actual:"$"+(wageNum!==null?wageNum.toFixed(2):got.val),issue:"",recommendation:"",citation:cite,perStoreExposureUSD:0};
+        }
+      } else if(got){
+        configured++;
+        var divergent = cls.uniform && E.modalShare>=MODAL_MIN && !isZeroSetting(E.modal) && got.val!=="" && normalizeForLaw(E.lawId,got.val)!==normalizeForLaw(E.lawId,E.modal);
+        if(divergent){
+          hasWarn=true;
+          chk={category:cls.cat,lawId:E.lawId,lawName:lname,minorAge:E.minorAge,configurable:true,csvHasRow:true,basis:"peer",
+               status:"warn",severity:cls.sev,
+               expected:"'"+E.modal+"' (used by "+pctModal+"% of "+stb+" stores brand-wide, across all operators)",
+               actual:"'"+got.val+"'",
+               issue:"This is set to '"+got.val+"', but "+pctModal+"% of "+stb+" stores brand-wide (all operators, not just yours) use '"+E.modal+"'.",
+               recommendation:"Consider matching the "+stb+" brand norm of '"+E.modal+"', or mark this store as an intentional exception.",
+               citation:cite,perStoreExposureUSD:0};
+        } else {
+          chk={category:cls.cat,lawId:E.lawId,lawName:lname,minorAge:E.minorAge,configurable:true,csvHasRow:true,basis:"peer",
+               status:"pass",severity:"info",
+               expected:"On at "+pctOn+"% of "+stb+" stores brand-wide",
+               actual:"'"+got.val+"'",issue:"",recommendation:"",citation:cite,perStoreExposureUSD:0};
         }
       } else {
         missing++; hasFail=true;
-        chk={category:cls.cat,lawId:"MISSING:"+E.lawId,lawName:lname,minorAge:E.minorAge,configurable:true,csvHasRow:false,
+        chk={category:cls.cat,lawId:"MISSING:"+E.lawId,lawName:lname,minorAge:E.minorAge,configurable:true,csvHasRow:false,basis:"peer",
              status:"fail",severity:cls.sev,
-             expected:"Active in "+Math.round(E.share*100)+"% of "+stb+" stores (peer baseline)",
-             actual:"Not configured / inactive",
-             issue:lname+" is enforced by the majority of "+stb+" stores but is missing here.",
-             recommendation:"Activate "+lname+" to match in-state peers.",
-             citation:cite,perStoreExposureUSD:baseExp};
+             expected:"On at "+pctOn+"% of "+stb+" stores brand-wide",
+             actual:"Not set up here",
+             issue:"'"+lname+"' is not set up here, but "+pctOn+"% of "+stb+" stores brand-wide (all operators, not just yours) have it on.",
+             recommendation:"Turn on "+lname+" to match the "+stName+" brand norm, or confirm it's intentionally off for your stores.",
+             citation:cite,perStoreExposureUSD:0};
       }
+      if(chk){ chk.storePct=pctOn; chk.orgsTotal=oTot; chk.orgsOn=(typeof oLaws[ek]==="number")?oLaws[ek]:0; }
       checks.push(chk);
-      var ex2=chk.perStoreExposureUSD*sc; totalExposure+=ex2;
-      catExposure[cls.cat]=(catExposure[cls.cat]||0)+ex2;
-      stateExposure[stb]=(stateExposure[stb]||0)+ex2;
-      if(ex2>0) lawExposure[lname]=(lawExposure[lname]||0)+ex2;
+      if(chk.status==="fail"||chk.status==="warn"||chk.status==="missing"){
+        totalIssues+=sc;
+        catIssues[cls.cat]=(catIssues[cls.cat]||0)+sc;
+        stateIssues[stb]=(stateIssues[stb]||0)+sc;
+        lawIssues[lname]=(lawIssues[lname]||0)+sc;
+      }
     }
     var overall=hasFail?"non_compliant":(hasWarn?"warning":"compliant");
     configFindings.push({configIndex:ci,stateAbbrev:stb,overallStatus:overall,
       totalApplicableLaws:checks.length,configuredCount:configured,missingCount:missing,checks:checks});
   }
   function topKey(o){ var bk=null,bv=-1,kk; for(kk in o){ if(o.hasOwnProperty(kk)&&o[kk]>bv){bv=o[kk];bk=kk;} } return bk; }
-  var topState=topKey(stateExposure), topCat=topKey(catExposure), topLaw=topKey(lawExposure);
+  var topState=topKey(stateIssues), topCat=topKey(catIssues), topLaw=topKey(lawIssues);
   var nStores=agg.totalStores||0;
   var summary="Deterministic audit of "+nStores+" stores across "+(agg.distinctStates?agg.distinctStates.length:0)+" state(s). "+
-    "Modeled annual exposure $"+Math.round(totalExposure).toLocaleString()+", assuming ~"+EMP_COUNT+" employees per location paid at each state's minimum wage. "+
-    (topState?("Highest-risk state: "+topState+" ($"+Math.round(stateExposure[topState]).toLocaleString()+"). "):"")+
-    (topCat?("Largest risk category: "+topCat+". "):"")+
-    "If your actual staffing levels or wage rates are different, these risk values will change proportionally. Figures are modeled estimates for prioritization, not legal determinations.";
+    totalIssues.toLocaleString()+" store-level issue(s) flagged. "+
+    (topState?("Most issues in "+topState+(stateIssues[topState]?(" ("+stateIssues[topState].toLocaleString()+")"):"")+". "):"")+
+    (topCat?("Largest gap area: "+topCat+". "):"")+
+    "Findings compare each store to a fixed brand-wide baseline and the app's regulatory data. They are prioritization signals for review, not legal determinations.";
   var patterns=[];
-  if(topCat) patterns.push(topCat+" gaps drive the most exposure across the portfolio.");
-  if(topLaw) patterns.push("'"+topLaw+"' is the single most material rule by modeled risk.");
-  patterns.push("Dollar exposure assumes "+EMP_COUNT+" employees/location paid at state minimum wage - adjust for your real headcount and pay rates.");
+  if(topCat) patterns.push(topCat+" has the most findings across the portfolio.");
+  if(topLaw) patterns.push("'"+topLaw+"' is the most frequently flagged rule.");
   patterns.push("Judged against a fixed statewide baseline (from the full portfolio), so a single-org upload is flagged the same as a full-portfolio run.");
-  return {summary:summary,estimatedAnnualExposureUSD:Math.round(totalExposure),patterns:patterns,configFindings:configFindings};
+  return {summary:summary,estimatedAnnualExposureUSD:0,patterns:patterns,configFindings:configFindings};
 }
 
 // Lazy-load the SheetJS Excel parser from CDN only when an .xlsx/.xls is uploaded.
@@ -1007,44 +824,35 @@ function StateModal(props){
     <div onClick={onClose} style={{position:"fixed",inset:0,background:"rgba(15,23,42,.6)",zIndex:2000,display:"flex",alignItems:"center",justifyContent:"center",padding:20}}>
       <div onClick={function(e){e.stopPropagation();}} style={{background:"#fff",borderRadius:14,maxWidth:940,width:"96vw",maxHeight:"90vh",overflowY:"auto",padding:30,boxShadow:"0 20px 60px rgba(0,0,0,.2)"}}>
         <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start",marginBottom:14}}>
->>>>>>> Stashed changes
           <div>
             <div style={{fontSize:22,fontWeight:800}}>{st.s} <span style={{color:"#94a3b8",fontWeight:400,fontSize:16}}>({st.a})</span></div>
-            <div style={{display:"flex",gap:8,marginTop:6,flexWrap:"wrap",alignItems:"center"}}>
-              <Pill r={st.r} t={st.r.toUpperCase()+" RISK"}/>
-              <SrcLink url={st.src} label="Official State Source"/>
-            </div>
+            <div style={{display:"flex",gap:8,marginTop:6,flexWrap:"wrap",alignItems:"center"}}><Pill r={st.r} t={st.r.toUpperCase()+" RISK"}/><SrcLink url={st.src} label="Official State Source"/></div>
           </div>
-          <button onClick={onClose} style={{border:"none",background:"#f1f5f9",borderRadius:8,padding:"6px 12px",cursor:"pointer",fontSize:14,flexShrink:0}}>✕</button>
+          <button onClick={onClose} style={{border:"none",background:"#f1f5f9",borderRadius:8,padding:"6px 12px",cursor:"pointer",fontSize:14,flexShrink:0}}>X</button>
         </div>
         <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:10,marginBottom:14}}>
-          {[["Min Wage",`$${st.mw.toFixed(2)}/hr`],["OT Rule",st.ot],["Tipped Rate",typeof st.tip==="number"?`$${st.tip.toFixed(2)}/hr`:st.tip],["Tip Credit",st.tc==="None"?"None":(typeof st.tc==="number"?`$${st.tc.toFixed(2)}`:"N/A")],["Paid Sick Leave",st.sl?"Required":"None"],["Fair Scheduling",st.sch?"Active":"None"]].map(([k,v])=>(
-            <div key={k} style={{background:"#f8fafc",borderRadius:8,padding:"10px 12px"}}>
-              <div style={{fontSize:10,color:"#94a3b8",fontWeight:600,textTransform:"uppercase",marginBottom:3}}>{k}</div>
-              <div style={{fontSize:13,fontWeight:700}}>{v}</div>
-            </div>
-          ))}
+          <div style={{background:"#f8fafc",borderRadius:8,padding:"10px 12px"}}><div style={{fontSize:10,color:"#94a3b8",fontWeight:600,textTransform:"uppercase",marginBottom:3}}>Min Wage</div><div style={{fontSize:13,fontWeight:700}}>{"$"+st.mw.toFixed(2)+"/hr"}</div></div>
+          <div style={{background:"#f8fafc",borderRadius:8,padding:"10px 12px"}}><div style={{fontSize:10,color:"#94a3b8",fontWeight:600,textTransform:"uppercase",marginBottom:3}}>OT Rule</div><div style={{fontSize:13,fontWeight:700}}>{st.ot}</div></div>
+          <div style={{background:"#f8fafc",borderRadius:8,padding:"10px 12px"}}><div style={{fontSize:10,color:"#94a3b8",fontWeight:600,textTransform:"uppercase",marginBottom:3}}>Tipped Rate</div><div style={{fontSize:13,fontWeight:700}}>{fmtTip()}</div></div>
+          <div style={{background:"#f8fafc",borderRadius:8,padding:"10px 12px"}}><div style={{fontSize:10,color:"#94a3b8",fontWeight:600,textTransform:"uppercase",marginBottom:3}}>Tip Credit</div><div style={{fontSize:13,fontWeight:700}}>{fmtTc()}</div></div>
+          <div style={{background:"#f8fafc",borderRadius:8,padding:"10px 12px"}}><div style={{fontSize:10,color:"#94a3b8",fontWeight:600,textTransform:"uppercase",marginBottom:3}}>Paid Sick Leave</div><div style={{fontSize:13,fontWeight:700}}>{st.sl?"Required":"None"}</div></div>
+          <div style={{background:"#f8fafc",borderRadius:8,padding:"10px 12px"}}><div style={{fontSize:10,color:"#94a3b8",fontWeight:600,textTransform:"uppercase",marginBottom:3}}>Fair Scheduling</div><div style={{fontSize:13,fontWeight:700}}>{st.sch?"Active":"None"}</div></div>
         </div>
-        {st.chg && <div style={{background:"rgba(220,38,38,.06)",border:"1px solid rgba(220,38,38,.2)",borderRadius:8,padding:"10px 14px",marginBottom:12}}><div style={{fontSize:11,fontWeight:700,color:"#dc2626",marginBottom:3}}>⚠ UPCOMING CHANGE</div><div style={{fontSize:12,color:"#7f1d1d"}}>{st.cd}: Min wage → <strong>${st.nr?.toFixed(2)}/hr</strong></div></div>}
-        {st.local && st.local!=="None" && <div style={{background:"rgba(99,102,241,.06)",border:"1px solid rgba(99,102,241,.2)",borderRadius:8,padding:"10px 14px",marginBottom:12}}><div style={{fontSize:11,fontWeight:700,color:"#6366f1",marginBottom:3}}>LOCAL RATES</div><div style={{fontSize:12,color:"#312e81"}}>{st.local}</div></div>}
+        {st.chg&&<div style={{background:"rgba(220,38,38,.06)",border:"1px solid rgba(220,38,38,.2)",borderRadius:8,padding:"10px 14px",marginBottom:12}}><div style={{fontSize:11,fontWeight:700,color:"#dc2626",marginBottom:3}}>UPCOMING CHANGE</div><div style={{fontSize:12,color:"#7f1d1d"}}>{st.cd+": Min wage to $"+fmtNr()+"/hr"}</div></div>}
+        {st.local&&st.local!=="None"&&<div style={{background:"rgba(99,102,241,.06)",border:"1px solid rgba(99,102,241,.2)",borderRadius:8,padding:"10px 14px",marginBottom:12}}><div style={{fontSize:11,fontWeight:700,color:"#6366f1",marginBottom:3}}>LOCAL RATES</div><div style={{fontSize:12,color:"#312e81"}}>{st.local}</div></div>}
         <div style={{marginBottom:12}}>
           <div style={{fontSize:11,fontWeight:700,color:"#475569",textTransform:"uppercase",marginBottom:8}}>Key Compliance Requirements</div>
-          {st.laws.map((l,i)=><div key={i} style={{display:"flex",gap:8,marginBottom:6,fontSize:12,color:"#334155"}}><span style={{color:"#6366f1",flexShrink:0}}>•</span>{l}</div>)}
+          {st.laws.map(function(l,i){return <div key={i} style={{display:"flex",gap:8,marginBottom:6,fontSize:12,color:"#334155"}}><span style={{color:"#6366f1",flexShrink:0}}>*</span>{l}</div>;})}
         </div>
-        {m.a14 && (
-          <div style={{background:"#fffbeb",border:"1px solid #fde68a",borderRadius:8,padding:"12px 14px",marginBottom:10}}>
-            <div style={{fontSize:11,fontWeight:700,color:"#92400e",textTransform:"uppercase",marginBottom:8}}>Minor Labor — Age-Specific Rules</div>
-            {m.permitNote && <div style={{fontSize:11,color:"#b45309",fontWeight:600,marginBottom:8}}>Work Permit: {m.permitNote}</div>}
-            <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:8}}>
-              {[["Age 14",m.a14,"#fef9c3"],["Age 15",m.a15,"#fef3c7"],["Age 16",m.a16,"#f0fdf4"],["Age 17",m.a17,"#dcfce7"]].map(([label,rules,bg])=>(
-                <div key={label} style={{background:bg,borderRadius:6,padding:"8px 10px"}}>
-                  <div style={{fontSize:10,fontWeight:700,color:"#374151",marginBottom:4,textTransform:"uppercase"}}>{label}</div>
-                  {(rules||[]).map((r,i)=><div key={i} style={{fontSize:10,color:"#334155",marginBottom:2,lineHeight:1.4}}>▸ {r}</div>)}
-                </div>
-              ))}
-            </div>
+        <div style={{background:"#fffbeb",border:"1px solid #fde68a",borderRadius:8,padding:"12px 14px",marginBottom:10}}>
+          <div style={{fontSize:11,fontWeight:700,color:"#92400e",textTransform:"uppercase",marginBottom:8}}>Minor Labor - Age-Specific Rules</div>
+          {m.permitNote&&<div style={{fontSize:11,color:"#b45309",fontWeight:600,marginBottom:8}}>{"Work Permit: "+m.permitNote}</div>}
+          <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:8}}>
+            {[["Age 14",m.a14,"#fef9c3"],["Age 15",m.a15,"#fef3c7"],["Age 16",m.a16,"#f0fdf4"],["Age 17",m.a17,"#dcfce7"]].map(function(item){
+              return <div key={item[0]} style={{background:item[2],borderRadius:6,padding:"8px 10px"}}><div style={{fontSize:10,fontWeight:700,color:"#374151",marginBottom:4,textTransform:"uppercase"}}>{item[0]}</div>{(item[1]||[]).map(function(r,i){return <div key={i} style={{fontSize:10,color:"#334155",marginBottom:2,lineHeight:1.4}}>{"> "+r}</div>;})}</div>;
+            })}
           </div>
-        )}
+        </div>
         <div style={{background:"#fefce8",border:"1px solid #fde68a",borderRadius:8,padding:"10px 14px",marginBottom:10}}>
           <div style={{fontSize:11,fontWeight:700,color:"#92400e",textTransform:"uppercase",marginBottom:6}}>Break Laws</div>
           <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:8,marginBottom:6}}>
@@ -1052,25 +860,18 @@ function StateModal(props){
             <div><div style={{fontSize:10,color:"#94a3b8",fontWeight:600,textTransform:"uppercase",marginBottom:2}}>Meal Break</div><div style={{fontSize:12,fontWeight:600}}>{st.brk.meal}</div></div>
           </div>
           <div style={{marginBottom:4}}><span style={{fontSize:10,color:"#92400e",fontWeight:700,textTransform:"uppercase"}}>Premium Pay: </span><span style={{fontSize:12}}>{st.brk.premium}</span></div>
-          <div style={{fontSize:11,color:"#78350f",fontStyle:"italic"}}>{st.brk.mealNote}</div>
+          <div style={{fontSize:11,color:"#78350f",fontStyle:"italic"}}>{st.brk.note}</div>
         </div>
         <div style={{background:"#f8fafc",borderRadius:8,padding:"10px 14px",marginBottom:10}}>
           <div style={{fontSize:11,fontWeight:700,color:"#475569",textTransform:"uppercase",marginBottom:4}}>Overtime</div>
           <div style={{fontSize:12,color:"#334155"}}>{st.otNote}</div>
         </div>
-        {st.sl && <div style={{fontSize:12,color:"#475569",marginBottom:6}}><strong>Sick Leave Detail:</strong> {st.slN}</div>}
-        {st.sch && <div style={{fontSize:12,color:"#475569"}}><strong>Scheduling Detail:</strong> {st.schN}</div>}
+        {st.sl&&<div style={{fontSize:12,color:"#475569",marginBottom:6}}><strong>Sick Leave: </strong>{st.slN}</div>}
       </div>
     </div>
   );
 }
 
-<<<<<<< Updated upstream
-function ListModal({title,desc,states,onSelect,onClose}) {
-  return (
-    <div onClick={onClose} style={{position:"fixed",inset:0,background:"rgba(15,23,42,.6)",zIndex:1500,display:"flex",alignItems:"center",justifyContent:"center",padding:20}}>
-      <div onClick={e=>e.stopPropagation()} style={{background:"#fff",borderRadius:14,maxWidth:640,width:"100%",maxHeight:"82vh",overflowY:"auto",padding:24,boxShadow:"0 20px 60px rgba(0,0,0,.2)"}}>
-=======
 function SyncDiffModal(props){
   var diff=props.diff; var onClose=props.onClose; var onItemClick=props.onItemClick;
   var added=diff.added||[];
@@ -1139,74 +940,22 @@ function ListModal(props){
   return(
     <div onClick={onClose} style={{position:"fixed",inset:0,background:"rgba(15,23,42,.6)",zIndex:1500,display:"flex",alignItems:"center",justifyContent:"center",padding:20}}>
       <div onClick={function(e){e.stopPropagation();}} style={{background:"#fff",borderRadius:14,maxWidth:760,width:"96vw",maxHeight:"88vh",overflowY:"auto",padding:26,boxShadow:"0 20px 60px rgba(0,0,0,.2)"}}>
->>>>>>> Stashed changes
         <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start",marginBottom:6}}>
           <div style={{fontSize:18,fontWeight:800}}>{title}</div>
-          <button onClick={onClose} style={{border:"none",background:"#f1f5f9",borderRadius:8,padding:"6px 12px",cursor:"pointer",fontSize:14,flexShrink:0}}>✕</button>
+          <button onClick={onClose} style={{border:"none",background:"#f1f5f9",borderRadius:8,padding:"6px 12px",cursor:"pointer",fontSize:14,flexShrink:0}}>X</button>
         </div>
-        {desc && <div style={{fontSize:12,color:"#64748b",marginBottom:14}}>{desc}</div>}
-        {states.map(st=>(
-          <div key={st.a} onClick={()=>onSelect(st)} style={{display:"flex",justifyContent:"space-between",alignItems:"center",padding:"10px 12px",borderBottom:"1px solid #f1f5f9",cursor:"pointer",borderRadius:8}}
-            onMouseEnter={e=>e.currentTarget.style.background="#f8fafc"} onMouseLeave={e=>e.currentTarget.style.background=""}>
-            <div><span style={{fontWeight:700,fontSize:13}}>{st.s}</span><span style={{color:"#94a3b8",fontSize:11,marginLeft:8}}>{st.a}</span><span style={{color:"#64748b",fontSize:11,marginLeft:8}}>${st.mw.toFixed(2)}/hr</span></div>
-            <div style={{display:"flex",gap:6,alignItems:"center"}}>{st.chg&&<Bdg t={`→$${st.nr?.toFixed(2)}`} c="#7c3aed" bg="rgba(124,58,237,.07)"/>}<Pill r={st.r} t={st.r.toUpperCase()}/><span style={{color:"#94a3b8",fontSize:11}}>›</span></div>
-          </div>
-        ))}
+        {desc&&<div style={{fontSize:12,color:"#64748b",marginBottom:14}}>{desc}</div>}
+        {states.map(function(st){
+          return <div key={st.a} onClick={function(){onSelect(st);}} style={{display:"flex",justifyContent:"space-between",alignItems:"center",padding:"10px 12px",borderBottom:"1px solid #f1f5f9",cursor:"pointer",borderRadius:8}} onMouseEnter={function(e){e.currentTarget.style.background="#f8fafc";}} onMouseLeave={function(e){e.currentTarget.style.background="";}}>
+            <div><span style={{fontWeight:700,fontSize:13}}>{st.s}</span><span style={{color:"#94a3b8",fontSize:11,marginLeft:8}}>{st.a}</span><span style={{color:"#64748b",fontSize:11,marginLeft:8}}>{"$"+st.mw.toFixed(2)+"/hr"}</span></div>
+            <div style={{display:"flex",gap:6,alignItems:"center"}}>{st.chg&&<Bdg t={"to "+(typeof st.nr==="number"?"$"+st.nr.toFixed(2):String(st.nr||""))} c="#7c3aed" bg="rgba(124,58,237,.07)"/>}<Pill r={st.r} t={st.r.toUpperCase()}/><span style={{color:"#94a3b8",fontSize:11}}>{">"}</span></div>
+          </div>;
+        })}
       </div>
     </div>
   );
 }
 
-<<<<<<< Updated upstream
-export default function App() {
-  const [tab, setTab] = useState(0);
-  const [stateModal, setStateModal] = useState(null);
-  const [listModal, setListModal] = useState(null);
-  const [search, setSearch] = useState("");
-  const [rFilter, setRFilter] = useState("all");
-  const [upYr, setUpYr] = useState("all");
-  const [upCat, setUpCat] = useState("all");
-  const [upcomingData, setUpcomingData] = useState(UPCOMING);
-  const [syncing, setSyncing] = useState(false);
-  const [syncStatus, setSyncStatus] = useState(null); // {msg, type: 'info'|'success'|'error'}
-  const [lastSynced, setLastSynced] = useState(null);
-
-  const filtered = useMemo(()=>STATES.filter(s=>(rFilter==="all"||s.r===rFilter)&&(s.s.toLowerCase().includes(search.toLowerCase())||s.a.toLowerCase().includes(search.toLowerCase()))),[search,rFilter]);
-
-  const handleSync = async () => {
-    setSyncing(true);
-    setSyncStatus({msg:"Connecting to web search...", type:"info"});
-    try {
-      let searchesDone = 0;
-      const raw = await fetchLatestChanges(({type, count, text}) => {
-        if(type==="search") {
-          searchesDone = count;
-          setSyncStatus({msg:`🔍 Searching the web... (${count} quer${count===1?"y":"ies"} completed)`, type:"info"});
-        } else if(type==="text") {
-          setSyncStatus({msg:`📥 Receiving latest data...`, type:"info"});
-        }
-      });
-      // Extract JSON
-      const match = raw.match(/\[[\s\S]*\]/);
-      if(!match) throw new Error("No JSON array found in response");
-      const parsed = JSON.parse(match[0]);
-      const valid = parsed.filter(u=>
-        u.cat && u.j && u.title && u.eff && u.yr && u.detail && u.impact && u.src
-        && ["Min Wage","Tipped Wage","Sick Leave","Minor Labor","Break Laws","Overtime","Scheduling","Restaurant-Specific"].includes(u.cat)
-        && [2026,2027].includes(Number(u.yr))
-      ).map(u=>({...u, yr:Number(u.yr)}));
-      if(valid.length===0) throw new Error("No valid items returned");
-      setUpcomingData(valid);
-      setLastSynced(new Date());
-      setSyncStatus({msg:`✅ Synced ${valid.length} items from ${searchesDone} web searches`, type:"success"});
-      setTab(8);
-      setTimeout(()=>setSyncStatus(null), 5000);
-    } catch(err) {
-      setSyncStatus({msg:`❌ Sync failed: ${err.message}`, type:"error"});
-      setTimeout(()=>setSyncStatus(null), 6000);
-    } finally {
-      setSyncing(false);
-=======
 function SchedModal(props){
   var item=props.item; var isUpcoming=props.isUpcoming; var onClose=props.onClose;
   var tc=item.type==="State"?"#7c3aed":item.type==="County"?"#0284c7":"#6366f1";
@@ -1391,8 +1140,12 @@ export default function App(){
   var compFilterStatusS=useState("issues"); var compFilterStatus=compFilterStatusS[0]; var setCompFilterStatus=compFilterStatusS[1];
   var compFilterCategoryS=useState("all"); var compFilterCategory=compFilterCategoryS[0]; var setCompFilterCategory=compFilterCategoryS[1];
   var compCollapsedS=useState({}); var compCollapsed=compCollapsedS[0]; var setCompCollapsed=compCollapsedS[1];
+  var compOpenRowsS=useState({}); var compOpenRows=compOpenRowsS[0]; var setCompOpenRows=compOpenRowsS[1];
+  var compGroupOpenS=useState({}); var compGroupOpen=compGroupOpenS[0]; var setCompGroupOpen=compGroupOpenS[1];
+  var compOverviewOpenS=useState(true); var compOverviewOpen=compOverviewOpenS[0]; var setCompOverviewOpen=compOverviewOpenS[1];
+  var compSelectedS=useState(null); var compSelected=compSelectedS[0]; var setCompSelected=compSelectedS[1];
   var compViewModeS=useState("findings"); var compViewMode=compViewModeS[0]; var setCompViewMode=compViewModeS[1];
-  var compGroupByS=useState("auto"); var compGroupBy=compGroupByS[0]; var setCompGroupBy=compGroupByS[1];
+  var compGroupByS=useState("none"); var compGroupBy=compGroupByS[0]; var setCompGroupBy=compGroupByS[1];
   var compShowUploadS=useState(true); var compShowUpload=compShowUploadS[0]; var setCompShowUpload=compShowUploadS[1];
   var compColReportS=useState(null); var compColReport=compColReportS[0]; var setCompColReport=compColReportS[1];
   var compBusyS=useState(null); var compBusy=compBusyS[0]; var setCompBusy=compBusyS[1];
@@ -1400,6 +1153,7 @@ export default function App(){
   var compFilterStateS=useState("all"); var compFilterState=compFilterStateS[0]; var setCompFilterState=compFilterStateS[1];
   var compTaskAssigneesS=useState({}); var compTaskAssignees=compTaskAssigneesS[0]; var setCompTaskAssignees=compTaskAssigneesS[1];
   var compDecisionsS=useState({}); var compDecisions=compDecisionsS[0]; var setCompDecisions=compDecisionsS[1];
+  var compStateViewS=useState("map"); var compStateView=compStateViewS[0]; var setCompStateView=compStateViewS[1];
 
   function handleComplianceFile(ev){
     var file=ev.target.files&&ev.target.files[0];
@@ -1479,7 +1233,7 @@ export default function App(){
         setCompShowUpload(false);
         var issues=0, i, j, ch;
         for(i=0;i<result.configFindings.length;i++){ ch=result.configFindings[i].checks; for(j=0;j<ch.length;j++){ if(ch[j].status==="fail"||ch[j].status==="warn") issues++; } }
-        setCompValStatus({msg:"Compliance check complete - "+issues+" issue(s), $"+Number(result.estimatedAnnualExposureUSD||0).toLocaleString()+" modeled exposure. Review findings below.",type:"success"});
+        setCompValStatus({msg:"Compliance check complete - "+issues+" issue(s) found. Review findings below.",type:"success"});
         setTimeout(function(){setCompValStatus(null);},6000);
       }catch(err){setCompValStatus({msg:"Compliance check failed: "+err.message,type:"error"}); setTimeout(function(){setCompValStatus(null);},8000);}
       finally{setCompValidating(false); setCompBusy(null);}
@@ -1506,40 +1260,24 @@ export default function App(){
         var dec=compDecisions[dKey]||{};
         var ass=compTaskAssignees[dKey]||"";
         tasks.push({
-          key:dKey, configIndex:cf.configIndex, owner:conf.primaryOwner, ownerCount:conf.owners.length,
+          key:dKey, configIndex:cf.configIndex, owner:conf.primaryOwner, owners:conf.owners||[], ownerCount:conf.owners.length,
           state:conf.assignedStateName, stateAbbrev:conf.assignedState, storeCount:conf.storeNumbers.length,
           category:ck.category||"Other", lawName:ck.lawName||ck.lawId, lawId:ck.lawId, minorAge:ck.minorAge||0,
           status:ck.status, severity:ck.severity, severityRank:sevPriority[ck.severity]||6,
           expected:ck.expected, actual:ck.actual, issue:ck.issue, recommendation:ck.recommendation, citation:ck.citation,
-          perStoreExposure:Number(ck.perStoreExposureUSD)||0, totalExposure:(Number(ck.perStoreExposureUSD)||0)*conf.storeNumbers.length,
+          basis:ck.basis, storePct:ck.storePct, orgsOn:ck.orgsOn, orgsTotal:ck.orgsTotal,
           acked:!!dec.acked, note:dec.note||"", assignee:ass
         });
       }
->>>>>>> Stashed changes
     }
-  };
-  const filteredUp = useMemo(()=>UPCOMING.filter(u=>(upYr==="all"||String(u.yr)===upYr)&&(upCat==="all"||u.cat===upCat)),[upYr,upCat]);
+    tasks.sort(function(a,b){
+      if(a.acked!==b.acked) return a.acked?1:-1;
+      if(a.severityRank!==b.severityRank) return a.severityRank-b.severityRank;
+      return b.storeCount-a.storeCount;
+    });
+    return tasks;
+  }
 
-<<<<<<< Updated upstream
-  const highRisk=STATES.filter(s=>s.r==="high");
-  const medRisk=STATES.filter(s=>s.r==="medium");
-  const upcoming=STATES.filter(s=>s.chg);
-  const noTipCredit=STATES.filter(s=>s.tc==="None");
-  const hasSL=STATES.filter(s=>s.sl);
-  const dailyOT=STATES.filter(s=>s.otD);
-  const hasBreakLaws=STATES.filter(s=>!s.brk.rest.includes("FLSA only")&&!s.brk.meal.includes("FLSA only"));
-  const hasPremium=STATES.filter(s=>s.brk.premium!=="None");
-
-  const openList=(title,desc,states)=>setListModal({title,desc,states});
-  const openState=st=>{setListModal(null);setStateModal(st);};
-  const inpStyle={padding:"7px 12px",border:"1px solid #e2e8f0",borderRadius:8,fontSize:12,outline:"none"};
-  const btnF=(val,label)=><button onClick={()=>setRFilter(val)} style={{border:"1px solid #e2e8f0",borderRadius:6,padding:"5px 12px",fontSize:11,fontWeight:600,cursor:"pointer",background:rFilter===val?"#6366f1":"#fff",color:rFilter===val?"#fff":"#64748b"}}>{label}</button>;
-
-  return (
-    <div style={{fontFamily:"system-ui,-apple-system,sans-serif",color:"#0f172a",minHeight:"100vh",background:"#f1f5f9"}}>
-      {stateModal && <StateModal st={stateModal} onClose={()=>setStateModal(null)}/>}
-      {listModal && !stateModal && <ListModal title={listModal.title} desc={listModal.desc} states={listModal.states} onSelect={openState} onClose={()=>setListModal(null)}/>}
-=======
   function generateExecBriefPDF(){
     if(!compResult||!compAgg) return;
     var totalChecks=0,passCount=0,failCount=0,missingCount=0,warnCount=0,critCount=0;
@@ -1547,70 +1285,72 @@ export default function App(){
     for(var fi=0;fi<compResult.configFindings.length;fi++){
       var cf=compResult.configFindings[fi]; var conf=compAgg.configs[cf.configIndex]; if(!cf.checks||!conf) continue;
       var sc=conf.storeNumbers.length; var stKey=conf.assignedStateName||conf.assignedState||"-"; var owKey=conf.primaryOwner;
-      if(!byState[stKey]) byState[stKey]={name:stKey,stores:0,issues:0,critical:0,exposure:0};
-      if(!byOwner[owKey]) byOwner[owKey]={name:owKey,state:stKey,stores:0,issues:0,critical:0,exposure:0};
+      if(!byState[stKey]) byState[stKey]={name:stKey,stores:0,issues:0,critical:0};
+      if(!byOwner[owKey]) byOwner[owKey]={name:owKey,state:stKey,stores:0,issues:0,critical:0};
       byState[stKey].stores+=sc; byOwner[owKey].stores+=sc;
       for(var ci=0;ci<cf.checks.length;ci++){
         var ck=cf.checks[ci]; totalChecks++;
         var cat=ck.category||"Other";
-        if(!byCategory[cat]) byCategory[cat]={name:cat,pass:0,warn:0,fail:0,missing:0,critical:0,exposure:0,stores:{}};
-        var exp=(Number(ck.perStoreExposureUSD)||0)*sc;
+        if(!byCategory[cat]) byCategory[cat]={name:cat,pass:0,warn:0,fail:0,missing:0,critical:0,stores:{}};
         var isIssue=(ck.status==="fail"||ck.status==="missing"||ck.status==="warn");
         if(ck.status==="pass") {passCount++; byCategory[cat].pass++;}
         else if(ck.status==="warn") {warnCount++; byCategory[cat].warn++;}
         else if(ck.status==="fail") {failCount++; byCategory[cat].fail++;}
         else if(ck.status==="missing") {missingCount++; byCategory[cat].missing++;}
-        byCategory[cat].exposure+=exp; byState[stKey].exposure+=exp; byOwner[owKey].exposure+=exp;
         if(isIssue){ byState[stKey].issues++; byOwner[owKey].issues++; }
         if(ck.severity==="critical"){critCount++; byCategory[cat].critical++; byState[stKey].critical++; byOwner[owKey].critical++;}
       }
     }
-    var totalExp=Number(compResult.estimatedAnnualExposureUSD||0);
-    function byExp(a,b){return b.exposure-a.exposure;}
-    var catRows=Object.keys(byCategory).map(function(k){return byCategory[k];}).sort(byExp);
-    var stateRows=Object.keys(byState).map(function(k){return byState[k];}).sort(byExp);
-    var ownerRows=Object.keys(byOwner).map(function(k){return byOwner[k];}).sort(byExp);
+    function catIss(r){return r.fail+r.missing+r.warn;}
+    function byCatIssues(a,b){return (catIss(b)-catIss(a))||(b.critical-a.critical);}
+    function byIssues(a,b){return (b.issues-a.issues)||(b.critical-a.critical)||(b.stores-a.stores);}
+    var catRows=Object.keys(byCategory).map(function(k){return byCategory[k];}).sort(byCatIssues);
+    var stateRows=Object.keys(byState).map(function(k){return byState[k];}).sort(byIssues);
+    var ownerRows=Object.keys(byOwner).map(function(k){return byOwner[k];}).sort(byIssues);
     var tasks=buildTaskList();
     var topActions=tasks.filter(function(t){return !t.acked && (t.severity==="critical"||t.severity==="high");}).slice(0,10);
     var dt=new Date(); var dateStr=dt.toLocaleDateString("en-US",{year:"numeric",month:"long",day:"numeric"});
-    function money(n){return "$"+Math.round(n).toLocaleString();}
-    function pctOf(n){return totalExp>0?Math.round(n/totalExp*100)+"%":"0%";}
     var html='<!doctype html><html><head><meta charset="utf-8"><title>Compliance Audit - Executive Brief - '+dateStr+'</title>';
     html+='<style>body{font-family:-apple-system,Segoe UI,Roboto,sans-serif;color:#1e293b;margin:0;padding:30px;line-height:1.5;font-size:11pt;}h1{font-size:22pt;margin:0 0 4px 0;color:#0f172a;}h2{font-size:15pt;margin:24px 0 10px 0;color:#1e3a8a;border-bottom:2px solid #1e3a8a;padding-bottom:4px;}h3{font-size:12pt;margin:14px 0 8px 0;color:#475569;}.subtitle{color:#64748b;margin-bottom:18px;font-size:10pt;}.kpis{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px;}.kpi{flex:1;min-width:130px;border:1px solid #e2e8f0;border-radius:6px;padding:10px 12px;}.kpi .l{font-size:8pt;color:#64748b;text-transform:uppercase;font-weight:700;letter-spacing:.04em;}.kpi .v{font-size:18pt;font-weight:800;margin-top:2px;}.danger{color:#dc2626;}.warn{color:#d97706;}.ok{color:#16a34a;}.muted{color:#64748b;}table{width:100%;border-collapse:collapse;margin-bottom:14px;font-size:9.5pt;}th{background:#1e3a8a;color:#fff;text-align:left;padding:7px 9px;font-weight:600;font-size:9pt;text-transform:uppercase;letter-spacing:.03em;}td{border-bottom:1px solid #e2e8f0;padding:7px 9px;vertical-align:top;}.r{text-align:right;}.bar{height:7px;background:#eef2f6;border-radius:4px;overflow:hidden;margin-top:3px;}.bar>span{display:block;height:100%;background:#dc2626;}.action{background:#fff;border:1px solid #e2e8f0;border-left:4px solid #dc2626;border-radius:4px;padding:10px 12px;margin-bottom:8px;page-break-inside:avoid;}.action.high{border-left-color:#d97706;}.action h4{margin:0 0 4px 0;font-size:10pt;color:#0f172a;}.action .meta{font-size:8.5pt;color:#64748b;margin-bottom:4px;}.action .rec{font-size:9.5pt;color:#312e81;background:#eef2ff;padding:6px 9px;border-radius:4px;margin-top:5px;}.pill{display:inline-block;padding:1px 7px;border-radius:3px;font-size:8pt;font-weight:700;text-transform:uppercase;}.pill.crit{background:#fee2e2;color:#991b1b;}.pill.high{background:#ffedd5;color:#9a3412;}.note{font-size:8.5pt;color:#94a3b8;margin:-6px 0 14px 0;}.footer{margin-top:30px;padding-top:14px;border-top:1px solid #e2e8f0;font-size:8pt;color:#94a3b8;}@media print{body{padding:18px;}h2{page-break-after:avoid;}.kpi,.action{break-inside:avoid;}}</style></head><body>';
-    html+='<h1>Labor Compliance Audit - Executive Brief</h1>';
+    html+='<h1>Labor compliance - what to fix</h1>';
     html+='<div class="subtitle">'+dateStr+' &middot; '+compAgg.totalStores+' stores &middot; '+compAgg.distinctOwners.length+' owner(s) &middot; '+compAgg.distinctStates.length+' state(s)</div>';
     html+='<div class="kpis">';
     html+='<div class="kpi"><div class="l">Stores</div><div class="v">'+compAgg.totalStores+'</div></div>';
-    html+='<div class="kpi"><div class="l">Total Checks</div><div class="v">'+totalChecks+'</div></div>';
-    html+='<div class="kpi"><div class="l">Passed</div><div class="v ok">'+passCount+'</div></div>';
-    html+='<div class="kpi"><div class="l">Issues</div><div class="v danger">'+(failCount+missingCount+warnCount)+'</div></div>';
-    html+='<div class="kpi"><div class="l">Critical</div><div class="v danger">'+critCount+'</div></div>';
-    html+='<div class="kpi"><div class="l">Annual Exposure</div><div class="v danger">'+money(totalExp)+'</div></div>';
+    html+='<div class="kpi"><div class="l">To fix</div><div class="v warn">'+(failCount+missingCount+warnCount)+'</div></div>';
+    html+='<div class="kpi"><div class="l">Urgent</div><div class="v danger">'+critCount+'</div></div>';
+    var _sp=totalChecks?Math.round(passCount*100/totalChecks):100;
+    html+='<div class="kpi"><div class="l">On track</div><div class="v ok">'+_sp+'%</div></div>';
     html+='</div>';
     html+='<h2>Executive Summary</h2><p>'+(compResult.summary||"")+'</p>';
-    if(compResult.patterns&&compResult.patterns.length){ html+='<h3>Pattern Observations</h3><ul>'; for(var pi=0;pi<compResult.patterns.length;pi++) html+='<li>'+compResult.patterns[pi]+'</li>'; html+='</ul>'; }
-    html+='<h2>Risk by Category</h2>';
-    html+='<table><thead><tr><th>Category</th><th class="r">Issues</th><th class="r">Critical</th><th class="r">Annual Exposure</th><th>Share of Exposure</th></tr></thead><tbody>';
-    for(var c1=0;c1<catRows.length;c1++){ var cr=catRows[c1]; var iss=cr.fail+cr.missing+cr.warn; var barW=totalExp>0?Math.round(cr.exposure/totalExp*100):0;
-      html+='<tr><td><strong>'+cr.name+'</strong></td><td class="r '+(iss>0?"danger":"ok")+'">'+iss+'</td><td class="r danger">'+cr.critical+'</td><td class="r danger">'+money(cr.exposure)+'</td><td>'+pctOf(cr.exposure)+'<div class="bar"><span style="width:'+barW+'%"></span></div></td></tr>'; }
+    if(compResult.patterns&&compResult.patterns.length){ html+='<h3>What stands out</h3><ul>'; for(var pi=0;pi<compResult.patterns.length;pi++) html+='<li>'+compResult.patterns[pi]+'</li>'; html+='</ul>'; }
+    html+='<h2>Where the gaps are</h2>';
+    html+='<table><thead><tr><th>Category</th><th class="r">To fix</th><th class="r">Urgent</th></tr></thead><tbody>';
+    for(var c1=0;c1<catRows.length;c1++){ var cr=catRows[c1]; var iss=cr.fail+cr.missing+cr.warn;
+      html+='<tr><td><strong>'+cr.name+'</strong></td><td class="r '+(iss>0?"danger":"ok")+'">'+iss+'</td><td class="r danger">'+cr.critical+'</td></tr>'; }
     html+='</tbody></table>';
-    html+='<h2>Risk by State</h2><table><thead><tr><th>State</th><th class="r">Stores</th><th class="r">Issues</th><th class="r">Critical</th><th class="r">Annual Exposure</th></tr></thead><tbody>';
-    for(var s1=0;s1<Math.min(stateRows.length,15);s1++){ var sr=stateRows[s1]; html+='<tr><td>'+sr.name+'</td><td class="r">'+sr.stores+'</td><td class="r danger">'+sr.issues+'</td><td class="r danger">'+sr.critical+'</td><td class="r danger">'+money(sr.exposure)+'</td></tr>'; }
+    html+='<h2>By state</h2><table><thead><tr><th>State</th><th class="r">Stores</th><th class="r">To fix</th><th class="r">Urgent</th></tr></thead><tbody>';
+    for(var s1=0;s1<Math.min(stateRows.length,15);s1++){ var sr=stateRows[s1]; html+='<tr><td>'+sr.name+'</td><td class="r">'+sr.stores+'</td><td class="r danger">'+sr.issues+'</td><td class="r danger">'+sr.critical+'</td></tr>'; }
     html+='</tbody></table>';
-    if(stateRows.length>15) html+='<div class="note">Showing top 15 of '+stateRows.length+' states by exposure. Full detail is in the CSV export.</div>';
-    html+='<h2>Highest-Risk Owners</h2><table><thead><tr><th>Owner</th><th>State</th><th class="r">Stores</th><th class="r">Issues</th><th class="r">Critical</th><th class="r">Annual Exposure</th></tr></thead><tbody>';
-    for(var o1=0;o1<Math.min(ownerRows.length,15);o1++){ var or=ownerRows[o1]; html+='<tr><td>'+or.name+'</td><td>'+or.state+'</td><td class="r">'+or.stores+'</td><td class="r danger">'+or.issues+'</td><td class="r danger">'+or.critical+'</td><td class="r danger">'+money(or.exposure)+'</td></tr>'; }
+    if(stateRows.length>15) html+='<div class="note">Showing top 15 of '+stateRows.length+' states by number to fix. Full detail is in the CSV export.</div>';
+    if(ownerRows.length>1){
+    html+='<h2>Owners to focus on</h2><table><thead><tr><th>Owner</th><th>State</th><th class="r">Stores</th><th class="r">To fix</th><th class="r">Urgent</th></tr></thead><tbody>';
+    for(var o1=0;o1<Math.min(ownerRows.length,15);o1++){ var or=ownerRows[o1]; html+='<tr><td>'+or.name+'</td><td>'+or.state+'</td><td class="r">'+or.stores+'</td><td class="r danger">'+or.issues+'</td><td class="r danger">'+or.critical+'</td></tr>'; }
     html+='</tbody></table>';
-    if(ownerRows.length>15) html+='<div class="note">Showing top 15 of '+ownerRows.length+' owners by exposure. Per-store, per-rule detail is in the CSV export.</div>';
-    html+='<h2>Top '+topActions.length+' Recommended Next Steps</h2>';
-    if(topActions.length===0) html+='<p class="muted">No critical or high-severity actions outstanding.</p>';
-    for(var ti=0;ti<topActions.length;ti++){ var t=topActions[ti]; var sevClass=t.severity==="critical"?"crit":"high"; var borderClass=t.severity==="critical"?"":" high";
+    if(ownerRows.length>15) html+='<div class="note">Showing top 15 of '+ownerRows.length+' owners by number to fix. Per-store, per-rule detail is in the CSV export.</div>';
+    }
+    html+='<h2>What to fix first</h2>';
+    if(topActions.length===0) html+='<p class="muted">Nothing urgent outstanding - you are in good shape.</p>';
+    for(var ti=0;ti<topActions.length;ti++){ var t=topActions[ti];
+      var tTag=t.basis==="regulation"?"Breaks the law":(t.severity==="critical"?"Urgent":"Worth checking");
+      var sevClass=(t.basis==="regulation"||t.severity==="critical")?"crit":"high";
+      var borderClass=(t.basis==="regulation"||t.severity==="critical")?"":" high";
       html+='<div class="action'+borderClass+'"><h4>'+(ti+1)+'. '+t.lawName+'</h4>';
-      html+='<div class="meta"><span class="pill '+sevClass+'">'+t.severity+'</span> &middot; '+t.category+' &middot; '+t.owner+' / '+t.state+' &middot; '+t.storeCount+' stores'+(t.totalExposure>0?' &middot; <strong>'+money(t.totalExposure)+' exposure</strong>':'')+'</div>';
+      html+='<div class="meta"><span class="pill '+sevClass+'">'+tTag+'</span> &middot; '+t.category+' &middot; '+t.owner+' / '+t.state+' &middot; '+t.storeCount+' stores</div>';
+      if(t.basis!=="regulation"&&t.orgsTotal>0){ var _opc=Math.round((t.orgsOn||0)*100/t.orgsTotal); html+='<div class="meta">'+_opc+'% of '+t.stateAbbrev+' operators use this rule ('+t.orgsOn+' of '+t.orgsTotal+').</div>'; }
       if(t.issue) html+='<div style="margin-top:5px;font-size:9.5pt;">'+t.issue+'</div>';
-      if(t.recommendation) html+='<div class="rec"><strong>Action:</strong> '+t.recommendation+'</div>';
+      if(t.recommendation) html+='<div class="rec"><strong>To stay compliant:</strong> '+t.recommendation+'</div>';
       html+='</div>'; }
-    html+='<div class="footer">Generated by Altametrics Labor Compliance Dashboard &middot; '+dateStr+' &middot; This is a high-level executive brief; the per-store, per-rule detail is in the CSV export. Dollar figures are modeled estimates assuming ~20 employees/location at state minimum wage - not legal determinations. Confirm material decisions with qualified counsel.</div>';
+    html+='<div class="footer">Generated by Altametrics Labor Compliance Dashboard &middot; '+dateStr+' &middot; This is a high-level executive brief; the per-store, per-rule detail is in the CSV export. Findings are prioritization signals, not legal determinations. Confirm material decisions with qualified counsel.</div>';
     html+='</body></html>';
     var w=window.open("","_blank");
     if(!w){ alert("Pop-up blocked. Please allow pop-ups for this site to generate the PDF."); return; }
@@ -1620,7 +1360,7 @@ export default function App(){
 
   function exportTasksToCsv(){
     if(!compResult||!compResult.configFindings||!compAgg){ alert("Run a compliance check first."); return; }
-    var headers=["Owner","Store Number","Store State","Assigned State","Category","Law ID","Law Name","Minor Age","Finding","Severity","Expected (statewide baseline)","Current Setting","Issue","Recommended Action","Per-Store Annual Exposure (USD)","Source"];
+    var headers=["Owner","Store Number","State","Category","Setting (rule)","What's wrong","Why it's flagged","What it should be","What it's set to now","What to do","How sure we are","Severity","Official source"];
     function esc(v){ v=(v==null?"":String(v)); if(v.indexOf(",")>=0||v.indexOf("\"")>=0||v.indexOf("\n")>=0) v="\""+v.replace(/"/g,"\"\"")+"\""; return v; }
     var rows=[headers.join(",")];
     for(var fi=0;fi<compResult.configFindings.length;fi++){
@@ -1628,14 +1368,12 @@ export default function App(){
       for(var ci=0;ci<cf.checks.length;ci++){
         var ck=cf.checks[ci];
         if(ck.status!=="fail"&&ck.status!=="missing"&&ck.status!=="warn") continue;
-        var label=(ck.status==="warn")?"DIVERGENT":(ck.csvHasRow===false?"MISSING":"FAIL");
-        var lawIdClean=String(ck.lawId||"").replace(/^MISSING:/,"");
+        var label=(ck.basis==="regulation")?"Below the legal minimum":(ck.csvHasRow===false?"Not set up (brand norm has it on)":"Different from the brand norm");
+        var sure=(ck.basis==="regulation")?"High - checked against the law":"Compared to the brand-wide norm in this state (all operators, not just your stores)";
         for(var si=0;si<conf.storeNumbers.length;si++){
           var sn=conf.storeNumbers[si];
           var owner=(conf.storeOwnerMap&&conf.storeOwnerMap[sn])||conf.primaryOwner;
-          var ssMeta=compAgg.storesByNumber?compAgg.storesByNumber[sn]:null;
-          var storeState=ssMeta?ssMeta.storeState:"";
-          rows.push([owner,sn,storeState,conf.assignedState,ck.category||"Other",lawIdClean,ck.lawName||"",ck.minorAge||0,label,ck.severity||"",ck.expected||"",ck.actual||"",ck.issue||"",ck.recommendation||"",Number(ck.perStoreExposureUSD)||0,ck.citation||""].map(esc).join(","));
+          rows.push([owner,sn,conf.assignedState,ck.category||"Other",ck.lawName||"",label,ck.issue||"",ck.expected||"",ck.actual||"",ck.recommendation||"",sure,ck.severity||"",ck.citation||""].map(esc).join(","));
         }
       }
     }
@@ -1745,416 +1483,524 @@ export default function App(){
       {detailModal&&<DetailModal item={detailModal.item} type={detailModal.type} onClose={function(){setDetailModal(null);}}/>}
       {listModal&&!stateModal&&!schedModal&&!detailModal&&<ListModal title={listModal.title} desc={listModal.desc} states={listModal.states} onSelect={openState} onClose={function(){setListModal(null);}}/>}
       {syncDiff&&!stateModal&&!schedModal&&!detailModal&&!listModal&&<SyncDiffModal diff={syncDiff} onClose={function(){setSyncDiff(null);}} onItemClick={function(item){setDetailModal({item:item,type:"upcoming"});}}/>}
->>>>>>> Stashed changes
 
-      <div style={{background:"linear-gradient(135deg,#1e1b4b 0%,#312e81 100%)",padding:"20px 24px 0"}}>
-        <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start",flexWrap:"wrap",gap:10,marginBottom:18}}>
+      <div style={{background:"linear-gradient(135deg,#1e1b4b 0%,#3730a3 60%,#312e81 100%)",padding:"22px 28px 0",boxShadow:"0 4px 24px rgba(0,0,0,.18)"}}>
+        <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start",flexWrap:"wrap",gap:12,marginBottom:20}}>
           <div>
-            <div style={{fontSize:20,fontWeight:800,color:"#fff"}}>🏢 Labor Compliance Dashboard</div>
-            <div style={{color:"rgba(255,255,255,.6)",fontSize:12,marginTop:3}}>
-              Restaurant Industry · 50-State Tracker · March 2026
-              {lastSynced && <span style={{marginLeft:10,color:"rgba(165,243,252,.7)"}}>· Last synced {lastSynced.toLocaleTimeString()}</span>}
-            </div>
+            <div style={{fontSize:24,fontWeight:800,color:"#fff",letterSpacing:"-.02em"}}>Labor Compliance Dashboard</div>
+            <div style={{color:"rgba(255,255,255,.55)",fontSize:13,marginTop:4,letterSpacing:".01em"}}>{"Restaurant Industry - 50-State Tracker - "+(new Date()).toLocaleDateString("en-US",{month:"long",year:"numeric"})}</div>
           </div>
           <div style={{display:"flex",gap:8,flexWrap:"wrap",alignItems:"center"}}>
-            <span style={{background:"rgba(220,38,38,.25)",color:"#fca5a5",border:"1px solid rgba(220,38,38,.4)",borderRadius:6,padding:"4px 12px",fontSize:11,fontWeight:700}}>{highRisk.length} High Risk States</span>
-            <span style={{background:"rgba(217,119,6,.2)",color:"#fcd34d",border:"1px solid rgba(217,119,6,.3)",borderRadius:6,padding:"4px 12px",fontSize:11,fontWeight:700}}>{upcoming.length} Wage Changes 2026</span>
-            {/* SYNC BUTTON */}
-            <button
-              onClick={handleSync}
-              disabled={syncing}
-              style={{
-                display:"flex",alignItems:"center",gap:7,
-                background:syncing?"rgba(99,102,241,.3)":"rgba(255,255,255,.12)",
-                color:syncing?"rgba(255,255,255,.5)":"#fff",
-                border:"1.5px solid rgba(255,255,255,.3)",
-                borderRadius:8,padding:"6px 16px",
-                fontSize:12,fontWeight:700,cursor:syncing?"not-allowed":"pointer",
-                transition:"all .2s"
-              }}
-              onMouseEnter={e=>{if(!syncing)e.currentTarget.style.background="rgba(255,255,255,.22)"}}
-              onMouseLeave={e=>{if(!syncing)e.currentTarget.style.background="rgba(255,255,255,.12)"}}
-            >
-              <span style={{display:"inline-block",animation:syncing?"spin 1s linear infinite":"none",fontSize:14}}>
-                {syncing ? "⟳" : "↻"}
+            <span style={{background:"rgba(220,38,38,.3)",color:"#fca5a5",border:"1px solid rgba(220,38,38,.5)",borderRadius:8,padding:"5px 14px",fontSize:12,fontWeight:700}}>{highRisk.length+" High Risk States"}</span>
+            <span style={{background:"rgba(217,119,6,.25)",color:"#fcd34d",border:"1px solid rgba(217,119,6,.4)",borderRadius:8,padding:"5px 14px",fontSize:12,fontWeight:700}}>{upcomingWage.length+" Wage Changes 2026"}</span>
+            {lastSynced ? (
+              <span title={"Last successful sync: "+lastSynced.toLocaleString()} style={{display:"inline-flex",alignItems:"center",gap:6,background:"rgba(34,197,94,.18)",color:"#86efac",border:"1px solid rgba(134,239,172,.45)",borderRadius:8,padding:"5px 12px",fontSize:12,fontWeight:700}}>
+                <span style={{display:"inline-block",width:7,height:7,borderRadius:"50%",background:"#22c55e",boxShadow:"0 0 6px #22c55e"}}/>
+                {"Synced "+timeAgo(lastSynced)+" - "+lastSynced.toLocaleDateString("en-US",{month:"short",day:"numeric"})+" "+lastSynced.toLocaleTimeString("en-US",{hour:"numeric",minute:"2-digit"})}
               </span>
-              {syncing ? "Syncing..." : "Sync Latest"}
-            </button>
+            ) : (
+              <span style={{display:"inline-flex",alignItems:"center",gap:6,background:"rgba(148,163,184,.2)",color:"#cbd5e1",border:"1px solid rgba(203,213,225,.3)",borderRadius:8,padding:"5px 12px",fontSize:12,fontWeight:700}}>
+                <span style={{display:"inline-block",width:7,height:7,borderRadius:"50%",background:"#94a3b8"}}/>Never synced
+              </span>
+            )}
+            <button onClick={handleSync} disabled={syncing} style={{display:"flex",alignItems:"center",gap:8,background:syncing?"rgba(99,102,241,.4)":"rgba(165,180,252,.15)",color:syncing?"rgba(255,255,255,.5)":"#fff",border:"1.5px solid rgba(165,180,252,.4)",borderRadius:8,padding:"7px 18px",fontSize:12,fontWeight:700,cursor:syncing?"not-allowed":"pointer",backdropFilter:"blur(4px)"}}>{syncing?"Syncing...":"Sync Latest"}</button>
           </div>
         </div>
-
-        {/* Sync status bar */}
-        {syncStatus && (
-          <div style={{
-            margin:"0 0 12px",padding:"8px 16px",borderRadius:8,fontSize:12,fontWeight:600,
-            background: syncStatus.type==="success"?"rgba(22,163,74,.2)":syncStatus.type==="error"?"rgba(220,38,38,.2)":"rgba(99,102,241,.2)",
-            color: syncStatus.type==="success"?"#86efac":syncStatus.type==="error"?"#fca5a5":"#c7d2fe",
-            border: `1px solid ${syncStatus.type==="success"?"rgba(22,163,74,.4)":syncStatus.type==="error"?"rgba(220,38,38,.4)":"rgba(99,102,241,.4)"}`,
-            display:"flex",alignItems:"center",gap:8
-          }}>
-            {syncStatus.type==="info" && <span style={{display:"inline-block",animation:"spin 1s linear infinite"}}>⟳</span>}
-            {syncStatus.msg}
-          </div>
-        )}
-
-        <style>{`@keyframes spin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}`}</style>
-        <div style={{display:"flex",gap:0,overflowX:"auto"}}>
-          {TABS.map((t,i)=><button key={i} onClick={()=>setTab(i)} style={{border:"none",background:"none",padding:"9px 13px",whiteSpace:"nowrap",borderBottom:tab===i?"3px solid #a5b4fc":"3px solid transparent",color:tab===i?"#a5b4fc":"rgba(255,255,255,.55)",fontWeight:600,fontSize:11,cursor:"pointer"}}>{t}</button>)}
+        {syncStatus&&<div style={{margin:"0 0 14px",padding:"9px 18px",borderRadius:8,fontSize:12,fontWeight:600,background:sC,color:sT,border:"1px solid "+sB}}>{syncStatus.msg}</div>}
+        <div style={{display:"flex",gap:0,overflowX:"auto",borderTop:"1px solid rgba(255,255,255,.08)"}}>
+                {TABS.map(function(t,i){return <button key={i} onClick={function(){setTab(i);}} style={{border:"none",background:"none",padding:"13px 18px",whiteSpace:"nowrap",borderBottom:tab===i?"3px solid #a5b4fc":"3px solid transparent",color:tab===i?"#a5b4fc":"rgba(255,255,255,.65)",fontWeight:tab===i?700:500,fontSize:14,cursor:"pointer",letterSpacing:".01em"}}>{t}</button>;})}    
         </div>
       </div>
 
-      <div style={{padding:20,maxWidth:1400,margin:"0 auto"}}>
+      <div style={{padding:"20px 28px"}}>
 
-        {/* OVERVIEW */}
-        {tab===0 && (
-          <div>
-            <div style={{display:"flex",gap:12,marginBottom:20,flexWrap:"wrap"}}>
-              <KPI label="High Risk States" value={highRisk.length} sub="Immediate audit needed" color="#dc2626" onClick={()=>openList("High Risk States","States with complex, multi-layered compliance requirements.",highRisk)}/>
-              <KPI label="Medium Risk" value={medRisk.length} sub="Monitor closely" color="#d97706" onClick={()=>openList("Medium Risk States","States with active wage increases, sick leave mandates, or notable local rates.",medRisk)}/>
-              <KPI label="2026 Wage Changes" value={upcoming.length} sub="Pending increases" color="#7c3aed" onClick={()=>openList("States with 2026 Wage Changes","All states with minimum wage increases scheduled in 2026.",upcoming)}/>
-              <KPI label="No Tip Credit" value={noTipCredit.length} sub="Full MW required" color="#0284c7" onClick={()=>openList("No Tip Credit States","States where tip credit is not allowed — full MW required for all tipped employees.",noTipCredit)}/>
-              <KPI label="Sick Leave Laws" value={hasSL.length} sub="State mandates active" color="#16a34a" onClick={()=>openList("States with Sick Leave Mandates","States requiring paid sick leave including new 2025–2026 laws.",hasSL)}/>
-              <KPI label="Daily OT States" value={dailyOT.length} sub="CA, AK, NV, CO" color="#dc2626" onClick={()=>openList("States with Daily Overtime","States requiring OT pay based on daily hours worked.",dailyOT)}/>
-            </div>
-            <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:16}}>
-              <div>
-                <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:10}}>
-                  <span style={{background:"rgba(220,38,38,.1)",color:"#dc2626",borderRadius:6,padding:"2px 8px",fontSize:11,fontWeight:700}}>🔴 HIGH RISK STATES</span>
-                  <span style={{fontSize:11,color:"#94a3b8"}}>Click any card for full detail</span>
-                </div>
-                {highRisk.map(st=>(
-                  <div key={st.a} onClick={()=>setStateModal(st)} style={{background:"#fff",border:"1px solid #fecaca",borderRadius:10,padding:"12px 14px",marginBottom:10,cursor:"pointer",boxShadow:"0 1px 3px rgba(0,0,0,.05)"}}
-                    onMouseEnter={e=>e.currentTarget.style.boxShadow="0 4px 12px rgba(220,38,38,.15)"} onMouseLeave={e=>e.currentTarget.style.boxShadow="0 1px 3px rgba(0,0,0,.05)"}>
-                    <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start",marginBottom:8}}>
-                      <div><span style={{fontWeight:800,fontSize:15}}>{st.s}</span><span style={{color:"#94a3b8",fontSize:12,marginLeft:6}}>{st.a}</span></div>
-                      <div style={{textAlign:"right"}}><div style={{fontWeight:800,fontSize:15}}>${st.mw.toFixed(2)}<span style={{fontWeight:400,fontSize:11,color:"#94a3b8"}}>/hr</span></div>{st.chg&&<div style={{fontSize:10,color:"#dc2626",fontWeight:700}}>→${st.nr?.toFixed(2)} on {st.cd}</div>}</div>
-                    </div>
-                    <div style={{display:"flex",gap:5,flexWrap:"wrap",marginBottom:6}}>
-                      {st.tc==="None"&&<Bdg t="No Tip Credit" c="#dc2626" bg="rgba(220,38,38,.07)"/>}
-                      {st.sch&&<Bdg t="Fair Scheduling" c="#7c3aed" bg="rgba(124,58,237,.07)"/>}
-                      {st.sl&&<Bdg t="Sick Leave" c="#0284c7" bg="rgba(2,132,199,.07)"/>}
-                      {st.otD&&<Bdg t="Daily OT" c="#d97706" bg="rgba(217,119,6,.08)"/>}
-                      {st.local&&st.local!=="None"&&<Bdg t="Local Rates" c="#6366f1" bg="rgba(99,102,241,.07)"/>}
-                    </div>
-                    <div style={{fontSize:11,color:"#64748b"}}>{st.note}</div>
+      {tab===0&&(
+        <div>
+          <div style={{display:"flex",gap:12,marginBottom:20,flexWrap:"wrap"}}>
+            <KPI label="High Risk States" value={highRisk.length} sub="Immediate audit needed" color="#dc2626" onClick={function(){openList("High Risk States","States with complex multi-layered compliance requirements.",highRisk);}}/>
+            <KPI label="Medium Risk" value={medRisk.length} sub="Monitor closely" color="#d97706" onClick={function(){openList("Medium Risk States","States with active wage increases, sick leave mandates, or notable local rates.",medRisk);}}/>
+            <KPI label="2026 Wage Changes" value={upcomingWage.length} sub="Pending increases" color="#7c3aed" onClick={function(){openList("States with 2026 Wage Changes","All states with minimum wage increases scheduled in 2026.",upcomingWage);}}/>
+            <KPI label="No Tip Credit" value={noTipCredit.length} sub="Full MW required" color="#0284c7" onClick={function(){openList("No Tip Credit States","States where tip credit is not allowed.",noTipCredit);}}/>
+            <KPI label="Sick Leave Laws" value={hasSL.length} sub="State mandates active" color="#16a34a" onClick={function(){openList("States with Sick Leave Mandates","States requiring paid sick leave.",hasSL);}}/>
+            <KPI label="Daily OT States" value={dailyOT.length} sub="CA, AK, NV, CO" color="#dc2626" onClick={function(){openList("States with Daily Overtime","States requiring OT based on daily hours.",dailyOT);}}/>
+          </div>
+          <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:16}}>
+            <div>
+              <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:10}}>
+                <span style={{background:"rgba(220,38,38,.1)",color:"#dc2626",borderRadius:6,padding:"2px 8px",fontSize:11,fontWeight:700}}>HIGH RISK STATES</span>
+                <span style={{fontSize:11,color:"#94a3b8"}}>Click any card for full detail</span>
+              </div>
+              {highRisk.map(function(st){
+                return <div key={st.a} onClick={function(){setStateModal(st);}} style={{background:"#fff",border:"1px solid #fecaca",borderRadius:10,padding:"12px 14px",marginBottom:10,cursor:"pointer",boxShadow:"0 1px 3px rgba(0,0,0,.05)"}}>
+                  <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start",marginBottom:8}}>
+                    <div><span style={{fontWeight:800,fontSize:15}}>{st.s}</span><span style={{color:"#94a3b8",fontSize:12,marginLeft:6}}>{st.a}</span></div>
+                    <div style={{textAlign:"right"}}><div style={{fontWeight:800,fontSize:15}}>{"$"+st.mw.toFixed(2)}<span style={{fontWeight:400,fontSize:11,color:"#94a3b8"}}>/hr</span></div>{st.chg&&<div style={{fontSize:10,color:"#dc2626",fontWeight:700}}>{"to "+(typeof st.nr==="number"?"$"+st.nr.toFixed(2):String(st.nr||""))+" on "+st.cd}</div>}</div>
                   </div>
-                ))}
-              </div>
-              <div>
-                <div style={{marginBottom:10}}><span style={{background:"rgba(124,58,237,.1)",color:"#7c3aed",borderRadius:6,padding:"2px 8px",fontSize:11,fontWeight:700}}>⏰ 2026 WAGE CHANGES</span></div>
-                <Card style={{padding:0,overflow:"hidden",marginBottom:16}}>
-                  <table style={{width:"100%",borderCollapse:"collapse"}}>
-                    <thead><tr><TH>State</TH><TH>Effective</TH><TH>Change</TH></tr></thead>
-                    <tbody>
-                      {upcoming.map(st=>(
-                        <tr key={st.a} onClick={()=>setStateModal(st)} style={{cursor:"pointer"}} onMouseEnter={e=>e.currentTarget.style.background="#f8fafc"} onMouseLeave={e=>e.currentTarget.style.background=""}>
-                          <TD><strong>{st.s}</strong></TD>
-                          <TD style={{color:"#94a3b8",fontSize:11}}>{st.cd}</TD>
-                          <TD style={{fontWeight:700,color:"#7c3aed",whiteSpace:"nowrap"}}>${st.mw.toFixed(2)} → ${st.nr?.toFixed(2)}</TD>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </Card>
-                <div style={{marginBottom:10}}><span style={{background:"rgba(220,38,38,.1)",color:"#dc2626",borderRadius:6,padding:"2px 8px",fontSize:11,fontWeight:700}}>⚖️ RECENT ENFORCEMENT</span></div>
-                {CASES.slice(0,3).map((c,i)=>(
-                  <div key={i} style={{background:"#fff",border:"1px solid #e2e8f0",borderRadius:10,padding:"12px 14px",marginBottom:10,boxShadow:"0 1px 3px rgba(0,0,0,.05)"}}>
-                    <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start",marginBottom:4}}>
-                      <div style={{fontWeight:700,fontSize:13}}>{c.co} <span style={{color:"#94a3b8",fontWeight:400,fontSize:11}}>({c.yr})</span></div>
-                      <div style={{fontWeight:800,color:"#dc2626",fontSize:13,flexShrink:0,marginLeft:8}}>{c.pen}</div>
-                    </div>
-                    <div style={{display:"flex",gap:6,marginBottom:5}}><Bdg t={c.type}/><Pill r={c.sev} t={c.sev.toUpperCase()}/></div>
-                    <div style={{fontSize:11,color:"#64748b",lineHeight:1.5}}>{c.detail}</div>
+                  <div style={{display:"flex",gap:5,flexWrap:"wrap",marginBottom:6}}>
+                    {st.tc==="None"&&<Bdg t="No Tip Credit" c="#dc2626" bg="rgba(220,38,38,.07)"/>}
+                    {st.sch&&<Bdg t="Fair Scheduling" c="#7c3aed" bg="rgba(124,58,237,.07)"/>}
+                    {st.sl&&<Bdg t="Sick Leave" c="#0284c7" bg="rgba(2,132,199,.07)"/>}
+                    {st.otD&&<Bdg t="Daily OT" c="#d97706" bg="rgba(217,119,6,.08)"/>}
+                    {st.local&&st.local!=="None"&&<Bdg t="Local Rates" c="#6366f1" bg="rgba(99,102,241,.07)"/>}
                   </div>
-                ))}
-              </div>
+                  <div style={{fontSize:11,color:"#64748b"}}>{st.note}</div>
+                </div>;
+              })}
             </div>
-          </div>
-        )}
-
-        {/* MIN WAGE */}
-        {tab===1 && (
-          <div>
-            <Tip>💡 Click any state row for full compliance details including age-specific minor rules, break laws, OT, and sick leave.</Tip>
-            <div style={{display:"flex",gap:10,marginBottom:14,flexWrap:"wrap",alignItems:"center"}}>
-              <input style={{...inpStyle,minWidth:180}} placeholder="Search state..." value={search} onChange={e=>setSearch(e.target.value)}/>
-              <div style={{display:"flex",gap:6,flexWrap:"wrap"}}>{btnF("all","All")}{btnF("high","High Risk")}{btnF("medium","Medium")}{btnF("low","Low Risk")}</div>
-            </div>
-            <Card style={{padding:0,overflow:"hidden"}}>
-              <table style={{width:"100%",borderCollapse:"collapse"}}>
-                <thead><tr>{["State","Min Wage","Tipped Rate","Tip Credit","OT Rule","Upcoming Change","Local Rates","Risk","Source"].map(h=><TH key={h}>{h}</TH>)}</tr></thead>
-                <tbody>
-                  {filtered.map(st=>(
-                    <tr key={st.a} onClick={()=>setStateModal(st)} style={{cursor:"pointer"}} onMouseEnter={e=>e.currentTarget.style.background="#f8fafc"} onMouseLeave={e=>e.currentTarget.style.background=""}>
-                      <TD><strong>{st.s}</strong> <span style={{color:"#94a3b8",fontSize:10}}>{st.a}</span></TD>
-                      <TD style={{fontWeight:700}}>${st.mw.toFixed(2)}</TD>
-                      <TD>{typeof st.tip==="number"?`$${st.tip.toFixed(2)}`:st.tip}</TD>
-                      <TD>{st.tc==="None"?<Bdg t="None" c="#dc2626" bg="rgba(220,38,38,.07)"/>:(typeof st.tc==="number"?`$${st.tc.toFixed(2)}`:"—")}</TD>
-                      <TD style={{color:"#64748b",fontSize:11}}>{st.ot}</TD>
-                      <TD>{st.chg?<span style={{color:"#7c3aed",fontWeight:700,fontSize:11}}>${st.nr?.toFixed(2)} · {st.cd}</span>:<span style={{color:"#cbd5e1",fontSize:11}}>—</span>}</TD>
-                      <TD style={{color:"#64748b",fontSize:11}}>{st.local&&st.local!=="None"?st.local:"—"}</TD>
-                      <TD><Pill r={st.r} t={st.r.toUpperCase()}/></TD>
-                      <TD><SrcLink url={st.src}/></TD>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </Card>
-          </div>
-        )}
-
-        {/* TIPPED WAGE */}
-        {tab===2 && (
-          <div>
-            <Tip>💡 80/20 Rule: tipped employees cannot spend >20% of shift on non-tipped duties. Top DOL enforcement focus. Avg back-wage finding: $1,400/employee.</Tip>
-            <div style={{display:"flex",gap:12,marginBottom:16,flexWrap:"wrap"}}>
-              <KPI label="No Tip Credit States" value={noTipCredit.length} sub="Full MW required" color="#dc2626" onClick={()=>openList("No Tip Credit States","States prohibiting tip credit.",noTipCredit)}/>
-              <KPI label="Highest Tipped Rate" value="$12.75" sub="Hawaii" color="#0284c7"/>
-              <KPI label="Federal Tip Credit" value="$5.12" sub="At $7.25 federal MW" color="#6366f1"/>
-            </div>
-            <Card style={{padding:0,overflow:"hidden"}}>
-              <table style={{width:"100%",borderCollapse:"collapse"}}>
-                <thead><tr>{["State","Min Wage","Tipped Cash Wage","Tip Credit","Notes","Risk","Source"].map(h=><TH key={h}>{h}</TH>)}</tr></thead>
-                <tbody>
-                  {STATES.map(st=>(
-                    <tr key={st.a} onClick={()=>setStateModal(st)} style={{cursor:"pointer"}} onMouseEnter={e=>e.currentTarget.style.background="#f8fafc"} onMouseLeave={e=>e.currentTarget.style.background=""}>
-                      <TD><strong>{st.s}</strong></TD>
-                      <TD style={{fontWeight:700}}>${st.mw.toFixed(2)}</TD>
-                      <TD style={{fontWeight:700,color:st.tc==="None"?"#dc2626":"#0f172a"}}>{typeof st.tip==="number"?`$${st.tip.toFixed(2)}`:st.tip}</TD>
-                      <TD>{st.tc==="None"?<Bdg t="No Credit" c="#dc2626" bg="rgba(220,38,38,.07)"/>:(typeof st.tc==="number"?`$${st.tc.toFixed(2)}`:"—")}</TD>
-                      <TD style={{fontSize:11,color:"#64748b",maxWidth:200}}>{st.note}</TD>
-                      <TD><Pill r={st.r} t={st.r.toUpperCase()}/></TD>
-                      <TD><SrcLink url={st.src}/></TD>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </Card>
-          </div>
-        )}
-
-        {/* MINOR LAWS */}
-        {tab===3 && (
-          <div>
-            <Tip>💡 Restaurant industry is the #1 DOL child labor enforcement sector. 950+ investigations in 2024. Age-specific rules vary significantly — Florida and Washington are stricter than federal for 14–15 year olds.</Tip>
-            <div style={{display:"flex",gap:12,marginBottom:16,flexWrap:"wrap"}}>
-              <KPI label="DOL Investigations" value="950+" sub="Child labor cases 2024" color="#dc2626"/>
-              <KPI label="Avg Penalty" value="$15K+" sub="Per minor violation" color="#d97706"/>
-              <KPI label="States Requiring Permit" value={Object.values(MINOR_AGES).filter(m=>m.permit).length} sub="Work/employment permit" color="#7c3aed"/>
-            </div>
-
-            <Card>
-              <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:12}}>
-                <div style={{fontWeight:700,fontSize:13}}>Federal FLSA Baseline — All States Must Meet or Exceed</div>
-                <SrcLink url="https://www.dol.gov/agencies/whd/child-labor/restaurant" label="DOL Restaurant Guide"/>
-              </div>
-              <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:10}}>
-                <div style={{background:"#fef9c3",borderRadius:8,padding:"10px 14px",border:"1px solid #fde68a"}}>
-                  <div style={{fontWeight:700,fontSize:11,color:"#92400e",marginBottom:6,textTransform:"uppercase"}}>Ages 14–15 Federal Limits</div>
-                  {B14.map((r,i)=><div key={i} style={{fontSize:11,color:"#334155",marginBottom:3}}>▸ {r}</div>)}
-                </div>
-                <div style={{background:"#f0fdf4",borderRadius:8,padding:"10px 14px",border:"1px solid #bbf7d0"}}>
-                  <div style={{fontWeight:700,fontSize:11,color:"#14532d",marginBottom:6,textTransform:"uppercase"}}>Ages 16–17 Federal Limits</div>
-                  {B16.map((r,i)=><div key={i} style={{fontSize:11,color:"#334155",marginBottom:3}}>▸ {r}</div>)}
-                  <div style={{fontSize:11,color:"#334155",marginBottom:3}}>▸ No federal hour limit for non-hazardous work</div>
-                </div>
-              </div>
-              <div style={{marginTop:10,padding:"8px 12px",background:"#fef2f2",borderRadius:8,border:"1px solid #fecaca",fontSize:11,color:"#7f1d1d"}}>
-                ⚠ Hazardous work banned under 18: meat slicers, power-driven equipment, most cooking appliances, delivery on public roads or e-bikes.
-              </div>
-            </Card>
-
-            <Card style={{padding:0,overflow:"hidden"}}>
-              <div style={{padding:"12px 16px",fontWeight:700,fontSize:13,borderBottom:"1px solid #e2e8f0",display:"flex",justifyContent:"space-between",alignItems:"center"}}>
-                <span>State-by-State Age-Specific Minor Labor Rules</span>
-                <span style={{fontSize:11,color:"#94a3b8",fontWeight:400}}>Click any row for full compliance detail · Scroll right for all columns →</span>
-              </div>
-              <div style={{overflowX:"auto"}}>
-                <table style={{width:"100%",borderCollapse:"collapse",minWidth:1100}}>
-                  <thead>
-                    <tr>
-                      <TH style={{minWidth:130,position:"sticky",left:0,zIndex:1}}>State</TH>
-                      <TH style={{minWidth:90}}>Work Permit</TH>
-                      <TH style={{minWidth:180,background:"#fef9c3",color:"#92400e"}}>Age 14</TH>
-                      <TH style={{minWidth:170,background:"#fef3c7",color:"#92400e"}}>Age 15</TH>
-                      <TH style={{minWidth:180,background:"#f0fdf4",color:"#14532d"}}>Age 16</TH>
-                      <TH style={{minWidth:170,background:"#dcfce7",color:"#14532d"}}>Age 17</TH>
-                      <TH style={{minWidth:70}}>Risk</TH>
-                      <TH style={{minWidth:90}}>Source</TH>
-                    </tr>
-                  </thead>
+            <div>
+              <div style={{marginBottom:10}}><span style={{background:"rgba(124,58,237,.1)",color:"#7c3aed",borderRadius:6,padding:"2px 8px",fontSize:11,fontWeight:700}}>2026 WAGE CHANGES</span></div>
+              <Card style={{padding:0,overflow:"hidden",marginBottom:16}}>
+                <table style={{width:"100%",borderCollapse:"collapse"}}>
+                  <thead><tr><TH>State</TH><TH>Effective</TH><TH>Change</TH></tr></thead>
                   <tbody>
-                    {STATES.map(st=>{
-                      const m=MINOR_AGES[st.a]||{};
-                      return (
-                        <tr key={st.a} onClick={()=>setStateModal(st)} style={{cursor:"pointer"}}
-                          onMouseEnter={e=>e.currentTarget.style.opacity="0.82"}
-                          onMouseLeave={e=>e.currentTarget.style.opacity="1"}>
-                          <td style={{padding:"8px 10px",borderBottom:"1px solid #f1f5f9",verticalAlign:"top",position:"sticky",left:0,background:"#fff",zIndex:1,minWidth:130}}>
-                            <div style={{fontWeight:700,fontSize:12}}>{st.s}</div>
-                            <div style={{fontSize:10,color:"#94a3b8"}}>{st.a}</div>
-                          </td>
-                          <td style={{padding:"8px 10px",borderBottom:"1px solid #f1f5f9",verticalAlign:"top",minWidth:90}}>
-                            {m.permit
-                              ? <div><Bdg t="Required" c="#dc2626" bg="rgba(220,38,38,.08)"/><div style={{fontSize:9,color:"#64748b",marginTop:4,lineHeight:1.3}}>{m.permitNote}</div></div>
-                              : <span style={{color:"#94a3b8",fontSize:11}}>None</span>}
-                          </td>
-                          <AgeCell rules={m.a14} bg="rgba(254,249,195,.4)"/>
-                          <AgeCell rules={m.a15} bg="rgba(254,243,199,.3)"/>
-                          <AgeCell rules={m.a16} bg="rgba(240,253,244,.5)"/>
-                          <AgeCell rules={m.a17} bg="rgba(220,252,231,.4)"/>
-                          <td style={{padding:"8px 10px",borderBottom:"1px solid #f1f5f9",verticalAlign:"top"}}>
-                            <Pill r={st.r} t={st.r.toUpperCase()}/>
-                          </td>
-                          <td style={{padding:"8px 10px",borderBottom:"1px solid #f1f5f9",verticalAlign:"top"}} onClick={e=>e.stopPropagation()}>
-                            <SrcLink url={st.src}/>
-                          </td>
-                        </tr>
-                      );
+                    {upcomingWage.map(function(st){
+                      return <tr key={st.a} onClick={function(){setStateModal(st);}} style={{cursor:"pointer"}} onMouseEnter={function(e){e.currentTarget.style.background="#f8fafc";}} onMouseLeave={function(e){e.currentTarget.style.background="";}}>
+                        <TD><strong>{st.s}</strong></TD><TD style={{color:"#94a3b8",fontSize:11}}>{st.cd}</TD>
+                        <TD style={{fontWeight:700,color:"#7c3aed",whiteSpace:"nowrap"}}>{"$"+st.mw.toFixed(2)+" to "+(typeof st.nr==="number"?"$"+st.nr.toFixed(2):String(st.nr||""))}</TD>
+                      </tr>;
                     })}
                   </tbody>
                 </table>
-              </div>
-            </Card>
-          </div>
-        )}
-
-        {/* BREAK LAWS */}
-        {tab===4 && (
-          <div>
-            <Tip>💡 California is the only state with statutory premium pay (1hr at regular rate) for missed breaks. Most other states have meal break requirements but violations trigger DOL complaints or civil action.</Tip>
-            <div style={{display:"flex",gap:12,marginBottom:16,flexWrap:"wrap"}}>
-              <KPI label="States w/ Break Laws" value={hasBreakLaws.length} sub="Beyond FLSA minimum" color="#d97706" onClick={()=>openList("States with Break Requirements","States requiring meal and/or rest breaks beyond federal FLSA baseline.",hasBreakLaws)}/>
-              <KPI label="Premium Pay States" value={hasPremium.length} sub="Penalty pay for violations" color="#dc2626" onClick={()=>openList("States with Break Premium Pay","States requiring extra compensation when a required break is missed.",hasPremium)}/>
-              <KPI label="FLSA Baseline" value="0 req." sub="No adult break mandate federally" color="#6366f1"/>
-              <KPI label="Paid Rest Rule" value="<20 min" sub="Short breaks must be paid (FLSA)" color="#16a34a"/>
-            </div>
-            <Card style={{background:"#fffbeb",border:"1px solid #fde68a",marginBottom:16}}>
-              <div style={{fontWeight:700,fontSize:13,marginBottom:10,color:"#92400e"}}>📋 Federal FLSA Baseline</div>
-              <div style={{display:"grid",gridTemplateColumns:"1fr 1fr 1fr",gap:12}}>
-                {[["Rest Breaks","Short breaks (5–20 min) must be counted as paid work time. No minimum frequency required federally."],["Meal Breaks","Bona fide meal period (30+ min, fully relieved) need NOT be paid. No federal requirement to provide one."],["Premium Pay","None federally. Only California mandates 1hr premium pay per missed break. Other states impose civil penalties."]].map(([k,v])=>(
-                  <div key={k} style={{background:"#fff",borderRadius:8,padding:"10px 14px",border:"1px solid #fde68a"}}>
-                    <div style={{fontWeight:700,fontSize:11,color:"#92400e",marginBottom:4,textTransform:"uppercase"}}>{k}</div>
-                    <div style={{fontSize:11,color:"#78350f",lineHeight:1.5}}>{v}</div>
-                  </div>
-                ))}
-              </div>
-            </Card>
-            <Card style={{padding:0,overflow:"hidden"}}>
-              <table style={{width:"100%",borderCollapse:"collapse"}}>
-                <thead><tr>{["State","Rest Break","Meal Break","Premium Pay","Notes","Risk","Source"].map(h=><TH key={h}>{h}</TH>)}</tr></thead>
-                <tbody>
-                  {STATES.map(st=>(
-                    <tr key={st.a} onClick={()=>setStateModal(st)} style={{cursor:"pointer",background:st.brk.premium!=="None"?"rgba(220,38,38,.02)":""}} onMouseEnter={e=>e.currentTarget.style.background=st.brk.premium!=="None"?"rgba(220,38,38,.05)":"#f8fafc"} onMouseLeave={e=>e.currentTarget.style.background=st.brk.premium!=="None"?"rgba(220,38,38,.02)":""}>
-                      <TD><strong>{st.s}</strong></TD>
-                      <TD style={{fontSize:11,color:st.brk.rest.includes("FLSA")?"#94a3b8":st.brk.rest.includes("PAID")?"#16a34a":"#334155",fontWeight:st.brk.rest.includes("PAID")?"700":"400"}}>{st.brk.rest}</TD>
-                      <TD style={{fontSize:11,color:st.brk.meal.includes("FLSA")?"#94a3b8":"#334155"}}>{st.brk.meal}</TD>
-                      <TD>{st.brk.premium!=="None"?<Bdg t={st.brk.premium} c="#dc2626" bg="rgba(220,38,38,.08)"/>:<span style={{color:"#cbd5e1",fontSize:11}}>None</span>}</TD>
-                      <TD style={{fontSize:11,color:"#64748b",maxWidth:220}}>{st.brk.mealNote}</TD>
-                      <TD><Pill r={st.r} t={st.r.toUpperCase()}/></TD>
-                      <TD><SrcLink url={st.src}/></TD>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </Card>
-          </div>
-        )}
-
-        {/* OVERTIME */}
-        {tab===5 && (
-          <div>
-            <Tip>💡 Only 4 states require daily overtime. Most follow FLSA weekly 40hrs. California is most complex — daily, double-time, and 7th-day rules all apply simultaneously.</Tip>
-            <div style={{display:"flex",gap:12,marginBottom:16,flexWrap:"wrap"}}>
-              <KPI label="Daily OT States" value={dailyOT.length} sub="CA, AK, NV, CO" color="#dc2626" onClick={()=>openList("Daily Overtime States","States requiring OT triggered by daily hours.",dailyOT)}/>
-              <KPI label="Federal Threshold" value="40 hrs/wk" sub="FLSA standard" color="#6366f1"/>
-              <KPI label="Exception: MN" value="48 hrs/wk" sub="Higher state threshold" color="#d97706"/>
-              <KPI label="OT Rate" value="1.5x" sub="Min; CA adds 2x after 12hrs" color="#0284c7"/>
-            </div>
-            <Card style={{border:"1px solid #fecaca",background:"rgba(220,38,38,.02)",marginBottom:16}}>
-              <div style={{fontWeight:700,fontSize:13,color:"#dc2626",marginBottom:12}}>⚡ States with Daily Overtime Requirements</div>
-              <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(240px,1fr))",gap:12}}>
-                {[{s:"California",trigger:"After 8hrs/day",rate:"1.5x (2x after 12hrs/day)",extra:"7th consecutive day: 1.5x first 8hrs, 2x after",src:"https://www.dir.ca.gov/dlse/faq_overtime.htm"},{s:"Alaska",trigger:"After 8hrs/day OR 40hrs/week",rate:"1.5x",extra:"Whichever threshold is reached first",src:"https://labor.alaska.gov/lss/whhome.htm"},{s:"Nevada",trigger:"After 8hrs/day (if earning <$18/hr)",rate:"1.5x",extra:"Also OT after 40hrs/week",src:"https://labor.nv.gov/"},{s:"Colorado",trigger:"After 12hrs/day OR 40hrs/week",rate:"1.5x",extra:"COMPS Order applies to hospitality",src:"https://cdle.colorado.gov/wages"}].map(({s,trigger,rate,extra,src})=>(
-                  <div key={s} style={{background:"#fff",border:"1px solid #e2e8f0",borderRadius:10,padding:"12px 14px"}}>
-                    <div style={{fontWeight:800,fontSize:14,marginBottom:6}}>{s}</div>
-                    <div style={{fontSize:11,color:"#475569",marginBottom:3}}><strong>Trigger:</strong> {trigger}</div>
-                    <div style={{fontSize:11,color:"#475569",marginBottom:3}}><strong>Rate:</strong> {rate}</div>
-                    <div style={{fontSize:11,color:"#64748b",marginBottom:8}}>{extra}</div>
-                    <SrcLink url={src}/>
-                  </div>
-                ))}
-              </div>
-            </Card>
-            <Card style={{padding:0,overflow:"hidden"}}>
-              <table style={{width:"100%",borderCollapse:"collapse"}}>
-                <thead><tr>{["State","OT Threshold","Daily OT","Rate","Special Notes","Risk","Source"].map(h=><TH key={h}>{h}</TH>)}</tr></thead>
-                <tbody>
-                  {STATES.map(st=>(
-                    <tr key={st.a} onClick={()=>setStateModal(st)} style={{cursor:"pointer"}} onMouseEnter={e=>e.currentTarget.style.background="#f8fafc"} onMouseLeave={e=>e.currentTarget.style.background=""}>
-                      <TD><strong>{st.s}</strong></TD>
-                      <TD style={{fontWeight:700,color:st.ot==="Weekly 48"?"#d97706":"#0f172a"}}>{st.ot}</TD>
-                      <TD>{st.otD?<Bdg t="Yes" c="#dc2626" bg="rgba(220,38,38,.08)"/>:<span style={{color:"#cbd5e1",fontSize:11}}>No</span>}</TD>
-                      <TD style={{fontSize:11}}>{st.a==="CA"?"1.5x / 2x":"1.5x"}</TD>
-                      <TD style={{fontSize:11,color:"#64748b",maxWidth:280}}>{st.otNote}</TD>
-                      <TD><Pill r={st.r} t={st.r.toUpperCase()}/></TD>
-                      <TD><SrcLink url={st.src}/></TD>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </Card>
-          </div>
-        )}
-
-<<<<<<< Updated upstream
-        {/* SCHEDULING */}
-        {tab===6 && (
-          <div>
-            <Tip>💡 Fair Workweek violations are the fastest-growing category in restaurant labor litigation. Starbucks settled $38.9M in NYC alone in 2025.</Tip>
-            <div style={{display:"flex",gap:12,marginBottom:16,flexWrap:"wrap"}}>
-              <KPI label="Active Jurisdictions" value="8" sub="Cities + states" color="#6366f1"/>
-              <KPI label="States with Laws" value={STATES.filter(s=>s.sch).length} sub="OR, WA, CA, IL, MN, NY" color="#7c3aed"/>
-              <KPI label="Standard Notice" value="14 days" sub="Across most jurisdictions" color="#0284c7"/>
-            </div>
-            {[{j:"Oregon (Statewide)",scope:"Food/hospitality 500+ employees",notice:"14 days",rules:"1.5x pay for clopening (<10hr gap); $1/hr premium per change within notice window",pen:"Civil penalties per violation",eff:"Jul 2018",r:"high",src:"https://www.oregon.gov/boli/workers/Pages/fair-work-week.aspx"},{j:"New York City",scope:"Fast food (30+ locs) & retail",notice:"14 days (fast food) / 72hrs (retail)",rules:"No clopening without consent + $100 premium; good-faith estimate at hire",pen:"$500–$2,500/violation",eff:"Nov 2017",r:"high",src:"https://www.nyc.gov/site/dca/about/fair-workweek-law.page"},{j:"Seattle, WA",scope:"Food service / retail 500+ employees",notice:"14 days",rules:"Clopening premium; hours to existing workers first; pay for on-call shifts",pen:"Civil penalties; back wages",eff:"Jul 2017",r:"high",src:"https://www.seattle.gov/laborstandards/ordinances/secure-scheduling"},{j:"San Francisco, CA",scope:"Retail 20+ employees",notice:"2 weeks",rules:"Predictability pay for changes; right to request flexible schedule",pen:"$50–$500/violation",eff:"Jul 2015",r:"high",src:"https://sfgov.org/olse/formula-retail-employee-rights-ordinances"},{j:"Chicago, IL",scope:"Hospitality/food service 100+ employees",notice:"14 days",rules:"Penalty pay for <14-day changes; right to decline hours; 11-hr rest between shifts",pen:"$300–$500/shift violation",eff:"Jul 2020",r:"high",src:"https://www.chicago.gov/city/en/depts/dol/provdrs/labor-standards.html"},{j:"Los Angeles, CA",scope:"Retail 300+ employees",notice:"14 days",rules:"Predictability pay; access to hours for existing employees before new hires",pen:"Civil action",eff:"Apr 2023",r:"high",src:"https://wagesla.lacity.org/"},{j:"Minneapolis, MN",scope:"Large employers",notice:"14 days",rules:"Premium pay for changes; good-faith schedule estimate at hire",pen:"Civil penalties",eff:"Jan 2021",r:"medium",src:"https://www.minneapolismn.gov/government/programs-initiatives/workplace-regulations/"},{j:"Philadelphia, PA",scope:"Retail 250+ employees / 30+ locs",notice:"10 days (→14 days)",rules:"Right of first refusal; no retaliation for not being on-call",pen:"$100–$2,000/violation",eff:"Apr 2020",r:"medium",src:"https://www.phila.gov/departments/office-of-worker-protections/"}].map((s,i)=>(
-              <Card key={i}>
-                <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start",marginBottom:10}}>
-                  <div><div style={{fontWeight:700,fontSize:14}}>{s.j}</div><div style={{fontSize:11,color:"#94a3b8",marginTop:2}}>Effective {s.eff} · {s.scope}</div></div>
-                  <div style={{display:"flex",gap:8,alignItems:"center",flexShrink:0,marginLeft:10}}><SrcLink url={s.src}/><Pill r={s.r} t={s.r.toUpperCase()}/></div>
-                </div>
-                <div style={{display:"grid",gridTemplateColumns:"1fr 1fr 1fr",gap:10}}>
-                  {[["Notice Required",s.notice],["Key Rules",s.rules],["Penalties",s.pen]].map(([k,v])=>(
-                    <div key={k} style={{background:"#f8fafc",borderRadius:8,padding:"8px 12px"}}><div style={{fontSize:10,color:"#94a3b8",fontWeight:600,textTransform:"uppercase",marginBottom:3}}>{k}</div><div style={{fontSize:11,color:"#334155"}}>{v}</div></div>
-                  ))}
-                </div>
               </Card>
-            ))}
-=======
+              <div style={{marginBottom:10}}><span style={{background:"rgba(220,38,38,.1)",color:"#dc2626",borderRadius:6,padding:"2px 8px",fontSize:11,fontWeight:700}}>RECENT ENFORCEMENT</span></div>
+              {CASES.slice(0,3).map(function(c,i){
+                return <div key={i} style={{background:"#fff",border:"1px solid #e2e8f0",borderRadius:10,padding:"12px 14px",marginBottom:10,boxShadow:"0 1px 3px rgba(0,0,0,.05)"}}>
+                  <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start",marginBottom:4}}>
+                    <div style={{fontWeight:700,fontSize:13}}>{c.co} <span style={{color:"#94a3b8",fontWeight:400,fontSize:11}}>{"("+c.yr+")"}</span></div>
+                    <div style={{fontWeight:800,color:"#dc2626",fontSize:13,flexShrink:0,marginLeft:8}}>{c.pen}</div>
+                  </div>
+                  <div style={{display:"flex",gap:6,marginBottom:5}}><Bdg t={c.type}/><Pill r={c.sev} t={c.sev.toUpperCase()}/></div>
+                  <div style={{fontSize:11,color:"#64748b",lineHeight:1.5}}>{c.detail}</div>
+                </div>;
+              })}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {tab===1&&(
+        <div>
+          <Tip>Click any state row for full compliance details including age-specific minor rules, break laws, OT, and sick leave.</Tip>
+          <div style={{display:"flex",gap:10,marginBottom:14,flexWrap:"wrap",alignItems:"center"}}>
+            <input style={{padding:"7px 12px",border:"1px solid #e2e8f0",borderRadius:8,fontSize:12,outline:"none",minWidth:180}} placeholder="Search state..." value={search} onChange={function(e){setSearch(e.target.value);}}/>
+            <div style={{display:"flex",gap:6,flexWrap:"wrap"}}>
+              {["all","high","medium","low"].map(function(v){return <button key={v} onClick={function(){setRFilter(v);}} style={{border:"1px solid #e2e8f0",borderRadius:6,padding:"5px 12px",fontSize:11,fontWeight:600,cursor:"pointer",background:rFilter===v?"#6366f1":"#fff",color:rFilter===v?"#fff":"#64748b"}}>{v==="all"?"All":v==="high"?"High Risk":v==="medium"?"Medium":"Low Risk"}</button>;})}
+            </div>
+          </div>
+          <Card style={{padding:0,overflow:"hidden"}}>
+            <table style={{width:"100%",borderCollapse:"collapse"}}>
+              <thead><tr>{["State","Min Wage","Tipped Rate","Tip Credit","OT Rule","Upcoming Change","Local Rates","Risk","Source"].map(function(h){return <TH key={h}>{h}</TH>;})}</tr></thead>
+              <tbody>
+                {filtered.map(function(st){
+                  return <tr key={st.a} onClick={function(){setStateModal(st);}} style={{cursor:"pointer"}} onMouseEnter={function(e){e.currentTarget.style.background="#f8fafc";}} onMouseLeave={function(e){e.currentTarget.style.background="";}}>
+                    <TD><strong>{st.s}</strong> <span style={{color:"#94a3b8",fontSize:10}}>{st.a}</span></TD>
+                    <TD style={{fontWeight:700}}>{"$"+st.mw.toFixed(2)}</TD>
+                    <TD>{typeof st.tip==="number"?"$"+st.tip.toFixed(2):st.tip}</TD>
+                    <TD>{st.tc==="None"?<Bdg t="None" c="#dc2626" bg="rgba(220,38,38,.07)"/>:(typeof st.tc==="number"?"$"+st.tc.toFixed(2):"--")}</TD>
+                    <TD style={{color:"#64748b",fontSize:11}}>{st.ot}</TD>
+                    <TD>{st.chg?<span style={{color:"#7c3aed",fontWeight:700,fontSize:11}}>{(typeof st.nr==="number"?"$"+st.nr.toFixed(2):String(st.nr||""))+" - "+st.cd}</span>:<span style={{color:"#cbd5e1",fontSize:11}}>--</span>}</TD>
+                    <TD style={{color:"#64748b",fontSize:11}}>{st.local&&st.local!=="None"?st.local:"--"}</TD>
+                    <TD><Pill r={st.r} t={st.r.toUpperCase()}/></TD>
+                    <TD><SrcLink url={st.src} label="Source"/></TD>
+                  </tr>;
+                })}
+              </tbody>
+            </table>
+          </Card>
+        </div>
+      )}
+
+      {tab===2&&(
+        <div>
+          <Tip>80/20 Rule: tipped employees cannot spend over 20% of shift on non-tipped duties. Top DOL enforcement focus. Avg back-wage finding: $1,400/employee.</Tip>
+          <div style={{display:"flex",gap:12,marginBottom:16,flexWrap:"wrap"}}>
+            <KPI label="No Tip Credit States" value={noTipCredit.length} sub="Full MW required" color="#dc2626" onClick={function(){openList("No Tip Credit States","States prohibiting tip credit.",noTipCredit);}}/>
+            <KPI label="Highest Tipped Rate" value="$12.75" sub="Hawaii" color="#0284c7"/>
+            <KPI label="Federal Tip Credit" value="$5.12" sub="At $7.25 federal MW" color="#6366f1"/>
+          </div>
+          <Card style={{padding:0,overflow:"hidden"}}>
+            <table style={{width:"100%",borderCollapse:"collapse"}}>
+              <thead><tr>{["State","Min Wage","Tipped Cash Wage","Tip Credit","Notes","Risk","Source"].map(function(h){return <TH key={h}>{h}</TH>;})}</tr></thead>
+              <tbody>
+                {STATES.map(function(st){
+                  return <tr key={st.a} onClick={function(){setStateModal(st);}} style={{cursor:"pointer"}} onMouseEnter={function(e){e.currentTarget.style.background="#f8fafc";}} onMouseLeave={function(e){e.currentTarget.style.background="";}}>
+                    <TD><strong>{st.s}</strong></TD>
+                    <TD style={{fontWeight:700}}>{"$"+st.mw.toFixed(2)}</TD>
+                    <TD style={{fontWeight:700,color:st.tc==="None"?"#dc2626":"#0f172a"}}>{typeof st.tip==="number"?"$"+st.tip.toFixed(2):st.tip}</TD>
+                    <TD>{st.tc==="None"?<Bdg t="No Credit" c="#dc2626" bg="rgba(220,38,38,.07)"/>:(typeof st.tc==="number"?"$"+st.tc.toFixed(2):"--")}</TD>
+                    <TD style={{fontSize:11,color:"#64748b",maxWidth:200}}>{st.note}</TD>
+                    <TD><Pill r={st.r} t={st.r.toUpperCase()}/></TD>
+                    <TD><SrcLink url={st.src} label="Source"/></TD>
+                  </tr>;
+                })}
+              </tbody>
+            </table>
+          </Card>
+        </div>
+      )}
+
+      {tab===3&&(
+        <div>
+          <Tip>Restaurant industry is the #1 DOL child labor enforcement sector. 950+ investigations in 2024. Florida and Washington are stricter than federal for ages 14-15.</Tip>
+          <div style={{display:"flex",gap:12,marginBottom:16,flexWrap:"wrap"}}>
+            <KPI label="DOL Investigations" value="950+" sub="Child labor cases 2024" color="#dc2626"/>
+            <KPI label="Avg Penalty" value="$15K+" sub="Per minor violation" color="#d97706"/>
+            <KPI label="States Requiring Permit" value={Object.values(MINOR_AGES).filter(function(m){return m.permit;}).length} sub="Work/employment permit" color="#7c3aed"/>
+          </div>
+          <Card>
+            <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:12}}>
+              <div style={{fontWeight:700,fontSize:13}}>Federal FLSA Baseline - All States Must Meet or Exceed</div>
+              <SrcLink url="https://www.dol.gov/agencies/whd/child-labor/restaurant" label="DOL Restaurant Guide"/>
+            </div>
+            <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:10}}>
+              <div style={{background:"#fef9c3",borderRadius:8,padding:"10px 14px",border:"1px solid #fde68a"}}>
+                <div style={{fontWeight:700,fontSize:11,color:"#92400e",marginBottom:6,textTransform:"uppercase"}}>Ages 14-15 Federal Limits</div>
+                {B14.map(function(r,i){return <div key={i} style={{fontSize:11,color:"#334155",marginBottom:3}}>{"> "+r}</div>;})}
+              </div>
+              <div style={{background:"#f0fdf4",borderRadius:8,padding:"10px 14px",border:"1px solid #bbf7d0"}}>
+                <div style={{fontWeight:700,fontSize:11,color:"#14532d",marginBottom:6,textTransform:"uppercase"}}>Ages 16-17 Federal Limits</div>
+                {B16.map(function(r,i){return <div key={i} style={{fontSize:11,color:"#334155",marginBottom:3}}>{"> "+r}</div>;})}
+              </div>
+            </div>
+            <div style={{marginTop:10,padding:"8px 12px",background:"#fef2f2",borderRadius:8,border:"1px solid #fecaca",fontSize:11,color:"#7f1d1d"}}>NOTE: Hazardous work banned under 18: meat slicers, power-driven equipment, most cooking appliances, delivery on public roads or e-bikes.</div>
+          </Card>
+          <Card style={{padding:0,overflow:"hidden"}}>
+            <div style={{padding:"12px 16px",fontWeight:700,fontSize:13,borderBottom:"1px solid #e2e8f0",display:"flex",justifyContent:"space-between",alignItems:"center"}}>
+              <span>State-by-State Age-Specific Minor Labor Rules</span>
+              <span style={{fontSize:11,color:"#94a3b8",fontWeight:400}}>Click any row for full detail - Scroll right</span>
+            </div>
+            <div style={{overflowX:"auto"}}>
+              <table style={{width:"100%",borderCollapse:"collapse",minWidth:1100}}>
+                <thead>
+                  <tr>
+                    <TH style={{minWidth:130,position:"sticky",left:0,zIndex:1}}>State</TH>
+                    <TH style={{minWidth:90}}>Work Permit</TH>
+                    <TH style={{minWidth:180,background:"#fef9c3",color:"#92400e"}}>Age 14</TH>
+                    <TH style={{minWidth:170,background:"#fef3c7",color:"#92400e"}}>Age 15</TH>
+                    <TH style={{minWidth:180,background:"#f0fdf4",color:"#14532d"}}>Age 16</TH>
+                    <TH style={{minWidth:170,background:"#dcfce7",color:"#14532d"}}>Age 17</TH>
+                    <TH style={{minWidth:70}}>Risk</TH>
+                    <TH style={{minWidth:90}}>Source</TH>
+                  </tr>
+                </thead>
+                <tbody>
+                  {STATES.map(function(st){
+                    var m=MINOR_AGES[st.a]||MA_DEF;
+                    return <tr key={st.a} onClick={function(){setStateModal(st);}} style={{cursor:"pointer"}} onMouseEnter={function(e){e.currentTarget.style.opacity=".85";}} onMouseLeave={function(e){e.currentTarget.style.opacity="1";}}>
+                      <td style={{padding:"8px 10px",borderBottom:"1px solid #f1f5f9",verticalAlign:"top",position:"sticky",left:0,background:"#fff",zIndex:1,minWidth:130}}><div style={{fontWeight:700,fontSize:12}}>{st.s}</div><div style={{fontSize:10,color:"#94a3b8"}}>{st.a}</div></td>
+                      <td style={{padding:"8px 10px",borderBottom:"1px solid #f1f5f9",verticalAlign:"top",minWidth:90}}>{m.permit?<div><Bdg t="Required" c="#dc2626" bg="rgba(220,38,38,.08)"/><div style={{fontSize:9,color:"#64748b",marginTop:4,lineHeight:1.3}}>{m.permitNote}</div></div>:<span style={{color:"#94a3b8",fontSize:11}}>None</span>}</td>
+                      <AgeCell rules={m.a14} bg="rgba(254,249,195,.4)"/>
+                      <AgeCell rules={m.a15} bg="rgba(254,243,199,.3)"/>
+                      <AgeCell rules={m.a16} bg="rgba(240,253,244,.5)"/>
+                      <AgeCell rules={m.a17} bg="rgba(220,252,231,.4)"/>
+                      <td style={{padding:"8px 10px",borderBottom:"1px solid #f1f5f9",verticalAlign:"top"}}><Pill r={st.r} t={st.r.toUpperCase()}/></td>
+                      <td style={{padding:"8px 10px",borderBottom:"1px solid #f1f5f9",verticalAlign:"top"}} onClick={function(e){e.stopPropagation();}}><SrcLink url={st.src} label="Source"/></td>
+                    </tr>;
+                  })}
+                </tbody>
+              </table>
+            </div>
+          </Card>
+        </div>
+      )}
+
+      {tab===4&&(
+        <div>
+          <Tip>California is the only state with statutory premium pay (1hr at regular rate) for missed breaks. Most other states have meal break requirements but no premium.</Tip>
+          <div style={{display:"flex",gap:12,marginBottom:16,flexWrap:"wrap"}}>
+            <KPI label="States w/ Break Laws" value={hasBreakLaws.length} sub="Beyond FLSA minimum" color="#d97706" onClick={function(){openList("States with Break Requirements","States requiring breaks beyond federal FLSA baseline.",hasBreakLaws);}}/>
+            <KPI label="Premium Pay States" value={hasPremium.length} sub="Penalty pay for violations" color="#dc2626" onClick={function(){openList("States with Break Premium Pay","States requiring extra compensation when a required break is missed.",hasPremium);}}/>
+            <KPI label="FLSA Baseline" value="0 req." sub="No adult break mandate federally" color="#6366f1"/>
+            <KPI label="Paid Rest Rule" value="under 20 min" sub="Short breaks must be paid (FLSA)" color="#16a34a"/>
+          </div>
+          <Card style={{background:"#fffbeb",border:"1px solid #fde68a",marginBottom:16}}>
+            <div style={{fontWeight:700,fontSize:13,marginBottom:10,color:"#92400e"}}>Federal FLSA Baseline</div>
+            <div style={{display:"grid",gridTemplateColumns:"1fr 1fr 1fr",gap:12}}>
+              {[["Rest Breaks","Short breaks (5-20 min) must be counted as paid work time. No minimum frequency required federally."],["Meal Breaks","Bona fide meal period (30+ min, fully relieved) need NOT be paid. No federal requirement to provide one."],["Premium Pay","None federally. Only California mandates 1hr premium pay per missed break. Other states impose civil penalties."]].map(function(item){return <div key={item[0]} style={{background:"#fff",borderRadius:8,padding:"10px 14px",border:"1px solid #fde68a"}}><div style={{fontWeight:700,fontSize:11,color:"#92400e",marginBottom:4,textTransform:"uppercase"}}>{item[0]}</div><div style={{fontSize:11,color:"#78350f",lineHeight:1.5}}>{item[1]}</div></div>;})}</div>
+          </Card>
+          <Card style={{padding:0,overflow:"hidden"}}>
+            <table style={{width:"100%",borderCollapse:"collapse"}}>
+              <thead><tr>{["State","Rest Break","Meal Break","Premium Pay","Notes","Risk","Source"].map(function(h){return <TH key={h}>{h}</TH>;})}</tr></thead>
+              <tbody>
+                {STATES.map(function(st){
+                  return <tr key={st.a} onClick={function(){setStateModal(st);}} style={{cursor:"pointer"}} onMouseEnter={function(e){e.currentTarget.style.background="#f8fafc";}} onMouseLeave={function(e){e.currentTarget.style.background="";}}>
+                    <TD><strong>{st.s}</strong></TD>
+                    <TD style={{fontSize:11,color:st.brk.rest.indexOf("FLSA")>=0?"#94a3b8":st.brk.rest.indexOf("PAID")>=0?"#16a34a":"#334155",fontWeight:st.brk.rest.indexOf("PAID")>=0?"700":"400"}}>{st.brk.rest}</TD>
+                    <TD style={{fontSize:11,color:st.brk.meal.indexOf("FLSA")>=0?"#94a3b8":"#334155"}}>{st.brk.meal}</TD>
+                    <TD>{st.brk.premium!=="None"?<Bdg t={st.brk.premium} c="#dc2626" bg="rgba(220,38,38,.08)"/>:<span style={{color:"#cbd5e1",fontSize:11}}>None</span>}</TD>
+                    <TD style={{fontSize:11,color:"#64748b",maxWidth:220}}>{st.brk.note}</TD>
+                    <TD><Pill r={st.r} t={st.r.toUpperCase()}/></TD>
+                    <TD><SrcLink url={st.src} label="Source"/></TD>
+                  </tr>;
+                })}
+              </tbody>
+            </table>
+          </Card>
+        </div>
+      )}
+
+      {tab===5&&(
+        <div>
+          <Tip>Only 4 states require daily overtime. Most follow FLSA weekly 40hrs. California is most complex - daily, double-time, and 7th-day rules all apply simultaneously.</Tip>
+          <div style={{display:"flex",gap:12,marginBottom:16,flexWrap:"wrap"}}>
+            <KPI label="Daily OT States" value={dailyOT.length} sub="CA, AK, NV, CO" color="#dc2626" onClick={function(){openList("Daily Overtime States","States requiring OT triggered by daily hours.",dailyOT);}}/>
+            <KPI label="Federal Threshold" value="40 hrs/wk" sub="FLSA standard" color="#6366f1"/>
+            <KPI label="Exception: MN" value="48 hrs/wk" sub="Higher state threshold" color="#d97706"/>
+            <KPI label="OT Rate" value="1.5x" sub="Min; CA adds 2x after 12hrs" color="#0284c7"/>
+          </div>
+          <Card style={{border:"1px solid #fecaca",background:"rgba(220,38,38,.02)",marginBottom:16}}>
+            <div style={{fontWeight:700,fontSize:13,color:"#dc2626",marginBottom:12}}>States with Daily Overtime Requirements</div>
+            <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(240px,1fr))",gap:12}}>
+              {[{s:"California",trigger:"After 8hrs/day",rate:"1.5x (2x after 12hrs/day)",extra:"7th consecutive day: 1.5x first 8hrs, 2x after",src:"https://www.dir.ca.gov/dlse/faq_overtime.htm"},{s:"Alaska",trigger:"After 8hrs/day OR 40hrs/week",rate:"1.5x",extra:"Whichever threshold reached first",src:"https://labor.alaska.gov/lss/whhome.htm"},{s:"Nevada",trigger:"After 8hrs/day (if earning under $18/hr)",rate:"1.5x",extra:"Also OT after 40hrs/week",src:"https://labor.nv.gov/"},{s:"Colorado",trigger:"After 12hrs/day OR 40hrs/week",rate:"1.5x",extra:"COMPS Order applies to hospitality",src:"https://cdle.colorado.gov/wages"}].map(function(item){
+                return <div key={item.s} style={{background:"#fff",border:"1px solid #e2e8f0",borderRadius:10,padding:"12px 14px"}}><div style={{fontWeight:800,fontSize:14,marginBottom:6}}>{item.s}</div><div style={{fontSize:11,color:"#475569",marginBottom:3}}><strong>Trigger: </strong>{item.trigger}</div><div style={{fontSize:11,color:"#475569",marginBottom:3}}><strong>Rate: </strong>{item.rate}</div><div style={{fontSize:11,color:"#64748b",marginBottom:8}}>{item.extra}</div><SrcLink url={item.src} label="Source"/></div>;
+              })}
+            </div>
+          </Card>
+          <Card style={{padding:0,overflow:"hidden"}}>
+            <table style={{width:"100%",borderCollapse:"collapse"}}>
+              <thead><tr>{["State","OT Threshold","Daily OT","Rate","Special Notes","Risk","Source"].map(function(h){return <TH key={h}>{h}</TH>;})}</tr></thead>
+              <tbody>
+                {STATES.map(function(st){
+                  return <tr key={st.a} onClick={function(){setStateModal(st);}} style={{cursor:"pointer"}} onMouseEnter={function(e){e.currentTarget.style.background="#f8fafc";}} onMouseLeave={function(e){e.currentTarget.style.background="";}}>
+                    <TD><strong>{st.s}</strong></TD>
+                    <TD style={{fontWeight:700,color:st.ot==="Weekly 48"?"#d97706":"#0f172a"}}>{st.ot}</TD>
+                    <TD>{st.otD?<Bdg t="Yes" c="#dc2626" bg="rgba(220,38,38,.08)"/>:<span style={{color:"#cbd5e1",fontSize:11}}>No</span>}</TD>
+                    <TD style={{fontSize:11}}>{st.a==="CA"?"1.5x / 2x":"1.5x"}</TD>
+                    <TD style={{fontSize:11,color:"#64748b",maxWidth:280}}>{st.otNote}</TD>
+                    <TD><Pill r={st.r} t={st.r.toUpperCase()}/></TD>
+                    <TD><SrcLink url={st.src} label="Source"/></TD>
+                  </tr>;
+                })}
+              </tbody>
+            </table>
+          </Card>
+        </div>
+      )}
+
+      {tab===6&&(function(){
+        var schedUpcomingFuture=SCHED_UPCOMING.filter(function(s){return !isPastDate(s.eff);});
+        var schedUpcomingHidden=SCHED_UPCOMING.length-schedUpcomingFuture.length;
+        return (
+        <div>
+          <Tip>{"Click any jurisdiction card for full rules, penalties, and enforcement notes. "+SCHED_ACTIVE.length+" active laws + "+schedUpcomingFuture.length+" upcoming/proposed tracked"+(schedUpcomingHidden>0?" ("+schedUpcomingHidden+" past-effective items hidden)":"")+"."}</Tip>
+          <div style={{display:"flex",gap:12,marginBottom:20,flexWrap:"wrap"}}>
+            <KPI label="Active Laws" value={SCHED_ACTIVE.length} sub="Currently enforced" color="#16a34a"/>
+            <KPI label="Upcoming / Proposed" value={schedUpcomingFuture.length} sub="Bills and expansions" color="#d97706"/>
+            <KPI label="States with Laws" value={[...new Set(SCHED_ACTIVE.map(function(s){return s.state;}))].length} sub="Incl. Oregon statewide" color="#7c3aed"/>
+            <KPI label="Cities / Counties" value={SCHED_ACTIVE.filter(function(s){return s.type==="City"||s.type==="County";}).length} sub="Local ordinances" color="#6366f1"/>
+            <KPI label="Cover Restaurants" value={SCHED_ACTIVE.filter(function(s){return s.restaurant;}).length} sub="Directly applicable" color="#dc2626"/>
+            <KPI label="Standard Notice" value="14 days" sub="Across most jurisdictions" color="#0284c7"/>
+          </div>
+          <div style={{marginBottom:24}}>
+            <div style={{display:"flex",alignItems:"center",gap:10,marginBottom:14,paddingBottom:10,borderBottom:"2px solid rgba(22,163,74,.2)"}}>
+              <div style={{background:"rgba(22,163,74,.1)",border:"1.5px solid rgba(22,163,74,.3)",borderRadius:8,padding:"6px 14px"}}>
+                <div style={{fontWeight:800,fontSize:13,color:"#16a34a"}}>Active Fair Workweek and Predictive Scheduling Laws</div>
+                <div style={{fontSize:10,color:"#94a3b8"}}>{SCHED_ACTIVE.length+" active jurisdictions - currently enforced - Click any card for full detail"}</div>
+              </div>
+            </div>
+            <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(320px,1fr))",gap:12}}>
+              {SCHED_ACTIVE.map(function(item){return <SchedCard key={item.id} item={item} isUpcoming={false}/>;})}
+            </div>
+          </div>
+          <div>
+            <div style={{display:"flex",alignItems:"center",gap:10,marginBottom:14,paddingBottom:10,borderBottom:"2px solid rgba(217,119,6,.2)"}}>
+              <div style={{background:"rgba(217,119,6,.1)",border:"1.5px solid rgba(217,119,6,.3)",borderRadius:8,padding:"6px 14px"}}>
+                <div style={{fontWeight:800,fontSize:13,color:"#d97706"}}>Upcoming, Proposed and Expanding Laws</div>
+                <div style={{fontSize:10,color:"#94a3b8"}}>{schedUpcomingFuture.length+" proposals tracked - not yet in effect"}</div>
+              </div>
+            </div>
+            <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(320px,1fr))",gap:12}}>
+              {schedUpcomingFuture.map(function(item){return <SchedCard key={item.id} item={item} isUpcoming={true}/>;})}
+            </div>
+          </div>
+          <div style={{marginTop:20,background:"#fef2f2",border:"1px solid #fecaca",borderRadius:10,padding:"12px 16px"}}>
+            <div style={{fontWeight:700,fontSize:12,color:"#dc2626",marginBottom:6}}>States that Preempt Local Scheduling Laws</div>
+            <div style={{fontSize:11,color:"#7f1d1d",lineHeight:1.6}}>Some states block cities from enacting their own scheduling ordinances. Known preemption states include <strong>Arkansas, Iowa, Missouri, Tennessee, and Georgia</strong>.</div>
+          </div>
+        </div>
+        );
+      })()}
+
+      {tab===7&&(
+        <div>
+          <Tip>Click any card for full detail. The regulatory environment shifted in late 2024. Monitor DOL rulemaking, WHD enforcement priorities, and potential reversals of paused rules.</Tip>
+          {FEDERAL_UPDATES.map(function(f,i){
+            return <Card key={i} onClick={function(){setDetailModal({item:f,type:"federal"});}} style={{marginBottom:16}}>
+              <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start",marginBottom:8}}>
+                <div style={{flex:1}}><div style={{display:"flex",gap:8,alignItems:"center",marginBottom:4,flexWrap:"wrap"}}><Bdg t={f.cat}/><span style={{fontWeight:700,fontSize:13}}>{f.title}</span></div><div style={{fontSize:11,color:"#94a3b8"}}>{f.date}</div></div>
+                <div style={{display:"flex",gap:8,alignItems:"center",marginLeft:10,flexShrink:0}}>
+                  <Bdg t={f.status} c={f.status==="Active"?"#16a34a":f.status==="Blocked"?"#dc2626":"#64748b"} bg={f.status==="Active"?"rgba(22,163,74,.08)":f.status==="Blocked"?"rgba(220,38,38,.07)":"rgba(100,116,139,.08)"}/>
+                  <Pill r={f.sev} t={f.sev.toUpperCase()}/>
+                </div>
+              </div>
+              <div style={{fontSize:12,color:"#475569",lineHeight:1.6,marginBottom:10}}>{f.detail.length>140?f.detail.slice(0,140)+"...":f.detail}</div>
+              <div style={{display:"flex",justifyContent:"space-between",alignItems:"center"}}>
+                <SrcLink url={f.src} label="Gov Source"/>
+                <span style={{fontSize:11,color:"#6366f1",fontWeight:600}}>Click for full detail</span>
+              </div>
+            </Card>;
+          })}
+        </div>
+      )}
+
+      {tab===8&&(function(){
+        var upcomingFuture=upcomingData.filter(function(u){return !isPastDate(u.eff);});
+        var SECTION_ORDER=["Min Wage","Tipped Wage","Sick Leave","Minor Labor","Break Laws","Overtime","Scheduling","Restaurant-Specific"];
+        var SECTION_META={
+          "Min Wage":{icon:"💵",label:"Minimum Wage",desc:"State and federal minimum wage increases and indexing changes"},
+          "Tipped Wage":{icon:"💰",label:"Tipped Wage",desc:"Tip credit changes, phase-outs, and pending federal legislation"},
+          "Sick Leave":{icon:"🏥",label:"Sick Leave",desc:"New state sick leave mandates and expansions"},
+          "Minor Labor":{icon:"👷",label:"Minor Labor",desc:"Child labor enforcement changes and age-specific rule updates"},
+          "Break Laws":{icon:"🕐",label:"Break Laws",desc:"Meal and rest break regulation changes and new recordkeeping requirements"},
+          "Overtime":{icon:"📊",label:"Overtime",desc:"OT threshold rulemakings and state-level threshold proposals"},
+          "Scheduling":{icon:"📅",label:"Scheduling",desc:"Fair Workweek expansions and new predictive scheduling laws"},
+          "Restaurant-Specific":{icon:"🏢",label:"Restaurant-Specific / Misc",desc:"Industry-wide laws, franchise liability, AI tools, and federal wage bills"},
+        };
+        var grouped={};
+        SECTION_ORDER.forEach(function(cat){
+          var items=upcomingFuture.filter(function(u){return u.cat===cat&&(upYr==="all"||String(u.yr)===upYr);});
+          if(items.length>0) grouped[cat]=items;
+        });
+        var totalShown=Object.values(grouped).reduce(function(a,v){return a+v.length;},0);
+        var hiddenCount=upcomingData.length-upcomingFuture.length;
+        return (
+          <div>
+            <Tip>{"Tracking "+upcomingFuture.length+" upcoming regulatory changes for 2026-2027"+(hiddenCount>0?" ("+hiddenCount+" past-effective items hidden)":"")+". Items marked PENDING are active legislation. Click any item for full detail."}</Tip>
+            <div style={{display:"flex",gap:12,marginBottom:16,flexWrap:"wrap"}}>
+              <KPI label="Total Upcoming" value={upcomingFuture.length} sub="Future-effective only" color="#6366f1"/>
+              <KPI label="2026 Changes" value={upcomingFuture.filter(function(u){return u.yr===2026;}).length} sub="This calendar year" color="#d97706"/>
+              <KPI label="2027 Changes" value={upcomingFuture.filter(function(u){return u.yr===2027;}).length} sub="Planning horizon" color="#7c3aed"/>
+              <KPI label="Critical Impact" value={upcomingFuture.filter(function(u){return u.impact==="critical";}).length} sub="Immediate action needed" color="#dc2626"/>
+            </div>
+            <div style={{display:"flex",gap:10,marginBottom:20,flexWrap:"wrap",alignItems:"center"}}>
+              <div style={{display:"flex",gap:6}}>
+                {["all","2026","2027"].map(function(yr){return <button key={yr} onClick={function(){setUpYr(yr);}} style={{border:"1px solid #e2e8f0",borderRadius:6,padding:"5px 16px",fontSize:11,fontWeight:600,cursor:"pointer",background:upYr===yr?"#6366f1":"#fff",color:upYr===yr?"#fff":"#64748b"}}>{yr==="all"?"All Years":yr}</button>;})}
+              </div>
+              <span style={{fontSize:11,color:"#94a3b8"}}>{totalShown+" item"+(totalShown!==1?"s":"")+" shown"}</span>
+              <span style={{fontSize:11,color:"#cbd5e1"}}>|</span>
+              <span style={{fontSize:11,color:"#94a3b8"}}>{upcomingData.length+" total in catalog (persisted across refresh)"}</span>
+              {lastSynced ? (
+                <span style={{display:"inline-flex",alignItems:"center",gap:5,background:"rgba(34,197,94,.1)",color:"#15803d",border:"1px solid rgba(134,239,172,.5)",borderRadius:6,padding:"3px 9px",fontSize:11,fontWeight:700}} title={lastSynced.toLocaleString()}>
+                  <span style={{display:"inline-block",width:6,height:6,borderRadius:"50%",background:"#22c55e"}}/>
+                  {"Last sync: "+lastSynced.toLocaleDateString("en-US",{month:"short",day:"numeric",year:"numeric"})+" at "+lastSynced.toLocaleTimeString("en-US",{hour:"numeric",minute:"2-digit"})+" ("+timeAgo(lastSynced)+")"}
+                </span>
+              ) : (
+                <span style={{background:"#f1f5f9",color:"#64748b",border:"1px solid #e2e8f0",borderRadius:6,padding:"3px 9px",fontSize:11,fontWeight:600}}>Never synced - click Sync Latest above</span>
+              )}
+              <button onClick={resetUpcomingCatalog} style={{marginLeft:"auto",border:"1px solid #fecaca",background:"#fff",color:"#dc2626",borderRadius:6,padding:"5px 12px",fontSize:11,fontWeight:600,cursor:"pointer"}} title="Restore catalog to original built-in items, removing all sync additions">Reset Catalog</button>
+            </div>
+            {SECTION_ORDER.filter(function(cat){return grouped[cat];}).map(function(cat){
+              var items=grouped[cat];
+              var meta=SECTION_META[cat]||{icon:"*",label:cat,desc:""};
+              var cc=CAT_COLORS[cat]||{c:"#6366f1",bg:"rgba(99,102,241,.08)"};
+              return (
+                <div key={cat} style={{marginBottom:28}}>
+                  <div style={{display:"flex",alignItems:"center",gap:12,marginBottom:12,paddingBottom:10,borderBottom:"2px solid "+cc.c+"22"}}>
+                    <div style={{background:cc.bg,border:"1.5px solid "+cc.c+"44",borderRadius:10,padding:"8px 14px",display:"flex",alignItems:"center",gap:8}}>
+                      <span style={{fontSize:18}}>{meta.icon}</span>
+                      <div>
+                        <div style={{fontWeight:800,fontSize:14,color:cc.c}}>{meta.label}</div>
+                        <div style={{fontSize:10,color:"#94a3b8",marginTop:1}}>{meta.desc}</div>
+                      </div>
+                    </div>
+                    <div style={{display:"flex",gap:6,marginLeft:"auto",flexShrink:0,flexWrap:"wrap"}}>
+                      {items.filter(function(u){return u.yr===2026;}).length>0&&<span style={{background:"rgba(217,119,6,.1)",color:"#d97706",border:"1px solid rgba(217,119,6,.25)",borderRadius:6,padding:"2px 10px",fontSize:11,fontWeight:700}}>{items.filter(function(u){return u.yr===2026;}).length+" in 2026"}</span>}
+                      {items.filter(function(u){return u.yr===2027;}).length>0&&<span style={{background:"rgba(124,58,237,.1)",color:"#7c3aed",border:"1px solid rgba(124,58,237,.25)",borderRadius:6,padding:"2px 10px",fontSize:11,fontWeight:700}}>{items.filter(function(u){return u.yr===2027;}).length+" in 2027"}</span>}
+                      {items.filter(function(u){return u.impact==="critical";}).length>0&&<span style={{background:"rgba(220,38,38,.1)",color:"#dc2626",border:"1px solid rgba(220,38,38,.25)",borderRadius:6,padding:"2px 10px",fontSize:11,fontWeight:700}}>{items.filter(function(u){return u.impact==="critical";}).length+" critical"}</span>}
+                    </div>
+                  </div>
+                  <div style={{display:"flex",flexDirection:"column",gap:10}}>
+                    {items.map(function(u,i){
+                      var impR=u.impact==="critical"?"critical":u.impact==="high"?"high":u.impact==="medium"?"medium":"low";
+                      var isPending=u.eff.toLowerCase().indexOf("pending")>=0;
+                      return (
+                        <div key={i} onClick={function(){setDetailModal({item:u,type:"upcoming"});}} style={{background:"#fff",border:"1px solid #e2e8f0",borderRadius:10,padding:"14px 18px",boxShadow:"0 1px 3px rgba(0,0,0,.04)",borderLeft:"4px solid "+cc.c,display:"flex",gap:14,alignItems:"flex-start",cursor:"pointer"}}>
+                          <div style={{flexShrink:0,display:"flex",flexDirection:"column",alignItems:"center",gap:6,paddingTop:2}}>
+                            <div style={{background:u.yr===2026?"rgba(217,119,6,.12)":"rgba(124,58,237,.1)",color:u.yr===2026?"#d97706":"#7c3aed",border:"1px solid "+(u.yr===2026?"rgba(217,119,6,.3)":"rgba(124,58,237,.3)"),borderRadius:6,padding:"3px 8px",fontSize:12,fontWeight:800,minWidth:44,textAlign:"center"}}>{u.yr}</div>
+                            <Pill r={impR} t={u.impact==="critical"?"CRIT":u.impact==="high"?"HIGH":u.impact==="medium"?"MED":"LOW"}/>
+                          </div>
+                          <div style={{flex:1,minWidth:0}}>
+                            <div style={{display:"flex",gap:6,alignItems:"center",flexWrap:"wrap",marginBottom:4}}>
+                              <span style={{fontWeight:700,fontSize:13,color:"#0f172a"}}>{u.title}</span>
+                              {isPending&&<Bdg t="PENDING" c="#64748b" bg="rgba(100,116,139,.08)"/>}
+                            </div>
+                            <div style={{display:"flex",gap:10,alignItems:"center",marginBottom:7,flexWrap:"wrap"}}>
+                              <span style={{fontSize:11,color:"#64748b",fontWeight:600}}>{u.j}</span>
+                              <span style={{fontSize:11,fontWeight:600,color:isPending?"#94a3b8":"#475569"}}>{u.eff}</span>
+                            </div>
+                            <div style={{fontSize:12,color:"#475569",lineHeight:1.65,marginBottom:8}}>{u.detail.length>120?u.detail.slice(0,120)+"...":u.detail}</div>
+                            <div style={{display:"flex",justifyContent:"space-between",alignItems:"center"}}>
+                              <SrcLink url={u.src} label="Official Reference"/>
+                              <span style={{fontSize:11,color:"#6366f1",fontWeight:600}}>Click for full detail</span>
+                            </div>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              );
+            })}
+            {totalShown===0&&<div style={{textAlign:"center",padding:"40px 20px",color:"#94a3b8",background:"#fff",borderRadius:12,border:"1px solid #e2e8f0"}}>No items match the selected year filter.</div>}
+          </div>
+        );
+      })()}
+
       {tab===9&&(function(){
         var compSC=compValStatus?compValStatus.type==="success"?"rgba(22,163,74,.1)":compValStatus.type==="error"?"rgba(220,38,38,.1)":"rgba(99,102,241,.1)":null;
         var compSB=compValStatus?compValStatus.type==="success"?"rgba(22,163,74,.3)":compValStatus.type==="error"?"rgba(220,38,38,.3)":"rgba(99,102,241,.3)":null;
         var compST=compValStatus?compValStatus.type==="success"?"#16a34a":compValStatus.type==="error"?"#dc2626":"#4f46e5":null;
         var hasResult=compResult&&compResult.configFindings;
-        var totalChecks=0,passCount=0,warnCount=0,failCount=0,missingCount=0,critCount=0;
-        var byCategory={};
+        var totalChecks=0,passCount=0,warnCount=0,failCount=0,missingCount=0,critCount=0,belowMin=0;
+        var byCategory={}, byStateH={}; var fStores={}, fOwners={}, fStates={};
+        var anyFilter=(compFilterCategory!=="all"||compFilterOwner!=="all"||compFilterState!=="all");
         if(hasResult){
           for(var fi=0;fi<compResult.configFindings.length;fi++){
-            var cf=compResult.configFindings[fi]; var bconf=compAgg?compAgg.configs[cf.configIndex]:null; var bsc=bconf?bconf.storeNumbers.length:1; if(!cf.checks) continue;
+            var cf=compResult.configFindings[fi]; var bconf=compAgg?compAgg.configs[cf.configIndex]:null; if(!cf.checks||!bconf) continue;
+            // State filter is config-level; owner filter is per-store (configs are shared across operators)
+            if(compFilterState!=="all" && bconf.assignedState!==compFilterState) continue;
+            var allSn=bconf.storeNumbers||[], som=bconf.storeOwnerMap||{}, bsc=0, sni, sOwn;
+            for(sni=0;sni<allSn.length;sni++){
+              sOwn=som[allSn[sni]]||bconf.primaryOwner;
+              if(compFilterOwner==="all" || sOwn===compFilterOwner){ bsc++; fStores[allSn[sni]]=1; fOwners[sOwn]=1; }
+            }
+            if(bsc===0) continue;
+            fStates[bconf.assignedState]=1;
+            var _sth=bconf.assignedState; if(!byStateH[_sth]) byStateH[_sth]={stores:0,checks:0,pass:0,gaps:0,critical:0,top:{}}; byStateH[_sth].stores+=bsc;
             for(var ci=0;ci<cf.checks.length;ci++){
-              var ck=cf.checks[ci]; totalChecks++;
-              var cat=ck.category||"Other";
-              if(!byCategory[cat]) byCategory[cat]={pass:0,warn:0,fail:0,missing:0,info:0,total:0,exposure:0};
+              var ck=cf.checks[ci]; var cat=ck.category||"Other";
+              // Category cards reflect owner+state scope (every category still shown)
+              if(!byCategory[cat]) byCategory[cat]={pass:0,warn:0,fail:0,missing:0,info:0,total:0};
               byCategory[cat].total++;
-              byCategory[cat].exposure+=(Number(ck.perStoreExposureUSD)||0)*bsc;
-              if(ck.status==="pass"){passCount++;byCategory[cat].pass++;}
-              else if(ck.status==="warn"){warnCount++;byCategory[cat].warn++;}
-              else if(ck.status==="fail"){failCount++;byCategory[cat].fail++;}
-              else if(ck.status==="missing"){missingCount++;byCategory[cat].missing++;}
+              if(ck.status==="pass") byCategory[cat].pass++;
+              else if(ck.status==="warn") byCategory[cat].warn++;
+              else if(ck.status==="fail") byCategory[cat].fail++;
+              else if(ck.status==="missing") byCategory[cat].missing++;
               else byCategory[cat].info++;
+              byStateH[_sth].checks++; if(ck.basis==="regulation"&&ck.status==="fail") belowMin++;
+              if(ck.status==="pass") byStateH[_sth].pass++;
+              else if(ck.status==="fail"||ck.status==="warn"||ck.status==="missing"){ byStateH[_sth].gaps++; if(ck.severity==="critical") byStateH[_sth].critical++; var _ln=ck.lawName||ck.lawId; byStateH[_sth].top[_ln]=(byStateH[_sth].top[_ln]||0)+1; }
+              // KPI tiles additionally honor the active Category filter
+              if(compFilterCategory!=="all" && cat!==compFilterCategory) continue;
+              totalChecks++;
+              if(ck.status==="pass") passCount++;
+              else if(ck.status==="warn") warnCount++;
+              else if(ck.status==="fail") failCount++;
+              else if(ck.status==="missing") missingCount++;
               if(ck.severity==="critical") critCount++;
             }
           }
         }
+        var fStoreCount=Object.keys(fStores).length, fOwnerCount=Object.keys(fOwners).length, fStateCount=Object.keys(fStates).length;
+        function _topKey(o){var bk="",bv=-1,kk;for(kk in o){if(o.hasOwnProperty(kk)&&o[kk]>bv){bv=o[kk];bk=kk;}}return bk;}
+        var stateHealthList=[]; var stateColorMap={};
+        for(var _sh in byStateH){ if(!byStateH.hasOwnProperty(_sh)) continue; var _H=byStateH[_sh];
+          var _sev=_H.critical>0?"crit":(_H.gaps>0?"warn":"ok");
+          var _hp=_H.checks>0?Math.round(_H.pass*100/_H.checks):100;
+          stateColorMap[_sh]=_sev;
+          stateHealthList.push({ab:_sh,stores:_H.stores,checks:_H.checks,gaps:_H.gaps,critical:_H.critical,health:_hp,top:_topKey(_H.top),sev:_sev});
+        }
+        stateHealthList.sort(function(a,b){ var r={crit:0,warn:1,ok:2}; if(r[a.sev]!==r[b.sev]) return r[a.sev]-r[b.sev]; return b.gaps-a.gaps; });
         var infoCount=totalChecks-passCount-warnCount-failCount-missingCount;
         function pct(n,d){return d===0?0:Math.round(n*1000/d)/10;}
         var passPct=pct(passCount,totalChecks),warnPct=pct(warnCount,totalChecks),failPct=pct(failCount,totalChecks),missingPct=pct(missingCount,totalChecks),infoPct=pct(infoCount,totalChecks);
@@ -2175,9 +2021,17 @@ export default function App(){
             return av-bv;
           });
         }
+        function flatRank(ck){
+          var r=0;
+          if(ck.basis==="regulation") r-=1000;
+          var sr={fail:0,missing:1,warn:2,info:3,pass:5};
+          r+=(sr[ck.status]==null?4:sr[ck.status])*10;
+          r+=(sevRank[ck.severity]==null?5:sevRank[ck.severity]);
+          return r;
+        }
         function passesFilter(ck,conf){
           if(compFilterCategory!=="all"&&(ck.category||"Other")!==compFilterCategory) return false;
-          if(compFilterOwner!=="all"&&conf&&conf.primaryOwner!==compFilterOwner) return false;
+          if(compFilterOwner!=="all"&&conf&&!(conf.owners&&conf.owners.indexOf(compFilterOwner)>=0)) return false;
           if(compFilterState!=="all"&&conf&&conf.assignedState!==compFilterState) return false;
           if(compFilterStatus==="all") return true;
           if(compFilterStatus==="issues") return ck.status==="fail"||ck.status==="warn"||ck.status==="missing";
@@ -2188,34 +2042,140 @@ export default function App(){
         var effectiveGroupBy=compGroupBy;
         if(effectiveGroupBy==="auto") effectiveGroupBy=multiOwner?"owner":(multiState?"state":"none");
         var groupedFindings=[];
+        var flatChecks=[];
         if(hasResult){
           var grpMap={};
           for(var gfi=0;gfi<compResult.configFindings.length;gfi++){
             var gcf=compResult.configFindings[gfi]; var gconf=compAgg.configs[gcf.configIndex]; if(!gconf) continue;
             var gKey=effectiveGroupBy==="owner"?gconf.primaryOwner:effectiveGroupBy==="state"?gconf.assignedStateName:"All Configurations";
-            if(!grpMap[gKey]) grpMap[gKey]={key:gKey,configs:[],totalStores:0,totalIssues:0,totalExposure:0};
+            if(!grpMap[gKey]) grpMap[gKey]={key:gKey,configs:[],totalStores:0,totalIssues:0};
             grpMap[gKey].configs.push({cf:gcf,conf:gconf});
             grpMap[gKey].totalStores+=gconf.storeNumbers.length;
             for(var gck=0;gck<(gcf.checks||[]).length;gck++){
               var gc=gcf.checks[gck];
               if(gc.status==="fail"||gc.status==="missing"||gc.status==="warn") grpMap[gKey].totalIssues++;
-              grpMap[gKey].totalExposure+=(Number(gc.perStoreExposureUSD)||0)*gconf.storeNumbers.length;
             }
           }
           groupedFindings=Object.keys(grpMap).map(function(k){return grpMap[k];}).sort(function(a,b){return b.totalIssues-a.totalIssues;});
+          for(var ffi=0;ffi<compResult.configFindings.length;ffi++){
+            var fcf=compResult.configFindings[ffi]; var fconf=compAgg.configs[fcf.configIndex]; if(!fconf) continue;
+            var fvis=(fcf.checks||[]).filter(function(c){return passesFilter(c,fconf);});
+            for(var fvj=0;fvj<fvis.length;fvj++){ flatChecks.push({ck:fvis[fvj],cf:fcf,conf:fconf}); }
+          }
+          flatChecks.sort(function(a,b){return flatRank(a.ck)-flatRank(b.ck);});
         }
         var taskList=hasResult?buildTaskList():[];
         var visibleTasks=taskList.filter(function(t){
           if(compFilterCategory!=="all"&&t.category!==compFilterCategory) return false;
-          if(compFilterOwner!=="all"&&t.owner!==compFilterOwner) return false;
+          if(compFilterOwner!=="all"&&!(t.owners&&t.owners.indexOf(compFilterOwner)>=0)) return false;
           if(compFilterState!=="all"&&t.stateAbbrev!==compFilterState) return false;
           if(compFilterStatus==="all") return true;
           if(compFilterStatus==="issues") return t.status==="fail"||t.status==="missing"||t.status==="warn";
           return t.status===compFilterStatus;
         });
         var openTaskCount=0; for(var tci=0;tci<taskList.length;tci++) if(!taskList[tci].acked) openTaskCount++;
+        function renderCheckCard(ck,cf2,conf2,showState){
+          var plain=ck.basis==="regulation"?{t:"Breaks the law",c:"#dc2626",b:"#fef2f2"}:((ck.severity==="critical"&&ck.status!=="pass")?{t:"Urgent",c:"#dc2626",b:"#fef2f2"}:(ck.status==="pass"?{t:"On track",c:"#16a34a",b:"#f0fdf4"}:{t:"Worth checking",c:"#b45309",b:"#fffbeb"}));
+          var dKey=cf2.configIndex+"::"+ck.lawId+"::"+(ck.minorAge||0);
+          var dec=compDecisions[dKey]||{};
+          var showBench=(ck.status==="fail"||ck.status==="warn")&&ck.basis!=="regulation"&&ck.orgsTotal>0;
+          var opc=ck.orgsTotal>0?Math.round((ck.orgsOn||0)*100/ck.orgsTotal):0;
+          var isSel=compSelected&&compSelected.ck===ck;
+          return (
+            <div key={dKey} className="rc-frow-wrap" style={{flex:"1 1 380px",minWidth:0,borderLeft:"3px solid "+plain.c,opacity:dec.acked?.6:1,boxShadow:isSel?"0 0 0 2px #4f46e5":"none"}}>
+              <div className="rc-frow" onClick={function(){setCompSelected({ck:ck,cf:cf2,conf:conf2});}}>
+                <span style={{width:8,height:8,borderRadius:"50%",background:plain.c,flexShrink:0}}/>
+                {showState&&<span className="rc-frow-state" title={conf2.assignedStateName||conf2.assignedState}>{conf2.assignedState}</span>}
+                <span className="rc-frow-name" title={ck.lawName||ck.lawId}>{ck.lawName||ck.lawId}</span>
+                {ck.minorAge>0&&<span style={{fontSize:10,color:"#64748b",fontWeight:700,flexShrink:0}}>Age {ck.minorAge}</span>}
+                {ck.category&&<span className="rc-frow-cat">{ck.category}</span>}
+                <span className="rc-frow-spacer"/>
+                {showBench&&<span className="rc-frow-pct" title="operators in this state using this rule">{opc+"% ops"}</span>}
+                <span className="rc-frow-tag" style={{color:plain.c,background:plain.b}}>{plain.t}</span>
+                {dec.acked&&<span className="rc-frow-ack" title="handled">{"\u2713"}</span>}
+                <i className="rc-chev">{"\u203a"}</i>
+              </div>
+            </div>
+          );
+        }
+        function renderDrawer(){
+          if(!compSelected) return null;
+          var ck=compSelected.ck, cf2=compSelected.cf, conf2=compSelected.conf;
+          var plain=ck.basis==="regulation"?{t:"Breaks the law",c:"#dc2626",b:"#fef2f2"}:((ck.severity==="critical"&&ck.status!=="pass")?{t:"Urgent",c:"#dc2626",b:"#fef2f2"}:(ck.status==="pass"?{t:"On track",c:"#16a34a",b:"#f0fdf4"}:{t:"Worth checking",c:"#b45309",b:"#fffbeb"}));
+          var dKey=cf2.configIndex+"::"+ck.lawId+"::"+(ck.minorAge||0);
+          var dec=compDecisions[dKey]||{};
+          var showBench=(ck.status==="fail"||ck.status==="warn")&&ck.basis!=="regulation"&&ck.orgsTotal>0;
+          var opc=ck.orgsTotal>0?Math.round((ck.orgsOn||0)*100/ck.orgsTotal):0;
+          function closeDrawer(){setCompSelected(null);}
+          return (
+            <div onClick={closeDrawer} style={{position:"fixed",top:0,left:0,right:0,bottom:0,background:"rgba(15,23,42,.35)",zIndex:9998}}>
+              <div onClick={function(e){e.stopPropagation();}} style={{position:"fixed",top:0,right:0,bottom:0,width:"min(460px,94vw)",background:"#fff",boxShadow:"-10px 0 34px rgba(15,23,42,.2)",zIndex:9999,display:"flex",flexDirection:"column"}}>
+                <div style={{padding:"14px 16px",borderBottom:"1px solid #eef1f6",display:"flex",alignItems:"flex-start",gap:10}}>
+                  <div style={{flex:1,minWidth:0}}>
+                    <div style={{display:"flex",gap:7,alignItems:"center",flexWrap:"wrap",marginBottom:6}}>
+                      <span className="rc-frow-state">{conf2.assignedState}</span>
+                      {ck.category&&<span className="rc-frow-cat">{ck.category}</span>}
+                      <span className="rc-frow-tag" style={{color:plain.c,background:plain.b}}>{plain.t}</span>
+                    </div>
+                    <div style={{fontWeight:800,fontSize:16,color:"#0f172a",lineHeight:1.25}}>{(ck.lawName||ck.lawId)+(ck.minorAge>0?(" (Age "+ck.minorAge+")"):"")}</div>
+                    <div style={{fontSize:11,color:"#94a3b8",marginTop:2}}>{(conf2.assignedStateName||conf2.assignedState)+(conf2.storeNumbers?(" \u00b7 "+conf2.storeNumbers.length+" store"+(conf2.storeNumbers.length!==1?"s":"")):"")}</div>
+                  </div>
+                  <button onClick={closeDrawer} style={{border:"none",background:"#f1f5f9",borderRadius:8,width:30,height:30,fontSize:18,lineHeight:1,cursor:"pointer",color:"#475569",flexShrink:0}}>{"\u00d7"}</button>
+                </div>
+                <div style={{padding:16,overflowY:"auto",flex:1}}>
+                  <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:8,marginBottom:10,fontSize:12}}>
+                    <div style={{background:"#f8fafc",border:"1px solid #e8edf3",borderRadius:9,padding:"8px 10px"}}><div style={{fontSize:9,color:"#94a3b8",fontWeight:700,textTransform:"uppercase",marginBottom:2}}>Brand norm</div><div style={{color:"#334155"}}>{ck.expected||"-"}</div></div>
+                    <div style={{background:"#f8fafc",border:"1px solid #e8edf3",borderRadius:9,padding:"8px 10px"}}><div style={{fontSize:9,color:"#94a3b8",fontWeight:700,textTransform:"uppercase",marginBottom:2}}>Your setting</div><div style={{color:"#334155"}}>{ck.actual||"-"}</div></div>
+                  </div>
+                  {ck.issue&&<div style={{background:"rgba(220,38,38,.05)",borderLeft:"3px solid #dc2626",borderRadius:9,padding:"9px 11px",marginBottom:10,fontSize:12,color:"#7f1d1d",lineHeight:1.45}}>{ck.issue}</div>}
+                  {showBench&&(
+                    <div style={{display:"flex",gap:10,flexWrap:"wrap",marginBottom:10}}>
+                      <div className="rc-statbox">{RingPc(opc,"#1d9e75")}<div><div className="pc">{opc+"%"}</div><div className="cap">{"of "+conf2.assignedState+" operators use this"}</div></div></div>
+                      <div className="rc-statbox">{RingPc(ck.storePct||0,"#378add")}<div><div className="pc">{(ck.storePct||0)+"%"}</div><div className="cap">{"of "+conf2.assignedState+" stores use this"}</div></div></div>
+                    </div>
+                  )}
+                  {ck.recommendation&&<div className="rc-comply" style={{marginBottom:12}}><span style={{fontWeight:800,color:"#16a34a",flexShrink:0}}>{"\u2713"}</span><div><span style={{fontWeight:700}}>To stay compliant: </span>{ck.recommendation}{ck.citation&&<a href={ck.citation} target="_blank" rel="noreferrer" style={{marginLeft:6,whiteSpace:"nowrap"}}>Official source</a>}</div></div>}
+                  <div style={{borderTop:"1px solid #eef1f6",paddingTop:12}}>
+                    <label style={{fontSize:12,color:"#475569",display:"flex",alignItems:"center",gap:6,cursor:"pointer",marginBottom:8}}><input type="checkbox" checked={!!dec.acked} onChange={function(e){toggleDecision(dKey,"acked",e.target.checked);}}/>Mark handled</label>
+                    <input placeholder="Add a note..." value={dec.note||""} onChange={function(e){toggleDecision(dKey,"note",e.target.value);}} style={{width:"100%",boxSizing:"border-box",padding:"8px 10px",border:"1px solid #e2e8f0",borderRadius:8,fontSize:12,outline:"none"}}/>
+                  </div>
+                </div>
+              </div>
+            </div>
+          );
+        }
+        function renderCheckRow(ck,cf2,conf2,showState){
+          var plain=ck.basis==="regulation"?{t:"Breaks the law",c:"#dc2626",b:"#fef2f2"}:((ck.severity==="critical"&&ck.status!=="pass")?{t:"Urgent",c:"#dc2626",b:"#fef2f2"}:(ck.status==="pass"?{t:"On track",c:"#16a34a",b:"#f0fdf4"}:{t:"Worth checking",c:"#b45309",b:"#fffbeb"}));
+          var dKey=cf2.configIndex+"::"+ck.lawId+"::"+(ck.minorAge||0);
+          var dec=compDecisions[dKey]||{};
+          var showBench=(ck.status==="fail"||ck.status==="warn")&&ck.basis!=="regulation"&&ck.orgsTotal>0;
+          var opc=ck.orgsTotal>0?Math.round((ck.orgsOn||0)*100/ck.orgsTotal):0;
+          var isSel=compSelected&&compSelected.ck===ck;
+          return (
+            <tr key={dKey} className={isSel?"rc-trsel":""} onClick={function(){setCompSelected({ck:ck,cf:cf2,conf:conf2});}} style={{opacity:dec.acked?.5:1}}>
+              <td className="rc-td-dot"><span style={{display:"inline-block",width:9,height:9,borderRadius:"50%",background:plain.c}}/></td>
+              {showState&&<td><span className="rc-frow-state">{conf2.assignedState}</span></td>}
+              <td className="rc-td-name"><span style={{fontWeight:600,color:"#0f172a"}}>{ck.lawName||ck.lawId}</span>{ck.minorAge>0&&<span style={{fontSize:10,color:"#64748b",fontWeight:700,marginLeft:6}}>Age {ck.minorAge}</span>}</td>
+              <td className="rc-td-cur" title={ck.actual||""} style={{color:(ck.status==="fail"||ck.status==="missing")?"#b91c1c":(ck.status==="warn"?"#b45309":"#334155"),fontWeight:(ck.status==="fail"||ck.status==="missing")?600:400}}>{ck.actual||"—"}</td>
+              <td className="rc-td-exp" title={ck.expected||""}>{ck.expected||"—"}</td>
+              <td>{ck.category&&<span className="rc-frow-cat">{ck.category}</span>}</td>
+              <td><span className="rc-frow-tag" style={{color:plain.c,background:plain.b}}>{plain.t}</span></td>
+              <td className="rc-td-bench">{showBench?(
+                <span style={{display:"inline-flex",alignItems:"center",gap:7}}>
+                  <svg width="26" height="26" viewBox="0 0 36 36" style={{flexShrink:0}}>
+                    <circle cx="18" cy="18" r="15" fill="none" stroke="#eef1f6" strokeWidth="5"/>
+                    <circle cx="18" cy="18" r="15" fill="none" stroke="#1d9e75" strokeWidth="5" strokeLinecap="round" strokeDasharray={2*Math.PI*15} strokeDashoffset={(2*Math.PI*15)*(1-opc/100)} transform="rotate(-90 18 18)"/>
+                  </svg>
+                  <span style={{whiteSpace:"nowrap"}}><span style={{fontSize:12,fontWeight:700,color:"#0f172a"}}>{opc+"%"}</span><span style={{color:"#94a3b8",fontSize:10,marginLeft:4}}>{"("+(ck.orgsOn||0)+"/"+ck.orgsTotal+")"}</span></span>
+                </span>
+              ):"\u2014"}</td>
+              <td className="rc-td-chev">{dec.acked?<span style={{color:"#16a34a",fontWeight:800}}>{"\u2713"}</span>:<span style={{color:"#cbd5e1"}}>{"\u203a"}</span>}</td>
+            </tr>
+          );
+        }
         return (
-          <div>
+          <div className="rc-dash">
+            <style>{`.rc-dash{color:#0f172a;}.rc-dash .rc-label{font-size:11px;color:#64748b;font-weight:600;text-transform:uppercase;letter-spacing:.05em;}.rc-dash select.rc-select{appearance:none;-webkit-appearance:none;-moz-appearance:none;background-color:#fff;background-image:url('data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%2210%22 height=%226%22 viewBox=%220 0 10 6%22%3E%3Cpath fill=%22%2394a3b8%22 d=%22M0 0l5 6 5-6z%22/%3E%3C/svg%3E');background-repeat:no-repeat;background-position:right 12px center;background-size:9px;border:1px solid #e2e8f0;border-radius:10px;padding:9px 32px 9px 13px;font-size:13px;font-weight:500;color:#1e293b;cursor:pointer;outline:none;transition:all .15s;max-width:260px;}.rc-dash select.rc-select:hover{border-color:#cbd5e1;}.rc-dash select.rc-select:focus{border-color:#6366f1;box-shadow:0 0 0 3px rgba(99,102,241,.12);}.rc-dash .rc-btn{display:inline-flex;align-items:center;gap:6px;border:1px solid #e2e8f0;background:#fff;color:#334155;border-radius:10px;padding:9px 16px;font-size:13px;font-weight:500;cursor:pointer;transition:all .15s;line-height:1;white-space:nowrap;}.rc-dash .rc-btn:hover{border-color:#cbd5e1;background:#f8fafc;}.rc-dash .rc-btn:active{transform:translateY(1px);}.rc-dash .rc-btn-primary{background:#4f46e5;border-color:#4f46e5;color:#fff;}.rc-dash .rc-btn-primary:hover{background:#4338ca;border-color:#4338ca;}.rc-dash .rc-seg{display:inline-flex;border:1px solid #e2e8f0;border-radius:11px;background:#f1f5f9;padding:3px;gap:2px;}.rc-dash .rc-seg button{border:none;background:transparent;color:#64748b;padding:7px 16px;font-size:13px;font-weight:500;cursor:pointer;border-radius:8px;transition:all .12s;}.rc-dash .rc-seg button:hover{color:#1e293b;}.rc-dash .rc-seg button.active{background:#fff;color:#4f46e5;box-shadow:0 1px 3px rgba(15,23,42,.1);}.rc-dash .rc-pill{border:1px solid #e2e8f0;background:#fff;color:#475569;border-radius:999px;padding:6px 14px;font-size:12px;font-weight:500;cursor:pointer;transition:all .12s;}.rc-dash .rc-pill:hover{border-color:#cbd5e1;background:#f8fafc;}.rc-dash .rc-chip{display:inline-flex;align-items:center;gap:6px;background:#eef2ff;border:1px solid #c7d2fe;color:#4338ca;border-radius:999px;padding:5px 12px;font-size:12px;font-weight:600;}.rc-dash .rc-chip button{border:none;background:transparent;cursor:pointer;color:#6366f1;font-weight:700;font-size:15px;line-height:1;padding:0;}.rc-dash .rc-card{background:#fff;border:1px solid #eaedf3;border-radius:14px;box-shadow:0 1px 3px rgba(15,23,42,.04);}.rc-dash .rc-tile{border-radius:14px;padding:13px 15px;border:1px solid transparent;}.rc-dash .rc-tile .lbl{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.04em;opacity:.9;}.rc-dash .rc-tile .val{font-size:36px;font-weight:800;margin-top:4px;line-height:1.02;}.rc-dash .rc-tile .sub{font-size:11px;opacity:.85;margin-top:2px;}.rc-dash .t-neutral{background:#f8fafc;border-color:#eef1f6;color:#0f172a;}.rc-dash .t-info{background:#eff6ff;border-color:#dbeafe;color:#1d4ed8;}.rc-dash .t-warn{background:#fffbeb;border-color:#fde68a;color:#b45309;}.rc-dash .t-danger{background:#fef2f2;border-color:#fecaca;color:#dc2626;}.rc-dash .t-ok{background:#f0fdf4;border-color:#bbf7d0;color:#16a34a;}.rc-dash .rc-mapwrap{background:#fff;border:1px solid #eaedf3;border-radius:14px;padding:14px 16px;box-shadow:0 1px 3px rgba(15,23,42,.04);}.rc-dash .rc-map path{stroke:#fff;stroke-width:1;transition:opacity .15s;}.rc-dash .rc-map path:hover{opacity:.82;}.rc-dash .rc-legend{display:flex;flex-wrap:wrap;gap:14px;font-size:12px;color:#64748b;margin-top:10px;}.rc-dash .rc-legend i{width:11px;height:11px;border-radius:3px;display:inline-block;margin-right:5px;vertical-align:-1px;}.rc-dash .rc-statecard{background:#fff;border:1px solid #eaedf3;border-left-width:4px;border-radius:10px;padding:12px 14px;}.rc-dash .rc-bar{height:8px;background:#f1f5f9;border-radius:5px;overflow:hidden;margin:8px 0 6px;}.rc-dash .rc-bar>span{display:block;height:100%;border-radius:5px;}.rc-dash .rc-gapcard{background:#fff;border:1px solid #eaedf3;border-left:4px solid #e2e8f0;border-radius:12px;padding:13px 15px;margin-bottom:10px;box-shadow:0 1px 2px rgba(15,23,42,.03);}.rc-dash .rc-comply{background:#f0fdf4;border:1px solid #bbf7d0;border-radius:10px;padding:11px 13px;font-size:15px;line-height:1.45;color:#15803d;display:flex;gap:9px;align-items:flex-start;}.rc-dash .rc-comply a{color:#15803d;font-weight:600;}.rc-dash .rc-bench{font-size:12px;color:#475569;}.rc-dash .rc-statbox{flex:1;min-width:150px;background:#f8fafc;border:1px solid #eef1f6;border-radius:12px;padding:11px 13px;display:flex;align-items:center;gap:12px;}.rc-dash .rc-statbox .pc{font-size:23px;font-weight:800;line-height:1;color:#0f172a;}.rc-dash .rc-statbox .cap{font-size:12px;color:#64748b;margin-top:3px;line-height:1.3;}.rc-dash .rc-cmprow{display:flex;align-items:center;gap:10px;margin-bottom:9px;}.rc-dash .rc-cmprow .ab{width:28px;font-weight:800;font-size:13px;color:#0f172a;flex-shrink:0;}.rc-dash .rc-cmptrack{flex:1;height:20px;background:#f1f5f9;border-radius:6px;overflow:hidden;}.rc-dash .rc-cmptrack>span{display:flex;align-items:center;height:100%;border-radius:6px;padding-left:8px;font-size:11px;font-weight:800;color:#fff;white-space:nowrap;}.rc-dash .rc-cmpmeta{width:84px;text-align:right;font-size:12px;font-weight:600;color:#64748b;flex-shrink:0;}.rc-dash .rc-fgrid{display:flex;flex-wrap:wrap;gap:6px;align-items:flex-start;}.rc-dash .rc-frow-wrap{background:#fff;border:1px solid #eef1f6;border-radius:8px;overflow:hidden;}.rc-dash .rc-frow{display:flex;align-items:center;gap:8px;padding:6px 10px;cursor:pointer;transition:background .12s;}.rc-dash .rc-frow:hover{background:#f8fafc;}.rc-dash .rc-frow-name{flex:0 1 auto;min-width:40px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-weight:600;font-size:13px;color:#0f172a;}.rc-dash .rc-frow-cat{font-size:11px;color:#6366f1;background:rgba(99,102,241,.08);padding:1px 8px;border-radius:999px;font-weight:600;white-space:nowrap;flex-shrink:0;}.rc-dash .rc-frow-state{font-size:10px;font-weight:800;color:#475569;background:#eef2f7;border:1px solid #e3e9f0;border-radius:5px;padding:1px 6px;flex-shrink:0;letter-spacing:.02em;}.rc-dash .rc-tblwrap{border:1px solid #eef1f6;border-radius:10px;overflow:hidden;background:#fff;margin-bottom:8px;}.rc-dash table.rc-tbl{width:100%;border-collapse:collapse;font-size:13px;}.rc-dash .rc-tbl th{text-align:left;font-size:9px;text-transform:uppercase;letter-spacing:.05em;color:#94a3b8;font-weight:800;padding:7px 12px;background:#f8fafc;border-bottom:1px solid #eef1f6;white-space:nowrap;}.rc-dash .rc-tbl td{padding:7px 12px;border-bottom:1px solid #f3f5f9;vertical-align:middle;}.rc-dash .rc-tbl tbody tr{cursor:pointer;}.rc-dash .rc-tbl tbody tr:last-child td{border-bottom:none;}.rc-dash .rc-tbl tbody tr:hover{background:#f8fafc;}.rc-dash .rc-tbl tr.rc-trsel{background:#eef2ff;}.rc-dash .rc-td-dot{width:8px;padding-right:0;}.rc-dash .rc-td-name{max-width:360px;}.rc-dash .rc-td-bench{color:#475569;font-size:12px;white-space:nowrap;}.rc-dash .rc-td-chev{width:22px;text-align:right;font-size:15px;}.rc-dash .rc-td-cur,.rc-dash .rc-td-exp{font-size:12px;max-width:230px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}.rc-dash .rc-td-exp{color:#0f766e;}.rc-dash .rc-frow-spacer{flex:1;min-width:6px;}.rc-dash .rc-frow-pct{font-size:11px;font-weight:700;color:#0f766e;background:#e1f5ee;padding:2px 9px;border-radius:999px;white-space:nowrap;flex-shrink:0;}.rc-dash .rc-frow-tag{font-size:11px;font-weight:700;padding:2px 10px;border-radius:999px;white-space:nowrap;flex-shrink:0;}.rc-dash .rc-frow-ack{color:#16a34a;font-weight:800;flex-shrink:0;}.rc-dash .rc-chev{font-style:normal;color:#94a3b8;font-size:17px;line-height:1;transition:transform .15s;flex-shrink:0;width:12px;text-align:center;}.rc-dash .rc-fdet{padding:9px 11px 11px;border-top:1px solid #f1f5f9;}`}</style>
             {(!hasResult||compShowUpload)&&(
               <Card>
                 <div style={{display:"flex",gap:14,alignItems:"center",flexWrap:"wrap"}}>
@@ -2259,8 +2219,6 @@ export default function App(){
                   <span style={{fontSize:12}}><strong>{totalChecks}</strong> checks</span>
                   <span style={{fontSize:12,color:"#cbd5e1"}}>&middot;</span>
                   <span style={{fontSize:12,color:"#fca5a5"}}><strong>{failCount+missingCount}</strong> issues</span>
-                  <span style={{fontSize:12,color:"#cbd5e1"}}>&middot;</span>
-                  <span style={{fontSize:12,color:"#fca5a5"}}>${(Number(compResult.estimatedAnnualExposureUSD||0)).toLocaleString()} exposure</span>
                 </div>
                 <div style={{display:"flex",gap:6}}>
                   <button onClick={function(){setCompShowUpload(true);}} style={{background:"rgba(255,255,255,.1)",color:"#fff",border:"1px solid rgba(255,255,255,.2)",borderRadius:5,padding:"5px 10px",fontSize:11,cursor:"pointer",fontWeight:600}}>New File</button>
@@ -2272,43 +2230,94 @@ export default function App(){
 
             {hasResult&&(
               <div>
-                <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(128px,1fr))",gap:7,marginBottom:10}}>
+                {anyFilter&&(
+                  <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:8,flexWrap:"wrap",background:"rgba(99,102,241,.06)",border:"1px solid rgba(99,102,241,.25)",borderRadius:6,padding:"6px 10px"}}>
+                    <span style={{fontSize:11,fontWeight:800,color:"#4f46e5",textTransform:"uppercase",letterSpacing:".04em"}}>Filtered view</span>
+                    <span style={{fontSize:11,color:"#475569"}}>{"showing "+fStoreCount+" store(s)"+(compFilterState!=="all"?(" \u00b7 "+compFilterState):"")+(compFilterOwner!=="all"?(" \u00b7 "+compFilterOwner):"")+(compFilterCategory!=="all"?(" \u00b7 "+compFilterCategory):"")}</span>
+                    <button onClick={function(){setCompFilterCategory("all");setCompFilterOwner("all");setCompFilterState("all");}} style={{marginLeft:"auto",border:"1px solid #e2e8f0",background:"#fff",borderRadius:5,padding:"3px 10px",fontSize:10,cursor:"pointer",color:"#475569",fontWeight:700}}>Clear all filters</button>
+                  </div>
+                )}
+                <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(150px,1fr))",gap:12,marginBottom:14}}>
                   {[
-                    {l:"Stores",v:compAgg.totalStores,c:"#6366f1"},
-                    {l:"Owners",v:compAgg.distinctOwners?compAgg.distinctOwners.length:1,c:"#0284c7"},
-                    {l:"States",v:compAgg.distinctStates?compAgg.distinctStates.length:1,c:"#0284c7"},
-                    {l:"Checks",v:totalChecks,c:"#475569"},
-                    {l:"Pass",v:passCount,c:"#16a34a"},
-                    {l:"Fail+Miss",v:failCount+missingCount,c:"#dc2626"},
-                    {l:"Critical",v:critCount,c:"#dc2626"},
-                    {l:"Annual Exposure",v:"$"+(Number(compResult.estimatedAnnualExposureUSD||0)).toLocaleString(),c:"#7c3aed"}
+                    {l:"Stores",v:fStoreCount,cls:"t-neutral"},
+                    {l:"To fix",v:failCount+missingCount+warnCount,cls:(failCount+missingCount+warnCount)>0?"t-warn":"t-ok"},
+                    {l:"Urgent",v:critCount,cls:critCount>0?"t-danger":"t-ok"},
+                    {l:"On track",v:passPct+"%",cls:passPct>=90?"t-ok":(passPct>=70?"t-warn":"t-danger")}
                   ].map(function(k,ki){
-                    return <div key={ki} style={{background:"#fff",border:"1px solid #e2e8f0",borderTop:"3px solid "+k.c,borderRadius:5,padding:"6px 9px"}}>
-                      <div style={{fontSize:9.5,color:"#64748b",fontWeight:700,textTransform:"uppercase",letterSpacing:".03em"}}>{k.l}</div>
-                      <div style={{fontSize:18,fontWeight:800,color:k.c,marginTop:2,lineHeight:1.05,whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis"}} title={String(k.v)}>{k.v}</div>
+                    return <div key={ki} className={"rc-tile "+k.cls}>
+                      <div className="lbl">{k.l}</div>
+                      <div className="val" title={String(k.v)}>{k.v}</div>
                     </div>;
                   })}
                 </div>
 
-                <Card style={{marginBottom:8,padding:"8px 12px"}}>
-                  <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:5,flexWrap:"wrap",gap:6}}>
-                    <div style={{fontWeight:700,fontSize:10,color:"#0f172a",textTransform:"uppercase",letterSpacing:".04em"}}>Status Across All Checks</div>
-                    <div style={{display:"flex",gap:8,fontSize:9,color:"#475569",flexWrap:"wrap"}}>
-                      <span><span style={{display:"inline-block",width:8,height:8,background:"#16a34a",borderRadius:2,marginRight:3}}/>Pass {passCount}</span>
-                      <span><span style={{display:"inline-block",width:8,height:8,background:"#d97706",borderRadius:2,marginRight:3}}/>Warn {warnCount}</span>
-                      <span><span style={{display:"inline-block",width:8,height:8,background:"#dc2626",borderRadius:2,marginRight:3}}/>Fail {failCount}</span>
-                      <span><span style={{display:"inline-block",width:8,height:8,background:"#991b1b",borderRadius:2,marginRight:3}}/>Missing {missingCount}</span>
-                      <span><span style={{display:"inline-block",width:8,height:8,background:"#64748b",borderRadius:2,marginRight:3}}/>Info {infoCount}</span>
+                <div onClick={function(){setCompOverviewOpen(!compOverviewOpen);}} style={{display:"flex",alignItems:"center",gap:8,cursor:"pointer",padding:"8px 12px",background:"#fff",border:"1px solid #eaedf3",borderRadius:12,marginBottom:8,boxShadow:"0 1px 3px rgba(15,23,42,.04)"}}>
+                  <span style={{fontStyle:"normal",color:"#94a3b8",fontSize:16,lineHeight:1,transform:compOverviewOpen?"rotate(90deg)":"none",transition:"transform .15s",display:"inline-block",width:11,textAlign:"center"}}>{"\u203a"}</span>
+                  <span style={{fontWeight:700,fontSize:14,color:"#0f172a"}}>Compliance overview</span>
+                  <span style={{fontSize:12,color:"#64748b",marginLeft:"auto"}}>{compOverviewOpen?"map, peer comparison & categories":(stateHealthList.length>0?(stateHealthList.filter(function(x){return x.sev!=="ok";}).length+" of "+stateHealthList.length+" states need attention"):"map & categories")}</span>
+                </div>
+                {compOverviewOpen&&(
+                <div>
+                {stateHealthList.length>0&&(
+                  <div style={{marginBottom:12}}>
+                    <div style={{display:"flex",alignItems:"center",gap:10,marginBottom:10,flexWrap:"wrap"}}>
+                      <div style={{fontWeight:700,fontSize:15,color:"#0f172a"}}>Compliance by state</div>
+                      {stateHealthList.length>1&&(
+                      <div className="rc-seg" style={{marginLeft:"auto"}}>
+                        <button className={compStateView==="map"?"active":""} onClick={function(){setCompStateView("map");}}>Map view</button>
+                        <button className={compStateView==="state"?"active":""} onClick={function(){setCompStateView("state");}}>By state</button>
+                      </div>
+                      )}
                     </div>
+                    {(compStateView==="map"&&stateHealthList.length>1)?(
+                      <div className="rc-mapwrap">
+                        <div style={{display:"flex",gap:20,flexWrap:"wrap",alignItems:"flex-start"}}>
+                          <div style={{flex:"1 1 300px",maxWidth:430}}>
+                            <svg className="rc-map" viewBox="0 0 900 520" style={{width:"100%",height:"auto",display:"block"}}>
+                              {Object.keys(STATE_PATHS).map(function(ab){
+                                var sev=stateColorMap[ab];
+                                var fill=sev==="crit"?"#ef4444":sev==="warn"?"#f59e0b":sev==="ok"?"#22c55e":"#eef1f6";
+                                return <path key={ab} d={STATE_PATHS[ab]} fill={fill}><title>{ab+(sev?(" - "+(byStateH[ab]?byStateH[ab].gaps:0)+" to fix, "+(byStateH[ab]?byStateH[ab].stores:0)+" store(s)"):" - no stores")}</title></path>;
+                              })}
+                            </svg>
+                            <div className="rc-legend">
+                              <span><i style={{background:"#ef4444"}}/>Urgent</span>
+                              <span><i style={{background:"#f59e0b"}}/>Worth checking</span>
+                              <span><i style={{background:"#22c55e"}}/>On track</span>
+                              <span><i style={{background:"#eef1f6"}}/>No stores</span>
+                            </div>
+                          </div>
+                          <div style={{flex:"1 1 260px",minWidth:230}}>
+                            <div style={{fontSize:12,fontWeight:700,color:"#64748b",textTransform:"uppercase",letterSpacing:".04em",marginBottom:12}}>Your states compared</div>
+                            {stateHealthList.map(function(stx,sxi){
+                              var ac=stx.sev==="crit"?"#ef4444":stx.sev==="warn"?"#f59e0b":"#22c55e";
+                              return <div key={sxi} className="rc-cmprow">
+                                <span className="ab">{stx.ab}</span>
+                                <div className="rc-cmptrack"><span style={{width:Math.max(stx.health,14)+"%",background:ac}}>{stx.health+"%"}</span></div>
+                                <span className="rc-cmpmeta">{stx.gaps>0?(stx.gaps+" to fix"):"all clear"}</span>
+                              </div>;
+                            })}
+                          </div>
+                        </div>
+                      </div>
+                    ):(
+                      <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(208px,1fr))",gap:12}}>
+                        {stateHealthList.map(function(stx,sxi){
+                          var ac=stx.sev==="crit"?"#ef4444":stx.sev==="warn"?"#f59e0b":"#22c55e";
+                          var lab=stx.critical>0?(stx.gaps+" gaps \u00b7 "+stx.critical+" critical"):(stx.gaps>0?(stx.gaps+" gap"+(stx.gaps!==1?"s":"")):"All clear");
+                          return <div key={sxi} className="rc-statecard" style={{borderLeftColor:ac}}>
+                            <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",gap:6}}>
+                              <span style={{fontWeight:700,fontSize:14}}>{stx.ab}</span>
+                              <span style={{fontSize:12,fontWeight:600,color:ac}}>{lab}</span>
+                            </div>
+                            <div className="rc-bar"><span style={{width:stx.health+"%",background:ac}}/></div>
+                            <div style={{fontSize:12,color:"#64748b"}}>{stx.stores+" store"+(stx.stores!==1?"s":"")+(stx.top?(" \u00b7 top gap: "+stx.top):"")}</div>
+                          </div>;
+                        })}
+                      </div>
+                    )}
                   </div>
-                  <div style={{display:"flex",height:20,borderRadius:4,overflow:"hidden",border:"1px solid #e2e8f0"}}>
-                    {passCount>0&&<div style={{flexGrow:passCount,background:"#16a34a",display:"flex",alignItems:"center",justifyContent:"center",color:"#fff",fontSize:9,fontWeight:700,minWidth:24}}>{passPct>=4?passPct+"%":""}</div>}
-                    {warnCount>0&&<div style={{flexGrow:warnCount,background:"#d97706",display:"flex",alignItems:"center",justifyContent:"center",color:"#fff",fontSize:9,fontWeight:700,minWidth:24}}>{warnPct>=4?warnPct+"%":""}</div>}
-                    {failCount>0&&<div style={{flexGrow:failCount,background:"#dc2626",display:"flex",alignItems:"center",justifyContent:"center",color:"#fff",fontSize:9,fontWeight:700,minWidth:24}}>{failPct>=4?failPct+"%":""}</div>}
-                    {missingCount>0&&<div style={{flexGrow:missingCount,background:"#991b1b",display:"flex",alignItems:"center",justifyContent:"center",color:"#fff",fontSize:9,fontWeight:700,minWidth:24}}>{missingPct>=4?missingPct+"%":""}</div>}
-                    {infoCount>0&&<div style={{flexGrow:infoCount,background:"#64748b",display:"flex",alignItems:"center",justifyContent:"center",color:"#fff",fontSize:9,fontWeight:700,minWidth:24}}>{infoPct>=4?infoPct+"%":""}</div>}
-                  </div>
-                </Card>
+                )}
 
                 <Card style={{marginBottom:8,padding:"8px 12px"}}>
                   <div style={{fontWeight:700,fontSize:10,color:"#0f172a",textTransform:"uppercase",letterSpacing:".04em",marginBottom:5}}>Categories (click to filter)</div>
@@ -2327,192 +2336,107 @@ export default function App(){
                         <div key={cati} onClick={function(){setCompFilterCategory(selected?"all":cat);}} style={{cursor:"pointer",background:selected?"rgba(99,102,241,.12)":rowBg,border:"1.5px solid "+(selected?"#6366f1":rowColor+"33"),borderRadius:4,padding:"5px 8px",borderLeft:"3px solid "+rowColor}}>
                           <div style={{fontWeight:700,fontSize:11,color:"#0f172a"}}>{cat}</div>
                           <div style={{fontSize:11,marginTop:2,fontWeight:800,color:rowColor}}>{(b.fail+b.missing+b.warn)>0?((b.fail+b.missing+b.warn)+" issue"+((b.fail+b.missing+b.warn)===1?"":"s")):"All clear"}</div>
-                          <div style={{fontSize:9.5,color:"#64748b",marginTop:1}}>{b.total+" checks"}{b.exposure>0?(" \u00b7 $"+Math.round(b.exposure).toLocaleString()):""}</div>
+                          <div style={{fontSize:9.5,color:"#64748b",marginTop:1}}>{b.total+" checks"}</div>
                         </div>
                       );
                     })}
                   </div>
                 </Card>
+                </div>
+                )}
 
-                <Card style={{marginBottom:8,padding:"7px 12px"}}>
+                <Card style={{marginBottom:8,padding:"9px 12px"}}>
                   <div style={{display:"flex",gap:8,alignItems:"center",flexWrap:"wrap"}}>
-                    <div style={{display:"flex",border:"1px solid #e2e8f0",borderRadius:5,overflow:"hidden"}}>
-                      <button onClick={function(){setCompViewMode("findings");}} style={{padding:"4px 12px",border:"none",background:compViewMode==="findings"?"#6366f1":"#fff",color:compViewMode==="findings"?"#fff":"#475569",fontSize:10,fontWeight:700,cursor:"pointer"}}>Findings</button>
-                      <button onClick={function(){setCompViewMode("tasks");}} style={{padding:"4px 12px",border:"none",background:compViewMode==="tasks"?"#6366f1":"#fff",color:compViewMode==="tasks"?"#fff":"#475569",fontSize:10,fontWeight:700,cursor:"pointer"}}>Tasks ({openTaskCount})</button>
+                    <div className="rc-seg">
+                      <button className={compViewMode==="findings"?"active":""} onClick={function(){setCompViewMode("findings");}}>Findings</button>
+                      <button className={compViewMode==="tasks"?"active":""} onClick={function(){setCompViewMode("tasks");}}>Tasks ({openTaskCount})</button>
                     </div>
                     {compViewMode==="findings"&&(
-                      <div style={{display:"flex",alignItems:"center",gap:4}}>
-                        <span style={{fontSize:9,color:"#64748b",fontWeight:700,textTransform:"uppercase"}}>Group:</span>
-                        <select value={compGroupBy} onChange={function(e){setCompGroupBy(e.target.value);}} style={{padding:"3px 6px",border:"1px solid #e2e8f0",borderRadius:4,fontSize:10,background:"#fff",cursor:"pointer"}}>
-                          <option value="auto">Auto</option>
-                          <option value="owner">Owner</option>
-                          <option value="state">State</option>
-                          <option value="none">None</option>
-                        </select>
-                      </div>
+                      <select className="rc-select" value={compFilterStatus} onChange={function(e){setCompFilterStatus(e.target.value);}} title="Show which findings">
+                        <option value="issues">Issues only</option>
+                        <option value="fail">Fail</option>
+                        <option value="missing">Missing</option>
+                        <option value="warn">Warn</option>
+                        <option value="pass">Pass</option>
+                        <option value="all">All</option>
+                      </select>
                     )}
+                    {compViewMode==="findings"&&multiState&&(
+                      <select className="rc-select" value={compFilterState} onChange={function(e){setCompFilterState(e.target.value);}} title="State">
+                        <option value="all">All states</option>
+                        {compAgg.distinctStates.map(function(st9,si){return <option key={si} value={st9}>{st9}</option>;})}
+                      </select>
+                    )}
+                    {compViewMode==="findings"&&multiOwner&&(
+                      <select className="rc-select" value={compFilterOwner} onChange={function(e){setCompFilterOwner(e.target.value);}} title="Owner">
+                        <option value="all">All owners</option>
+                        {compAgg.distinctOwners.map(function(o9,oi){return <option key={oi} value={o9}>{o9}</option>;})}
+                      </select>
+                    )}
+                    {compViewMode==="findings"&&(
+                      <select className="rc-select" value={compGroupBy} onChange={function(e){setCompGroupBy(e.target.value);}} title="Group by">
+                        <option value="auto">Group: auto</option>
+                        <option value="owner">Group: owner</option>
+                        <option value="state">Group: state</option>
+                        <option value="none">Flat: all issues</option>
+                      </select>
+                    )}
+                    {compFilterCategory!=="all"&&<span className="rc-chip">{compFilterCategory} <button onClick={function(){setCompFilterCategory("all");}}>×</button></span>}
                     <div style={{flex:1}}/>
-                    <button onClick={generateExecBriefPDF} style={{background:"#7c3aed",color:"#fff",border:"none",borderRadius:5,padding:"4px 11px",fontSize:10,fontWeight:700,cursor:"pointer"}}>Generate PDF Brief</button>
-                    <button onClick={exportTasksToCsv} style={{background:"#0284c7",color:"#fff",border:"none",borderRadius:5,padding:"4px 11px",fontSize:10,fontWeight:700,cursor:"pointer"}}>Export Tasks (CSV)</button>
-                  </div>
-                </Card>
-
-                <Card style={{marginBottom:8,padding:"7px 12px"}}>
-                  <div style={{display:"flex",gap:6,alignItems:"center",flexWrap:"wrap"}}>
-                    <span style={{fontSize:9,color:"#64748b",fontWeight:700,textTransform:"uppercase"}}>Status:</span>
-                    {[
-                      {k:"issues",l:"Issues",c:"#dc2626"},
-                      {k:"fail",l:"Fail",c:"#dc2626"},
-                      {k:"missing",l:"Missing",c:"#991b1b"},
-                      {k:"warn",l:"Warn",c:"#d97706"},
-                      {k:"pass",l:"Pass",c:"#16a34a"},
-                      {k:"all",l:"All",c:"#6366f1"}
-                    ].map(function(p,pi){
-                      var sel=compFilterStatus===p.k;
-                      return <button key={pi} onClick={function(){setCompFilterStatus(p.k);}} style={{cursor:"pointer",border:"1.5px solid "+(sel?p.c:"#e2e8f0"),background:sel?p.c:"#fff",color:sel?"#fff":"#475569",borderRadius:4,padding:"3px 8px",fontSize:10,fontWeight:700}}>{p.l}</button>;
-                    })}
-                    {multiOwner&&(
-                      <div style={{display:"flex",alignItems:"center",gap:4,marginLeft:6}}>
-                        <span style={{fontSize:9,color:"#64748b",fontWeight:700,textTransform:"uppercase"}}>Owner:</span>
-                        <select value={compFilterOwner} onChange={function(e){setCompFilterOwner(e.target.value);}} style={{padding:"3px 6px",border:"1px solid #e2e8f0",borderRadius:4,fontSize:10,background:"#fff",cursor:"pointer"}}>
-                          <option value="all">All</option>
-                          {compAgg.distinctOwners.map(function(o,oi){return <option key={oi} value={o}>{o}</option>;})}
-                        </select>
-                      </div>
-                    )}
-                    {multiState&&(
-                      <div style={{display:"flex",alignItems:"center",gap:4,marginLeft:6}}>
-                        <span style={{fontSize:9,color:"#64748b",fontWeight:700,textTransform:"uppercase"}}>State:</span>
-                        <select value={compFilterState} onChange={function(e){setCompFilterState(e.target.value);}} style={{padding:"3px 6px",border:"1px solid #e2e8f0",borderRadius:4,fontSize:10,background:"#fff",cursor:"pointer"}}>
-                          <option value="all">All</option>
-                          {compAgg.distinctStates.map(function(s,si){return <option key={si} value={s}>{s}</option>;})}
-                        </select>
-                      </div>
-                    )}
-                    {compFilterCategory!=="all"&&<span style={{fontSize:10,color:"#475569",padding:"2px 7px",background:"rgba(99,102,241,.1)",border:"1px solid rgba(99,102,241,.3)",borderRadius:4,fontWeight:700,marginLeft:6}}>{compFilterCategory} <button onClick={function(){setCompFilterCategory("all");}} style={{border:"none",background:"transparent",cursor:"pointer",color:"#6366f1",fontWeight:800,marginLeft:2,fontSize:10}}>x</button></span>}
+                    <button className="rc-btn rc-btn-primary" onClick={generateExecBriefPDF}>PDF brief</button>
+                    <button className="rc-btn" onClick={exportTasksToCsv}>CSV</button>
                   </div>
                 </Card>
 
                 {compResult.summary&&(
-                  <Card style={{marginBottom:8,padding:"8px 12px"}}>
-                    <div style={{display:"grid",gridTemplateColumns:compResult.patterns&&compResult.patterns.length?"2fr 1fr":"1fr",gap:12}}>
-                      <div>
-                        <div style={{fontWeight:700,fontSize:10,color:"#0f172a",textTransform:"uppercase",letterSpacing:".04em",marginBottom:3}}>Executive Summary</div>
-                        <div style={{fontSize:11,color:"#334155",lineHeight:1.55}}>{compResult.summary}</div>
-                      </div>
-                      {compResult.patterns&&compResult.patterns.length>0&&(
-                        <div>
-                          <div style={{fontWeight:700,fontSize:10,color:"#475569",textTransform:"uppercase",marginBottom:3}}>Patterns</div>
-                          {compResult.patterns.slice(0,4).map(function(p,pi){return <div key={pi} style={{display:"flex",gap:4,marginBottom:2,fontSize:10,color:"#334155"}}><span style={{color:"#6366f1",flexShrink:0,fontWeight:700}}>*</span>{p}</div>;})}
-                        </div>
-                      )}
-                    </div>
-                  </Card>
+                  <div style={{fontSize:12,color:"#64748b",lineHeight:1.4,margin:"0 2px 8px"}}>{compResult.summary}</div>
+                )}
+                {compViewMode==="findings"&&effectiveGroupBy!=="none"&&groupedFindings.length>1&&(
+                  <div style={{display:"flex",gap:10,marginBottom:8,fontSize:12,alignItems:"center"}}>
+                    <button onClick={function(){var n={}; groupedFindings.forEach(function(g){n[g.key]=true;}); setCompGroupOpen(n);}} style={{border:"none",background:"transparent",color:"#4f46e5",fontWeight:600,cursor:"pointer",padding:0}}>Expand all</button>
+                    <span style={{color:"#cbd5e1"}}>|</span>
+                    <button onClick={function(){var n={}; groupedFindings.forEach(function(g){n[g.key]=false;}); setCompGroupOpen(n);}} style={{border:"none",background:"transparent",color:"#64748b",fontWeight:600,cursor:"pointer",padding:0}}>Collapse all</button>
+                    <span style={{color:"#94a3b8",marginLeft:"auto"}}>{groupedFindings.length+" "+(effectiveGroupBy==="owner"?"owners":"states")+" \u00b7 tap one to open"}</span>
+                  </div>
                 )}
 
-                {compViewMode==="findings"&&groupedFindings.map(function(grp,gi){
-                  var visibleConfigCount=0;
+                {compViewMode==="findings"&&effectiveGroupBy==="none"&&(
+                  flatChecks.length>0
+                    ? <div className="rc-tblwrap"><table className="rc-tbl"><thead><tr><th></th><th>State</th><th>Finding</th><th>Current setting</th><th>Expected</th><th>Category</th><th>Status</th><th>Operators using</th><th></th></tr></thead><tbody>{flatChecks.map(function(fc){return renderCheckRow(fc.ck,fc.cf,fc.conf,true);})}</tbody></table></div>
+                    : <div style={{textAlign:"center",padding:"26px",color:"#94a3b8",fontSize:13}}>No findings match the current filter.</div>
+                )}
+                {compViewMode==="findings"&&effectiveGroupBy!=="none"&&groupedFindings.map(function(grp,gi){
+                  var grpRows=[];
                   for(var ci2=0;ci2<grp.configs.length;ci2++){
                     var entry=grp.configs[ci2];
-                    for(var cki2=0;cki2<(entry.cf.checks||[]).length;cki2++){
-                      if(passesFilter(entry.cf.checks[cki2],entry.conf)){visibleConfigCount++; break;}
-                    }
+                    var vis=(entry.cf.checks||[]).filter(function(c){return passesFilter(c,entry.conf);});
+                    for(var vj=0;vj<vis.length;vj++){ grpRows.push({ck:vis[vj],cf:entry.cf,conf:entry.conf}); }
                   }
-                  if(visibleConfigCount===0&&effectiveGroupBy!=="none") return null;
+                  if(grpRows.length===0) return null;
+                  grpRows.sort(function(a,b){return flatRank(a.ck)-flatRank(b.ck);});
+                  var gOpen=(grp.key in compGroupOpen)?compGroupOpen[grp.key]:true;
+                  var showSt=effectiveGroupBy==="owner";
                   return (
-                    <div key={gi} style={{marginBottom:10}}>
-                      {effectiveGroupBy!=="none"&&(
-                        <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",padding:"7px 12px",background:"linear-gradient(90deg,#1e293b 0%,#334155 100%)",borderRadius:"5px 5px 0 0",color:"#fff"}}>
-                          <div style={{display:"flex",gap:8,alignItems:"center",flexWrap:"wrap"}}>
-                            <span style={{fontSize:9,color:"#94a3b8",fontWeight:700,textTransform:"uppercase",letterSpacing:".05em"}}>{effectiveGroupBy==="owner"?"Owner":"State"}</span>
-                            <span style={{fontWeight:800,fontSize:13}}>{grp.key}</span>
-                            <span style={{fontSize:10,color:"#cbd5e1"}}>{grp.totalStores+" stores"}</span>
-                          </div>
-                          <div style={{fontSize:11}}>
-                            <span style={{color:"#fca5a5",fontWeight:700}}>{grp.totalIssues} issues</span>
-                            {grp.totalExposure>0&&<span style={{marginLeft:8,color:"#fca5a5",fontWeight:700}}>${grp.totalExposure.toLocaleString()}</span>}
-                          </div>
+                    <div key={gi} style={{marginBottom:8}}>
+                      <div onClick={function(){var n=Object.assign({},compGroupOpen); n[grp.key]=!gOpen; setCompGroupOpen(n);}} style={{display:"flex",justifyContent:"space-between",alignItems:"center",padding:"6px 11px",background:"linear-gradient(90deg,#1e293b 0%,#334155 100%)",borderRadius:gOpen?"7px 7px 0 0":"8px",color:"#fff",cursor:"pointer"}}>
+                        <div style={{display:"flex",gap:8,alignItems:"center",flexWrap:"wrap"}}>
+                          <span style={{fontStyle:"normal",color:"#94a3b8",fontSize:15,lineHeight:1,transform:gOpen?"rotate(90deg)":"none",transition:"transform .15s",display:"inline-block",width:10,textAlign:"center"}}>{"\u203a"}</span>
+                          <span style={{fontSize:9,color:"#94a3b8",fontWeight:700,textTransform:"uppercase",letterSpacing:".05em"}}>{effectiveGroupBy==="owner"?"Owner":"State"}</span>
+                          <span style={{fontWeight:800,fontSize:13}}>{grp.key}</span>
+                          <span style={{fontSize:10,color:"#cbd5e1"}}>{grp.totalStores+" stores"}</span>
+                        </div>
+                        <div style={{fontSize:11}}><span style={{color:"#fca5a5",fontWeight:700}}>{grp.totalIssues+" to fix"}</span></div>
+                      </div>
+                      {gOpen&&(
+                        <div className="rc-tblwrap" style={{borderTop:"none",borderTopLeftRadius:0,borderTopRightRadius:0,marginBottom:0}}>
+                          <table className="rc-tbl"><thead><tr><th></th>{showSt&&<th>State</th>}<th>Finding</th><th>Current setting</th><th>Expected</th><th>Category</th><th>Status</th><th>Operators using</th><th></th></tr></thead><tbody>{grpRows.map(function(fc){return renderCheckRow(fc.ck,fc.cf,fc.conf,showSt);})}</tbody></table>
                         </div>
                       )}
-                      {grp.configs.map(function(entry,ei){
-                        var cf2=entry.cf, conf2=entry.conf;
-                        var stateColor=cf2.overallStatus==="compliant"?"#16a34a":cf2.overallStatus==="warning"?"#d97706":"#dc2626";
-                        var stateBg=cf2.overallStatus==="compliant"?"rgba(22,163,74,.08)":cf2.overallStatus==="warning"?"rgba(217,119,6,.08)":"rgba(220,38,38,.07)";
-                        var allChecks=cf2.checks||[];
-                        var visibleChecks=sortChecks(allChecks.filter(function(c){return passesFilter(c,conf2);}));
-                        if(visibleChecks.length===0) return null;
-                        var configExposure=0;
-                        for(var ce=0;ce<allChecks.length;ce++){configExposure+=(Number(allChecks[ce].perStoreExposureUSD)||0)*conf2.storeNumbers.length;}
-                        var collapsed=!!compCollapsed[cf2.configIndex];
-                        return (
-                          <div key={ei} style={{background:"#fff",border:"1px solid #e2e8f0",borderLeft:"4px solid "+stateColor,borderRadius:effectiveGroupBy!=="none"?0:5,padding:"8px 12px",marginBottom:6}}>
-                            <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start",flexWrap:"wrap",gap:5,marginBottom:collapsed?0:6}}>
-                              <div style={{flex:1,minWidth:0}}>
-                                <div style={{display:"flex",gap:5,alignItems:"center",flexWrap:"wrap"}}>
-                                  <span style={{background:stateBg,color:stateColor,border:"1px solid "+stateColor+"44",borderRadius:3,padding:"1px 6px",fontSize:9,fontWeight:700,textTransform:"uppercase"}}>{cf2.overallStatus||"unknown"}</span>
-                                  {effectiveGroupBy!=="state"&&<span style={{fontSize:10,color:"#64748b",fontWeight:700}}>{conf2.assignedStateName||conf2.assignedState}</span>}
-                                  <span style={{fontWeight:700,fontSize:12}}>{"Config #"+(cf2.configIndex+1)}</span>
-                                  <span style={{fontSize:10,color:"#64748b"}}>{conf2.storeNumbers.length+" store"+(conf2.storeNumbers.length!==1?"s":"")}</span>
-                                  {effectiveGroupBy!=="owner"&&conf2.owners&&conf2.owners.length===1&&<span style={{fontSize:10,color:"#64748b"}}>&middot; {conf2.primaryOwner}</span>}
-                                  {cf2.totalApplicableLaws&&<span style={{fontSize:9,color:"#94a3b8"}}>{"("+cf2.configuredCount+"/"+cf2.totalApplicableLaws+" configured)"}</span>}
-                                </div>
-                              </div>
-                              <div style={{display:"flex",gap:6,alignItems:"center"}}>
-                                <span style={{fontSize:10,color:"#64748b"}}>{visibleChecks.length+"/"+allChecks.length}</span>
-                                {configExposure>0&&<span style={{fontSize:11,fontWeight:800,color:"#dc2626"}}>${configExposure.toLocaleString()}</span>}
-                                <button onClick={function(){var n=Object.assign({},compCollapsed); n[cf2.configIndex]=!collapsed; setCompCollapsed(n);}} style={{border:"1px solid #e2e8f0",background:"#fff",borderRadius:4,padding:"2px 7px",fontSize:10,cursor:"pointer",fontWeight:700,color:"#475569"}}>{collapsed?"+":"-"}</button>
-                              </div>
-                            </div>
-                            {!collapsed&&visibleChecks.map(function(ck,cki){
-                              var sevColor=ck.severity==="critical"?"#dc2626":ck.severity==="high"?"#dc2626":ck.severity==="medium"?"#d97706":ck.severity==="low"?"#16a34a":"#64748b";
-                              var stColor=ck.status==="pass"?"#16a34a":ck.status==="warn"?"#d97706":ck.status==="fail"?"#dc2626":ck.status==="missing"?"#991b1b":"#64748b";
-                              var dKey=cf2.configIndex+"::"+ck.lawId+"::"+(ck.minorAge||0);
-                              var dec=compDecisions[dKey]||{};
-                              return (
-                                <div key={cki} style={{background:dec.acked?"rgba(99,102,241,.04)":"#fafbfc",border:"1px solid #e8edf3",borderLeft:"3px solid "+stColor,borderRadius:4,padding:"6px 9px",marginBottom:4}}>
-                                  <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start",flexWrap:"wrap",gap:5,marginBottom:4}}>
-                                    <div style={{flex:1,minWidth:0}}>
-                                      <div style={{display:"flex",gap:3,alignItems:"center",flexWrap:"wrap",marginBottom:2}}>
-                                        <span style={{background:stColor+"15",color:stColor,padding:"1px 6px",borderRadius:3,fontSize:9,fontWeight:700,textTransform:"uppercase"}}>{ck.status}</span>
-                                        <span style={{background:sevColor+"15",color:sevColor,padding:"1px 6px",borderRadius:3,fontSize:9,fontWeight:700,textTransform:"uppercase"}}>{ck.severity}</span>
-                                        {ck.category&&<span style={{fontSize:9,color:"#6366f1",background:"rgba(99,102,241,.08)",padding:"1px 6px",borderRadius:3,fontWeight:700}}>{ck.category}</span>}
-                                        {ck.csvHasRow===false&&<span style={{fontSize:9,color:"#991b1b",background:"rgba(153,27,27,.08)",padding:"1px 6px",borderRadius:3,fontWeight:700}}>NOT IN CSV</span>}
-                                        {ck.minorAge>0&&<span style={{fontSize:9,color:"#64748b",fontWeight:700}}>Age {ck.minorAge}</span>}
-                                      </div>
-                                      <div style={{fontWeight:700,fontSize:12,color:"#0f172a"}}>{ck.lawName||ck.lawId}</div>
-                                    </div>
-                                    {Number(ck.perStoreExposureUSD)>0&&<div style={{fontSize:11,fontWeight:800,color:"#dc2626",flexShrink:0,whiteSpace:"nowrap"}}>{"$"+(Number(ck.perStoreExposureUSD)*conf2.storeNumbers.length).toLocaleString()}</div>}
-                                  </div>
-                                  <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:4,marginBottom:ck.issue||ck.recommendation?4:0,fontSize:10}}>
-                                    <div style={{background:"#fff",border:"1px solid #e8edf3",borderRadius:3,padding:"3px 6px"}}>
-                                      <span style={{fontSize:9,color:"#94a3b8",fontWeight:700,textTransform:"uppercase",marginRight:3}}>Expected:</span>
-                                      <span style={{color:"#334155"}}>{ck.expected||"-"}</span>
-                                    </div>
-                                    <div style={{background:"#fff",border:"1px solid #e8edf3",borderRadius:3,padding:"3px 6px"}}>
-                                      <span style={{fontSize:9,color:"#94a3b8",fontWeight:700,textTransform:"uppercase",marginRight:3}}>Configured:</span>
-                                      <span style={{color:"#334155"}}>{ck.actual||"-"}</span>
-                                    </div>
-                                  </div>
-                                  {ck.issue&&<div style={{background:"rgba(220,38,38,.04)",borderLeft:"2px solid #dc2626",borderRadius:3,padding:"3px 7px",marginBottom:3,fontSize:10,color:"#7f1d1d"}}><strong>Issue:</strong> {ck.issue}</div>}
-                                  {ck.recommendation&&<div style={{background:"rgba(99,102,241,.04)",borderLeft:"2px solid #6366f1",borderRadius:3,padding:"3px 7px",marginBottom:3,fontSize:10,color:"#312e81"}}><strong>Action:</strong> {ck.recommendation}</div>}
-                                  <div style={{display:"flex",gap:5,alignItems:"center"}}>
-                                    <label style={{fontSize:10,color:"#475569",display:"flex",alignItems:"center",gap:3,cursor:"pointer",whiteSpace:"nowrap"}}>
-                                      <input type="checkbox" checked={!!dec.acked} onChange={function(e){toggleDecision(dKey,"acked",e.target.checked);}}/>
-                                      Ack
-                                    </label>
-                                    <input placeholder="Note..." value={dec.note||""} onChange={function(e){toggleDecision(dKey,"note",e.target.value);}} style={{flex:1,padding:"3px 6px",border:"1px solid #e2e8f0",borderRadius:3,fontSize:10,outline:"none"}}/>
-                                    {ck.citation&&<a href={ck.citation} target="_blank" rel="noreferrer" style={{fontSize:9,color:"#6366f1",textDecoration:"none"}}>Source</a>}
-                                  </div>
-                                </div>
-                              );
-                            })}
-                          </div>
-                        );
-                      })}
                     </div>
                   );
                 })}
 
+                {renderDrawer()}
                 {compViewMode==="tasks"&&(
                   <div>
                     <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:6,gap:6,flexWrap:"wrap"}}>
@@ -2520,7 +2444,7 @@ export default function App(){
                       <button onClick={function(){bulkAcknowledgeVisibleTasks(visibleTasks);}} disabled={visibleTasks.length===0} style={{background:visibleTasks.length===0?"#e2e8f0":"#16a34a",color:"#fff",border:"none",borderRadius:4,padding:"4px 11px",fontSize:10,fontWeight:700,cursor:visibleTasks.length===0?"not-allowed":"pointer"}}>Acknowledge All Visible ({visibleTasks.length})</button>
                     </div>
                     <div style={{background:"#fff",border:"1px solid #e2e8f0",borderRadius:5,overflow:"hidden"}}>
-                      <div style={{display:"grid",gridTemplateColumns:"30px 60px 70px 100px 1fr 90px 80px 60px 90px 200px",gap:0,background:"#1e293b",color:"#cbd5e1",fontSize:9,fontWeight:700,textTransform:"uppercase",letterSpacing:".04em",padding:"5px 0"}}>
+                      <div style={{display:"grid",gridTemplateColumns:"30px 60px 70px 100px 1fr 90px 80px 60px 200px",gap:0,background:"#1e293b",color:"#cbd5e1",fontSize:9,fontWeight:700,textTransform:"uppercase",letterSpacing:".04em",padding:"5px 0"}}>
                         <div style={{padding:"0 6px",textAlign:"center"}}>#</div>
                         <div style={{padding:"0 6px"}}>Status</div>
                         <div style={{padding:"0 6px"}}>Severity</div>
@@ -2529,7 +2453,6 @@ export default function App(){
                         <div style={{padding:"0 6px"}}>Owner</div>
                         <div style={{padding:"0 6px"}}>State</div>
                         <div style={{padding:"0 6px",textAlign:"right"}}>Stores</div>
-                        <div style={{padding:"0 6px",textAlign:"right"}}>Exposure</div>
                         <div style={{padding:"0 6px"}}>Assignee / Note</div>
                       </div>
                       {visibleTasks.length===0&&<div style={{padding:"20px",textAlign:"center",color:"#94a3b8",fontSize:12}}>No tasks match the current filters.</div>}
@@ -2537,7 +2460,7 @@ export default function App(){
                         var tStColor=t.status==="warn"?"#d97706":t.status==="fail"?"#dc2626":t.status==="missing"?"#991b1b":"#64748b";
                         var tSevColor=t.severity==="critical"?"#dc2626":t.severity==="high"?"#dc2626":t.severity==="medium"?"#d97706":t.severity==="low"?"#16a34a":"#64748b";
                         return (
-                          <div key={ti} style={{display:"grid",gridTemplateColumns:"30px 60px 70px 100px 1fr 90px 80px 60px 90px 200px",gap:0,borderTop:"1px solid #e8edf3",fontSize:10,padding:"6px 0",alignItems:"center",background:t.acked?"rgba(99,102,241,.04)":"#fff"}}>
+                          <div key={ti} style={{display:"grid",gridTemplateColumns:"30px 60px 70px 100px 1fr 90px 80px 60px 200px",gap:0,borderTop:"1px solid #e8edf3",fontSize:10,padding:"6px 0",alignItems:"center",background:t.acked?"rgba(99,102,241,.04)":"#fff"}}>
                             <div style={{padding:"0 6px",textAlign:"center",color:"#94a3b8",fontWeight:700}}>{ti+1}</div>
                             <div style={{padding:"0 6px"}}><span style={{background:tStColor+"15",color:tStColor,padding:"1px 5px",borderRadius:3,fontSize:9,fontWeight:700,textTransform:"uppercase"}}>{t.status}</span></div>
                             <div style={{padding:"0 6px"}}><span style={{background:tSevColor+"15",color:tSevColor,padding:"1px 5px",borderRadius:3,fontSize:9,fontWeight:700,textTransform:"uppercase"}}>{t.severity}</span></div>
@@ -2549,7 +2472,6 @@ export default function App(){
                             <div style={{padding:"0 6px",fontSize:10,color:"#475569",overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{t.owner}</div>
                             <div style={{padding:"0 6px",fontSize:10,color:"#475569"}}>{t.state}</div>
                             <div style={{padding:"0 6px",textAlign:"right",fontWeight:700,color:"#475569"}}>{t.storeCount}</div>
-                            <div style={{padding:"0 6px",textAlign:"right",fontWeight:800,color:t.totalExposure>0?"#dc2626":"#94a3b8"}}>{t.totalExposure>0?"$"+t.totalExposure.toLocaleString():"-"}</div>
                             <div style={{padding:"0 6px",display:"flex",gap:3,alignItems:"center"}}>
                               <input type="checkbox" checked={t.acked} onChange={function(e){toggleDecision(t.key,"acked",e.target.checked);}}/>
                               <input placeholder="Assignee" value={t.assignee} onChange={function(e){var n=Object.assign({},compTaskAssignees); n[t.key]=e.target.value; setCompTaskAssignees(n);}} style={{width:65,padding:"2px 4px",border:"1px solid #e2e8f0",borderRadius:3,fontSize:9}}/>
@@ -2563,151 +2485,12 @@ export default function App(){
                 )}
               </div>
             )}
->>>>>>> Stashed changes
           </div>
-        )}
+        );
+      })()}
 
-        {/* FEDERAL UPDATES */}
-        {tab===7 && (
-          <div>
-            <Tip>💡 The regulatory environment shifted in late 2024. Monitor DOL rulemaking, WHD enforcement priorities, and potential reversals of paused rules.</Tip>
-            {FEDERAL_UPDATES.map((f,i)=>(
-              <Card key={i}>
-                <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start",marginBottom:8}}>
-                  <div style={{flex:1}}><div style={{display:"flex",gap:8,alignItems:"center",marginBottom:4,flexWrap:"wrap"}}><Bdg t={f.cat}/><span style={{fontWeight:700,fontSize:13}}>{f.title}</span></div><div style={{fontSize:11,color:"#94a3b8"}}>{f.date}</div></div>
-                  <div style={{display:"flex",gap:8,alignItems:"center",marginLeft:10,flexShrink:0}}>
-                    <Bdg t={f.status} c={f.status==="Active"?"#16a34a":f.status==="Blocked"?"#dc2626":f.status==="Expired"?"#64748b":"#16a34a"} bg={f.status==="Active"?"rgba(22,163,74,.08)":f.status==="Blocked"?"rgba(220,38,38,.07)":"rgba(100,116,139,.08)"}/>
-                    <Pill r={f.sev} t={f.sev.toUpperCase()}/>
-                  </div>
-                </div>
-                <div style={{fontSize:12,color:"#475569",lineHeight:1.6,marginBottom:8}}>{f.detail}</div>
-                <SrcLink url={f.src} label="DOL Source"/>
-              </Card>
-            ))}
-          </div>
-        )}
-
-        {/* UPCOMING CHANGES */}
-        {tab===8 && (()=>{
-          const SECTION_ORDER = ["Min Wage","Tipped Wage","Sick Leave","Minor Labor","Break Laws","Overtime","Scheduling","Restaurant-Specific"];
-          const SECTION_META = {
-            "Min Wage":      {icon:"💵", label:"Minimum Wage",        desc:"State and federal minimum wage increases and indexing changes"},
-            "Tipped Wage":   {icon:"🍽️", label:"Tipped Wage",         desc:"Tip credit changes, phase-outs, and pending federal legislation"},
-            "Sick Leave":    {icon:"🏥", label:"Sick Leave",           desc:"New state sick leave mandates and expansions"},
-            "Minor Labor":   {icon:"🧑‍🍳", label:"Minor Labor",         desc:"Child labor enforcement changes and age-specific rule updates"},
-            "Break Laws":    {icon:"⏸️", label:"Break Laws",           desc:"Meal and rest break regulation changes and new recordkeeping requirements"},
-            "Overtime":      {icon:"⏱️", label:"Overtime",             desc:"OT threshold rulemakings and state-level threshold proposals"},
-            "Scheduling":    {icon:"📅", label:"Scheduling",           desc:"Fair Workweek expansions and new predictive scheduling laws"},
-            "Restaurant-Specific":{icon:"🏢", label:"Restaurant-Specific / Misc", desc:"Industry-wide laws, franchise liability, AI tools, and federal wage bills"},
-          };
-
-          const grouped = SECTION_ORDER.reduce((acc,cat)=>{
-            const items = upcomingData.filter(u=>u.cat===cat&&(upYr==="all"||String(u.yr)===upYr));
-            if(items.length>0) acc[cat]=items;
-            return acc;
-          },{});
-
-          const totalShown = Object.values(grouped).flat().length;
-
-          return (
-            <div>
-              <Tip>💡 Tracking {upcomingData.length} confirmed and proposed regulatory changes for 2026–2027. Items marked "Pending" are active legislation — verify timing with official sources before acting.</Tip>
-
-              {/* KPIs */}
-              <div style={{display:"flex",gap:12,marginBottom:16,flexWrap:"wrap"}}>
-                <KPI label="Total Tracked" value={upcomingData.length} sub="2026–2027 changes" color="#6366f1"/>
-                <KPI label="2026 Changes" value={upcomingData.filter(u=>u.yr===2026).length} sub="This calendar year" color="#d97706"/>
-                <KPI label="2027 Changes" value={upcomingData.filter(u=>u.yr===2027).length} sub="Planning horizon" color="#7c3aed"/>
-                <KPI label="Critical Impact" value={upcomingData.filter(u=>u.impact==="critical").length} sub="Immediate action needed" color="#dc2626"/>
-              </div>
-
-              {/* Year filter + summary */}
-              <div style={{display:"flex",gap:10,marginBottom:20,flexWrap:"wrap",alignItems:"center"}}>
-                <div style={{display:"flex",gap:6}}>
-                  {["all","2026","2027"].map(yr=>(
-                    <button key={yr} onClick={()=>setUpYr(yr)} style={{border:"1px solid #e2e8f0",borderRadius:6,padding:"5px 16px",fontSize:11,fontWeight:600,cursor:"pointer",background:upYr===yr?"#6366f1":"#fff",color:upYr===yr?"#fff":"#64748b"}}>
-                      {yr==="all"?"All Years":yr}
-                    </button>
-                  ))}
-                </div>
-                <span style={{fontSize:11,color:"#94a3b8"}}>{totalShown} item{totalShown!==1?"s":""} across {Object.keys(grouped).length} categor{Object.keys(grouped).length!==1?"ies":"y"}</span>
-              </div>
-
-              {/* Sectioned content */}
-              {Object.entries(grouped).map(([cat,items])=>{
-                const meta = SECTION_META[cat]||{icon:"📌",label:cat,desc:""};
-                const cc = CAT_COLORS[cat]||{c:"#6366f1",bg:"rgba(99,102,241,.08)"};
-                return (
-                  <div key={cat} style={{marginBottom:28}}>
-                    {/* Section header */}
-                    <div style={{display:"flex",alignItems:"center",gap:12,marginBottom:12,paddingBottom:10,borderBottom:`2px solid ${cc.c}22`}}>
-                      <div style={{background:cc.bg,border:`1.5px solid ${cc.c}44`,borderRadius:10,padding:"8px 14px",display:"flex",alignItems:"center",gap:8}}>
-                        <span style={{fontSize:18}}>{meta.icon}</span>
-                        <div>
-                          <div style={{fontWeight:800,fontSize:14,color:cc.c}}>{meta.label}</div>
-                          <div style={{fontSize:10,color:"#94a3b8",marginTop:1}}>{meta.desc}</div>
-                        </div>
-                      </div>
-                      <div style={{display:"flex",gap:6,marginLeft:"auto",flexShrink:0}}>
-                        <span style={{background:"rgba(217,119,6,.1)",color:"#d97706",border:"1px solid rgba(217,119,6,.25)",borderRadius:6,padding:"2px 10px",fontSize:11,fontWeight:700}}>
-                          {items.filter(u=>u.yr===2026).length} in 2026
-                        </span>
-                        {items.filter(u=>u.yr===2027).length>0 && (
-                          <span style={{background:"rgba(124,58,237,.1)",color:"#7c3aed",border:"1px solid rgba(124,58,237,.25)",borderRadius:6,padding:"2px 10px",fontSize:11,fontWeight:700}}>
-                            {items.filter(u=>u.yr===2027).length} in 2027
-                          </span>
-                        )}
-                        {items.filter(u=>u.impact==="critical").length>0 && (
-                          <span style={{background:"rgba(220,38,38,.1)",color:"#dc2626",border:"1px solid rgba(220,38,38,.25)",borderRadius:6,padding:"2px 10px",fontSize:11,fontWeight:700}}>
-                            {items.filter(u=>u.impact==="critical").length} critical
-                          </span>
-                        )}
-                      </div>
-                    </div>
-
-                    {/* Item cards */}
-                    <div style={{display:"flex",flexDirection:"column",gap:10}}>
-                      {items.map((u,i)=>{
-                        const impR=u.impact==="critical"?"critical":u.impact==="high"?"high":u.impact==="medium"?"medium":"low";
-                        const isPending=u.eff.toLowerCase().includes("pending");
-                        return (
-                          <div key={i} style={{background:"#fff",border:"1px solid #e2e8f0",borderRadius:10,padding:"14px 18px",boxShadow:"0 1px 3px rgba(0,0,0,.04)",borderLeft:`4px solid ${cc.c}`,display:"flex",gap:14,alignItems:"flex-start"}}>
-                            {/* Left: year badge */}
-                            <div style={{flexShrink:0,display:"flex",flexDirection:"column",alignItems:"center",gap:6,paddingTop:2}}>
-                              <div style={{background:u.yr===2026?"rgba(217,119,6,.12)":"rgba(124,58,237,.1)",color:u.yr===2026?"#d97706":"#7c3aed",border:`1px solid ${u.yr===2026?"rgba(217,119,6,.3)":"rgba(124,58,237,.3)"}`,borderRadius:6,padding:"3px 8px",fontSize:12,fontWeight:800,minWidth:44,textAlign:"center"}}>{u.yr}</div>
-                              <Pill r={impR} t={u.impact==="critical"?"CRIT":u.impact==="high"?"HIGH":u.impact==="medium"?"MED":"LOW"}/>
-                            </div>
-                            {/* Right: content */}
-                            <div style={{flex:1,minWidth:0}}>
-                              <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start",flexWrap:"wrap",gap:6,marginBottom:4}}>
-                                <div style={{display:"flex",gap:6,alignItems:"center",flexWrap:"wrap"}}>
-                                  <span style={{fontWeight:700,fontSize:13,color:"#0f172a"}}>{u.title}</span>
-                                  {isPending&&<Bdg t="PENDING" c="#64748b" bg="rgba(100,116,139,.08)"/>}
-                                </div>
-                              </div>
-                              <div style={{display:"flex",gap:10,alignItems:"center",marginBottom:7,flexWrap:"wrap"}}>
-                                <span style={{fontSize:11,color:"#64748b",fontWeight:600}}>📍 {u.j}</span>
-                                <span style={{color:"#e2e8f0"}}>│</span>
-                                <span style={{fontSize:11,fontWeight:600,color:isPending?"#94a3b8":"#475569"}}>⏰ {u.eff}</span>
-                              </div>
-                              <div style={{fontSize:12,color:"#475569",lineHeight:1.65,marginBottom:8}}>{u.detail}</div>
-                              <div style={{display:"flex",alignItems:"center",gap:12}}>
-                                <SrcLink url={u.src} label="Official Reference"/>
-                                {isPending&&<span style={{fontSize:10,color:"#94a3b8",fontStyle:"italic"}}>Track at congress.gov or state legislature site</span>}
-                              </div>
-                            </div>
-                          </div>
-                        );
-                      })}
-                    </div>
-                  </div>
-                );
-              })}
-              {totalShown===0&&<div style={{textAlign:"center",padding:"40px 20px",color:"#94a3b8",background:"#fff",borderRadius:12,border:"1px solid #e2e8f0"}}>No items match the selected year filter.</div>}
-            </div>
-          );
-        })()}
       </div>
     </div>
+    </ErrorBoundary>
   );
 }

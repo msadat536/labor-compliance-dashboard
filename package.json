@@ -1,5 +1,6 @@
 {
   "name": "labor-compliance-dashboard",
+  "homepage": "https://msadat536.github.io/labor-compliance-dashboard",
   "version": "0.1.0",
   "private": true,
   "dependencies": {
